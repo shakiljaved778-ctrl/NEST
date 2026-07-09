@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #12294b;
+  --navy-deep: #0c1d37;
+  --gold: #c9a227;
+  --teal: #0f9d8a;
+  --pearl: #f5f7fb;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-pearl text-ink font-body antialiased;
+}
+
+/* RTL niceties for Arabic / Urdu inside the phone prototype */
+[dir="rtl"] {
+  letter-spacing: 0;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-card border border-navy-100/60;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-navy text-white font-semibold px-4 py-3 transition hover:bg-navy-600 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center rounded-xl bg-gold text-navy-800 font-semibold px-4 py-3 transition hover:bg-gold-light disabled:opacity-40;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-xl border border-navy-200 text-navy font-semibold px-4 py-3 transition hover:bg-navy-50;
+  }
+  .kicker {
+    @apply text-[11px] font-bold uppercase tracking-[0.18em] text-teal;
+  }
+  .kicker-gold {
+    @apply text-[11px] font-bold uppercase tracking-[0.18em] text-gold;
+  }
+}
+
+/* Thin scrollbars inside phone frames */
+.phone-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.phone-scroll::-webkit-scrollbar-thumb {
+  background: rgba(18, 41, 75, 0.18);
+  border-radius: 4px;
+}
+
+/* Simple pulse for live-tracking dot */
+@keyframes nest-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(15, 157, 138, 0.45); }
+  70% { box-shadow: 0 0 0 12px rgba(15, 157, 138, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(15, 157, 138, 0); }
+}
+.pulse-dot {
+  animation: nest-pulse 1.8s infinite;
+}
