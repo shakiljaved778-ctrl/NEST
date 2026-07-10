@@ -16,6 +16,8 @@ tags:
   - name: pricing
   - name: matching
   - name: bookings
+  - name: payments
+  - name: providers
   - name: ai
   - name: admin
 
@@ -176,6 +178,173 @@ paths:
                 properties:
                   booking: { $ref: "#/components/schemas/Booking" }
         "404": { $ref: "#/components/responses/NotFound" }
+
+  /payments:
+    get:
+      tags: [payments]
+      summary: Payments + refunds ledger (admin)
+      operationId: listPayments
+      responses:
+        "200":
+          description: All payments and refunds, newest first
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payments:
+                    type: array
+                    items: { $ref: "#/components/schemas/Payment" }
+                  refunds:
+                    type: array
+                    items: { $ref: "#/components/schemas/Refund" }
+
+  /payments/intent:
+    post:
+      tags: [payments]
+      summary: Create a payment intent for a booking (idempotent per booking)
+      operationId: createPaymentIntent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bookingId]
+              properties:
+                bookingId: { type: string }
+                method: { $ref: "#/components/schemas/PaymentMethod" }
+      responses:
+        "201":
+          description: Payment intent (status requires_confirmation)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payment: { $ref: "#/components/schemas/Payment" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /payments/confirm:
+    post:
+      tags: [payments]
+      summary: Pre-authorize — hold funds until job completion
+      description: >
+        Capture happens automatically when the booking is PATCHed to status
+        "completed"; the captured payment (with e-invoice) is returned on that call.
+      operationId: confirmPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [paymentId]
+              properties:
+                paymentId: { type: string }
+      responses:
+        "200":
+          description: Authorized payment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payment: { $ref: "#/components/schemas/Payment" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /refunds:
+    post:
+      tags: [payments]
+      summary: Partial or full refund against a captured payment
+      operationId: createRefund
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [paymentId, amount]
+              properties:
+                paymentId: { type: string }
+                amount: { type: number }
+                reason: { type: string }
+      responses:
+        "201":
+          description: Refund created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refund: { $ref: "#/components/schemas/Refund" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /providers/{id}/quality:
+    get:
+      tags: [providers]
+      summary: AI quality score for a provider
+      operationId: getProviderQuality
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          example: p1
+      responses:
+        "200":
+          description: Quality signals + weighted 0–100 score with band and flags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  providerId: { type: string }
+                  signals: { $ref: "#/components/schemas/QualitySignals" }
+                  quality: { $ref: "#/components/schemas/QualityScore" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /ai/translate:
+    post:
+      tags: [ai]
+      summary: Real-time chat translation across the 6 pilot languages
+      operationId: aiTranslate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message, targetLang]
+              properties:
+                message: { type: string }
+                targetLang: { $ref: "#/components/schemas/LanguageCode" }
+                sourceLang: { $ref: "#/components/schemas/LanguageCode" }
+      responses:
+        "200":
+          description: Translation with emergency flag
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TranslationResult" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /admin/fraud:
+    get:
+      tags: [admin]
+      summary: Live fraud scan over marketplace data
+      operationId: adminFraud
+      responses:
+        "200":
+          description: Fraud flags ranked by risk
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flags:
+                    type: array
+                    items: { $ref: "#/components/schemas/FraudFlag" }
+                  scannedAt: { type: string, format: date-time }
 
   /ai/assistant:
     post:
@@ -472,6 +641,101 @@ components:
         refundRisk: { type: number, minimum: 0, maximum: 1 }
         humanEscalation: { type: boolean }
         summary: { type: string, maxLength: 140 }
+
+    PaymentMethod:
+      type: string
+      enum: [card, apple_pay, google_pay, wallet]
+
+    PaymentStatus:
+      type: string
+      enum: [requires_confirmation, authorized, captured, refunded, partially_refunded, cancelled]
+
+    PaymentSplit:
+      type: object
+      properties:
+        gross: { type: number }
+        vat: { type: number, description: "0 until Qatar's 5% VAT lands (H2-2026)" }
+        commission: { type: number }
+        commissionRate: { type: number, description: "tiered by category: cleaning 20%, technical 15%, salon 25%, care 12%" }
+        providerNet: { type: number }
+
+    Invoice:
+      type: object
+      properties:
+        number: { type: string, example: INV-2026-000123 }
+        issuedAt: { type: string, format: date-time }
+        currency: { type: string, const: QAR }
+        lines:
+          type: array
+          items: { $ref: "#/components/schemas/QuoteLine" }
+        vatRate: { type: number }
+        vatAmount: { type: number }
+        total: { type: number }
+
+    Payment:
+      type: object
+      properties:
+        id: { type: string, example: PAY-1000 }
+        bookingId: { type: string }
+        method: { $ref: "#/components/schemas/PaymentMethod" }
+        status: { $ref: "#/components/schemas/PaymentStatus" }
+        amount: { type: number }
+        refundedAmount: { type: number }
+        split: { $ref: "#/components/schemas/PaymentSplit" }
+        invoice: { $ref: "#/components/schemas/Invoice" }
+        createdAt: { type: string, format: date-time }
+        capturedAt: { type: string, format: date-time }
+
+    Refund:
+      type: object
+      properties:
+        id: { type: string, example: RF-100 }
+        paymentId: { type: string }
+        amount: { type: number }
+        reason: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    QualitySignals:
+      type: object
+      properties:
+        rating: { type: number, description: "1–5" }
+        checklistCompletion: { type: number }
+        photoCompliance: { type: number }
+        chatSentiment: { type: number, description: "-1…1" }
+        repeatRate: { type: number }
+        refundRate: { type: number }
+        onTimeRate: { type: number }
+
+    QualityScore:
+      type: object
+      properties:
+        score: { type: integer, minimum: 0, maximum: 100 }
+        band: { type: string, enum: [excellent, good, needs_improvement, at_risk] }
+        breakdown:
+          type: object
+          additionalProperties: { type: number }
+        flags:
+          type: array
+          items: { type: string }
+
+    TranslationResult:
+      type: object
+      properties:
+        translation: { type: string }
+        sourceLang: { $ref: "#/components/schemas/LanguageCode" }
+        targetLang: { $ref: "#/components/schemas/LanguageCode" }
+        translated: { type: boolean, description: "false = passthrough degradation mode" }
+        flagEmergency: { type: boolean }
+
+    FraudFlag:
+      type: object
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [coupon_abuse, refund_abuse, fake_bookings, rating_manipulation] }
+        entity: { type: string }
+        score: { type: number, minimum: 0, maximum: 1 }
+        signal: { type: string }
+        suggestedAction: { type: string }
 
     MarketplaceStats:
       type: object

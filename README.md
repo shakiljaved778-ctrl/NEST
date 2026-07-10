@@ -11,7 +11,8 @@ products**, built from the NEST master blueprint and pitch deck.
 | **Customer app** | [`/customer`](http://localhost:4200/customer) | Full interactive phone wireframe: splash → language (6 languages, Arabic/Urdu RTL) → OTP login → zone selection → home → service & packages → add-ons → schedule → address → payment & coupons → AI matching → confirmation → live tracking → chat with AI translation → rating, plus booking history, Nest AI assistant, wallet & coupons, Nest+ subscriptions, complaints/refunds and family profiles |
 | **Provider app** | [`/provider`](http://localhost:4200/provider) | Onboarding, KYC documents, skills & tests, availability, job requests with accept/decline, job details, navigation, service checklist, before/after photos, job completion & payout, earnings, ratings/quality score, training academy |
 | **Admin & Ops** | [`/admin`](http://localhost:4200/admin) | AI daily summary, KPIs, **90-day pilot scoreboard (Seed-readiness gates)**, live bookings table with manual assignment, provider management & verification queue, 15-service catalog manager, dynamic pricing engine & commissions, disputes/refunds with AI triage, coupon campaigns, demand heatmap with SLA alerts, fraud monitor |
-| **AI layer** | `/api/ai/*` | Booking assistant (safety-aware routing to the right service), provider matching (weighted scoring), dynamic pricing, complaint classifier, admin daily summary |
+| **AI layer** | `/api/ai/*` | Booking assistant (safety-aware routing to the right service), provider matching (weighted scoring), dynamic pricing, complaint classifier, 6-language chat translation with emergency flagging, provider quality scoring, fraud detection, admin daily summary |
+| **Payments** | `/api/payments/*` | Mock-PSP money engine mirroring the production flow: intent → pre-auth → capture on completion, tiered commission split, VAT-ready e-invoices, partial/full refunds |
 
 ## Quick start
 
@@ -47,16 +48,23 @@ app/                    Next.js App Router
     bookings/           GET/POST /api/bookings, GET/PATCH /api/bookings/:id
     ai/assistant/       POST /api/ai/assistant   — AI booking assistant
     ai/complaint/       POST /api/ai/complaint   — AI complaint classifier
+    ai/translate/       POST /api/ai/translate   — 6-language chat translation
+    payments/           POST /api/payments/intent|confirm, GET /api/payments
+    refunds/            POST /api/refunds        — partial/full refunds
+    providers/          GET  /api/providers/:id/quality — AI quality score
     admin/summary/      GET  /api/admin/summary  — stats + AI daily summary
     admin/pilot/        GET  /api/admin/pilot    — pilot scoreboard (Seed gates)
+    admin/fraud/        GET  /api/admin/fraud    — live fraud scan
 components/             Customer / provider / admin UIs, phone frame
 lib/                    Domain layer: catalog (15 services), zones, i18n (6 languages),
-                        pricing engine, provider matching, AI modules, pilot scoreboard,
-                        in-memory store
+                        pricing engine, provider matching, AI modules, chat translation,
+                        payments & commission engine, quality scoring, fraud detection,
+                        pilot scoreboard, in-memory store
 prisma/schema.prisma    Production PostgreSQL schema (users, providers, KYC documents,
                         bookings, payments, refunds, complaints, coupons, subscriptions,
                         wallet, chat, notifications, AI logs, fraud flags, audit logs)
-tests/                  Vitest unit suites: pricing, matching, AI, booking store, pilot
+tests/                  Vitest unit suites: pricing, matching, AI, booking store, pilot,
+                        payments, translation, quality, fraud
 docs/                   PRD & personas, design system, architecture, API reference,
                         OpenAPI spec, AI orchestration & prompt registry, store
                         submission kit (EN/AR), launch checklist & iteration playbook,

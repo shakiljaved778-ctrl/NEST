@@ -50,11 +50,21 @@ const COMPLAINTS = [
   { id: "C-309", booking: "NB-1032", category: "poor_quality", priority: "medium", text: "AC still noisy after deep clean, rework requested.", escalated: false, refund: null },
 ];
 
-const FRAUD_FLAGS = [
-  { id: "F-88", type: "Coupon abuse", entity: "Customer +974 ••2231", score: 0.82, note: "6 accounts, same device, NEST10 reuse", action: "Block coupons" },
-  { id: "F-87", type: "Fake reviews", entity: "Provider p9", score: 0.64, note: "Rating burst from 3 linked accounts", action: "Review" },
-  { id: "F-86", type: "Refund abuse", entity: "Customer +974 ••8817", score: 0.58, note: "4 refund claims in 30 days, no photos", action: "Manual review" },
+/** Example patterns shown when the live scan (GET /api/admin/fraud) finds nothing. */
+const FRAUD_EXAMPLES = [
+  { id: "F-88", type: "coupon_abuse", entity: "Customer +974 ••2231", score: 0.82, signal: "6 accounts, same device, NEST10 reuse", suggestedAction: "Block coupons" },
+  { id: "F-87", type: "rating_manipulation", entity: "Provider p9", score: 0.64, signal: "Rating burst from 3 linked accounts", suggestedAction: "Review" },
+  { id: "F-86", type: "refund_abuse", entity: "Customer +974 ••8817", score: 0.58, signal: "4 refund claims in 30 days, no photos", suggestedAction: "Manual review" },
 ];
+
+interface FraudFlagRow {
+  id: string;
+  type: string;
+  entity: string;
+  score: number;
+  signal: string;
+  suggestedAction: string;
+}
 
 export default function AdminDashboard() {
   const [tab, setTab] = useState<Tab>("overview");
@@ -62,12 +72,17 @@ export default function AdminDashboard() {
   const [summary, setSummary] = useState<string>("");
   const [stats, setStats] = useState<{ bookingsToday: number; gmvToday: number; activeProviders: number; avgRating: number } | null>(null);
   const [pilot, setPilot] = useState<PilotScoreboard | null>(null);
+  const [fraudFlags, setFraudFlags] = useState<FraudFlagRow[]>([]);
 
   useEffect(() => {
     fetch("/api/admin/pilot")
       .then((r) => r.json())
       .then(setPilot)
       .catch(() => setPilot(null));
+    fetch("/api/admin/fraud")
+      .then((r) => r.json())
+      .then((d) => setFraudFlags(d.flags ?? []))
+      .catch(() => setFraudFlags([]));
     fetch("/api/bookings")
       .then((r) => r.json())
       .then((d) => setBookings(d.bookings ?? []))
@@ -431,36 +446,46 @@ export default function AdminDashboard() {
           </div>
         );
 
-      case "fraud":
+      case "fraud": {
+        const liveScanClean = fraudFlags.length === 0;
+        const rows = liveScanClean ? FRAUD_EXAMPLES : fraudFlags;
         return (
-          <div className="card overflow-x-auto">
-            <table className="w-full text-sm min-w-[700px]">
-              <thead>
-                <tr className="bg-navy text-white">
-                  {["Flag", "Type", "Entity", "Risk score", "Signal", "Action"].map((h) => (
-                    <th key={h} className="px-4 py-3 text-start font-semibold">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {FRAUD_FLAGS.map((f) => (
-                  <tr key={f.id} className="border-b border-navy-50 last:border-0 hover:bg-pearl">
-                    <td className="px-4 py-3 font-semibold text-navy">{f.id}</td>
-                    <td className="px-4 py-3">{f.type}</td>
-                    <td className="px-4 py-3 text-navy-500">{f.entity}</td>
-                    <td className="px-4 py-3">
-                      <span className={`chip ${f.score > 0.7 ? "bg-red-50 text-red-600" : "bg-gold-soft text-gold-dark"}`}>
-                        {(f.score * 100).toFixed(0)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-navy-500">{f.note}</td>
-                    <td className="px-4 py-3"><button className="chip bg-navy text-white">{f.action}</button></td>
+          <div className="space-y-4">
+            <div className={`card p-4 text-sm font-semibold ${liveScanClean ? "bg-teal-soft !border-teal/40 text-teal-dark" : "bg-red-50 !border-red-200 text-red-600"}`}>
+              {liveScanClean
+                ? "✓ Live scan clean — no fraud flags in current marketplace data. Showing example patterns the detector watches for."
+                : `⚠ ${fraudFlags.length} live fraud flag${fraudFlags.length === 1 ? "" : "s"} need review.`}
+            </div>
+            <div className="card overflow-x-auto">
+              <table className="w-full text-sm min-w-[700px]">
+                <thead>
+                  <tr className="bg-navy text-white">
+                    {["Flag", "Type", "Entity", "Risk score", "Signal", "Action"].map((h) => (
+                      <th key={h} className="px-4 py-3 text-start font-semibold">{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {rows.map((f) => (
+                    <tr key={f.id} className="border-b border-navy-50 last:border-0 hover:bg-pearl">
+                      <td className="px-4 py-3 font-semibold text-navy">{f.id}</td>
+                      <td className="px-4 py-3">{f.type.replace(/_/g, " ")}</td>
+                      <td className="px-4 py-3 text-navy-500">{f.entity}</td>
+                      <td className="px-4 py-3">
+                        <span className={`chip ${f.score > 0.7 ? "bg-red-50 text-red-600" : "bg-gold-soft text-gold-dark"}`}>
+                          {(f.score * 100).toFixed(0)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-navy-500">{f.signal}</td>
+                      <td className="px-4 py-3"><button className="chip bg-navy text-white">{f.suggestedAction}</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         );
+      }
     }
   }
 
