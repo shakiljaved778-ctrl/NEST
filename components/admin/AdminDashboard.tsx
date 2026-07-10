@@ -5,10 +5,12 @@ import Link from "next/link";
 import { SERVICES, ZONES, getService, getZone } from "@/lib/catalog";
 import { PROVIDERS } from "@/lib/providers";
 import { COUPONS } from "@/lib/pricing";
+import type { PilotScoreboard } from "@/lib/pilot";
 import type { Booking } from "@/lib/types";
 
 type Tab =
   | "overview"
+  | "pilot"
   | "bookings"
   | "providers"
   | "catalog"
@@ -20,6 +22,7 @@ type Tab =
 
 const TABS: { id: Tab; icon: string; label: string }[] = [
   { id: "overview", icon: "📊", label: "Overview" },
+  { id: "pilot", icon: "🎯", label: "Pilot scoreboard" },
   { id: "bookings", icon: "📋", label: "Bookings" },
   { id: "providers", icon: "🪪", label: "Providers" },
   { id: "catalog", icon: "🗂️", label: "Service catalog" },
@@ -58,8 +61,13 @@ export default function AdminDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [summary, setSummary] = useState<string>("");
   const [stats, setStats] = useState<{ bookingsToday: number; gmvToday: number; activeProviders: number; avgRating: number } | null>(null);
+  const [pilot, setPilot] = useState<PilotScoreboard | null>(null);
 
   useEffect(() => {
+    fetch("/api/admin/pilot")
+      .then((r) => r.json())
+      .then(setPilot)
+      .catch(() => setPilot(null));
     fetch("/api/bookings")
       .then((r) => r.json())
       .then((d) => setBookings(d.bookings ?? []))
@@ -139,6 +147,64 @@ export default function AdminDashboard() {
             </div>
           </div>
         );
+
+      case "pilot": {
+        if (!pilot) return <div className="card p-8 text-sm text-navy-400">Loading pilot scoreboard…</div>;
+        const GATE_TONE: Record<string, string> = {
+          achieved: "bg-teal text-white",
+          on_track: "bg-gold-soft text-gold-dark",
+          at_risk: "bg-red-50 text-red-600",
+        };
+        const GATE_LABEL: Record<string, string> = { achieved: "✓ achieved", on_track: "on track", at_risk: "⚠ at risk" };
+        const fmt = (g: (typeof pilot.gates)[number], v: number) =>
+          g.unit === "qar" ? `QAR ${v.toLocaleString()}` : g.unit === "percent" ? `${v}%` : v.toLocaleString();
+        return (
+          <div className="space-y-6">
+            <div className="card !bg-navy-800 !border-navy-700 p-5 text-white flex flex-wrap items-center gap-6">
+              <div>
+                <p className="kicker-gold mb-1">🎯 90-day Doha pilot → Seed gate</p>
+                <p className="font-display text-2xl font-bold">Day {pilot.day} of 90</p>
+                <p className="text-xs text-navy-200 mt-1">{pilot.daysRemaining} days remaining · 2 beachhead zones · 5 pilot services</p>
+              </div>
+              <div className="ms-auto">
+                <span className={`chip ${pilot.seedReady ? "bg-teal text-white" : "bg-gold text-navy-800"}`}>
+                  {pilot.seedReady ? "✓ Seed-ready — all gates passed" : `${pilot.gates.filter((g) => g.status === "achieved").length} of ${pilot.gates.length} gates passed`}
+                </span>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {pilot.gates.map((g) => {
+                const pct = Math.min(100, Math.round((g.current / g.target) * 100));
+                return (
+                  <div key={g.id} className="card p-5">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="font-bold text-navy text-sm">{g.label}</p>
+                      <span className={`chip ${GATE_TONE[g.status]}`}>{GATE_LABEL[g.status]}</span>
+                    </div>
+                    <p className="font-display text-2xl font-bold text-navy">
+                      {fmt(g, g.current)}
+                      <span className="text-sm font-normal text-navy-400">
+                        {" "}/ {fmt(g, g.target)}{g.targetMax ? `–${g.targetMax.toLocaleString()}` : ""}
+                      </span>
+                    </p>
+                    <div className="h-2 rounded bg-navy-50 overflow-hidden mt-3">
+                      <span
+                        className={`block h-full ${g.status === "achieved" ? "bg-teal" : g.status === "on_track" ? "bg-gold" : "bg-red-500"}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-navy-400 mt-2">{g.detail}</p>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-xs text-navy-400">
+              Gates from the business plan: live MVP · 40–60 verified providers · 2 Doha zones · 1,500–3,000 bookings ·
+              &gt;40% repeat rate · QAR 500k GMV run-rate. Pass all gates → open the Seed round.
+            </p>
+          </div>
+        );
+      }
 
       case "bookings":
         return (
