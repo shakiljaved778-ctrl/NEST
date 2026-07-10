@@ -12,16 +12,293 @@ servers:
     description: Local development
 
 tags:
+  - name: auth
   - name: catalog
   - name: pricing
   - name: matching
   - name: bookings
   - name: payments
   - name: providers
+  - name: subscriptions
+  - name: wallet
+  - name: chat
+  - name: analytics
   - name: ai
   - name: admin
 
 paths:
+  /auth/otp/request:
+    post:
+      tags: [auth]
+      summary: Request a login OTP (SMS in production; demo code in the response here)
+      operationId: requestOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone: { type: string, example: "+97455123456" }
+      responses:
+        "200":
+          description: Code issued (30s resend cooldown, 5-minute TTL)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  phone: { type: string }
+                  demoCode: { type: string, description: "demo builds only" }
+                  resendAfterMs: { type: integer }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /auth/otp/verify:
+    post:
+      tags: [auth]
+      summary: Exchange the OTP for a session token
+      operationId: verifyOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, code]
+              properties:
+                phone: { type: string }
+                code: { type: string }
+                role: { type: string, enum: [customer, provider, ops, admin], default: customer }
+      responses:
+        "200":
+          description: Session (24h TTL; production issues JWT + rotating refresh)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session: { $ref: "#/components/schemas/Session" }
+        "401":
+          description: Wrong/expired code or attempt limit reached
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: { type: string }
+
+  /subscriptions:
+    get:
+      tags: [subscriptions]
+      summary: Nest+ plans and the customer's active subscription
+      operationId: getSubscriptions
+      parameters:
+        - name: customer
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Plans + subscription (null when none)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plans:
+                    type: array
+                    items: { $ref: "#/components/schemas/Plan" }
+                  subscription:
+                    oneOf:
+                      - { $ref: "#/components/schemas/Subscription" }
+                      - { type: "null" }
+    post:
+      tags: [subscriptions]
+      summary: Subscribe ({customer, planId}) or cancel ({subscriptionId, cancel:true})
+      operationId: mutateSubscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer: { type: string }
+                planId: { type: string }
+                subscriptionId: { type: string }
+                cancel: { type: boolean }
+      responses:
+        "201":
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription: { $ref: "#/components/schemas/Subscription" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /wallet:
+    get:
+      tags: [wallet]
+      summary: Wallet balance, ledger and active coupons
+      operationId: getWallet
+      parameters:
+        - name: customer
+          in: query
+          schema: { type: string, default: demo }
+      responses:
+        "200":
+          description: Balance derived from the transaction ledger
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer: { type: string }
+                  balance: { type: number }
+                  transactions:
+                    type: array
+                    items: { $ref: "#/components/schemas/WalletTransaction" }
+                  coupons:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code: { type: string }
+                        type: { type: string, enum: [percent, fixed] }
+                        value: { type: number }
+                        label: { type: string }
+    post:
+      tags: [wallet]
+      summary: Credit ({customer, type, amount, note}) or debit ({customer, debit:true, amount, note})
+      operationId: mutateWallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customer, amount]
+              properties:
+                customer: { type: string }
+                amount: { type: number }
+                type: { type: string, enum: [topup, refund_credit, reward, promo] }
+                debit: { type: boolean }
+                note: { type: string }
+      responses:
+        "201":
+          description: Transaction + new balance (overdrafts rejected)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction: { $ref: "#/components/schemas/WalletTransaction" }
+                  balance: { type: number }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /chat/{bookingId}:
+    get:
+      tags: [chat]
+      summary: Auto-translated message thread for a booking
+      operationId: getChatThread
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Messages with original + translation stored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items: { $ref: "#/components/schemas/ChatMessage" }
+    post:
+      tags: [chat]
+      summary: Send a message; auto-translated for the recipient
+      operationId: sendChatMessage
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sender, text]
+              properties:
+                sender: { type: string, enum: [customer, provider] }
+                text: { type: string }
+                recipientLang: { $ref: "#/components/schemas/LanguageCode" }
+      responses:
+        "201":
+          description: Stored message (emergency-flagged when applicable)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { $ref: "#/components/schemas/ChatMessage" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /events:
+    post:
+      tags: [analytics]
+      summary: Track a named-taxonomy analytics event
+      operationId: trackEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, actor]
+              properties:
+                name:
+                  type: string
+                  enum: [booking_started, quote_viewed, payment_succeeded, rebook_tapped, ai_assistant_booked, provider_accepted, job_completed, rating_submitted, complaint_filed, subscription_started]
+                actor: { type: string }
+                properties:
+                  type: object
+                  additionalProperties: true
+      responses:
+        "201":
+          description: Event recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  event: { $ref: "#/components/schemas/AnalyticsEvent" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /admin/funnel:
+    get:
+      tags: [admin]
+      summary: Weekly booking-funnel review (>20% drop ⇒ kill or fix)
+      operationId: adminFunnel
+      responses:
+        "200":
+          description: Cohort funnel over the golden path
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  steps:
+                    type: array
+                    items: { $ref: "#/components/schemas/FunnelStep" }
+                  healthy: { type: boolean }
+
   /catalog:
     get:
       tags: [catalog]
@@ -641,6 +918,81 @@ components:
         refundRisk: { type: number, minimum: 0, maximum: 1 }
         humanEscalation: { type: boolean }
         summary: { type: string, maxLength: 140 }
+
+    Session:
+      type: object
+      properties:
+        token: { type: string }
+        phone: { type: string }
+        role: { type: string, enum: [customer, provider, ops, admin] }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: integer, description: "epoch ms" }
+
+    Plan:
+      type: object
+      properties:
+        id: { type: string, example: nest-family }
+        name: { type: string }
+        nameAr: { type: string }
+        priceMonthly: { type: number }
+        discountRate: { type: number }
+        features:
+          type: array
+          items: { type: string }
+        popular: { type: boolean }
+
+    Subscription:
+      type: object
+      properties:
+        id: { type: string, example: SUB-100 }
+        customer: { type: string }
+        planId: { type: string }
+        status: { type: string, enum: [active, cancelled] }
+        startedAt: { type: string, format: date-time }
+        cancelledAt: { type: string, format: date-time }
+        renewsAt: { type: string, format: date-time }
+
+    WalletTransaction:
+      type: object
+      properties:
+        id: { type: string }
+        customer: { type: string }
+        type: { type: string, enum: [topup, refund_credit, reward, promo, payment] }
+        amount: { type: number, description: "positive = credit, negative = debit" }
+        note: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    ChatMessage:
+      type: object
+      properties:
+        id: { type: string }
+        bookingId: { type: string }
+        sender: { type: string, enum: [customer, provider] }
+        original: { type: string }
+        originalLang: { $ref: "#/components/schemas/LanguageCode" }
+        translated: { type: string }
+        translatedLang: { $ref: "#/components/schemas/LanguageCode" }
+        flagEmergency: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    AnalyticsEvent:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        actor: { type: string }
+        properties:
+          type: object
+          additionalProperties: true
+        createdAt: { type: string, format: date-time }
+
+    FunnelStep:
+      type: object
+      properties:
+        step: { type: string }
+        actors: { type: integer }
+        conversion: { type: number }
+        killOrFix: { type: boolean }
 
     PaymentMethod:
       type: string

@@ -49,12 +49,18 @@ app/                    Next.js App Router
     ai/assistant/       POST /api/ai/assistant   — AI booking assistant
     ai/complaint/       POST /api/ai/complaint   — AI complaint classifier
     ai/translate/       POST /api/ai/translate   — 6-language chat translation
+    auth/               POST /api/auth/otp/request|verify — OTP login + sessions
     payments/           POST /api/payments/intent|confirm, GET /api/payments
     refunds/            POST /api/refunds        — partial/full refunds
     providers/          GET  /api/providers/:id/quality — AI quality score
+    subscriptions/      GET/POST /api/subscriptions — Nest+ plans
+    wallet/             GET/POST /api/wallet     — ledger, coupons
+    chat/               GET/POST /api/chat/:bookingId — auto-translated chat
+    events/             POST /api/events         — named analytics taxonomy
     admin/summary/      GET  /api/admin/summary  — stats + AI daily summary
     admin/pilot/        GET  /api/admin/pilot    — pilot scoreboard (Seed gates)
     admin/fraud/        GET  /api/admin/fraud    — live fraud scan
+    admin/funnel/       GET  /api/admin/funnel   — weekly funnel review
 components/             Customer / provider / admin UIs, phone frame
 lib/                    Domain layer: catalog (15 services), zones, i18n (6 languages),
                         pricing engine, provider matching, AI modules, chat translation,

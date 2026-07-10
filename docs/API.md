@@ -2,6 +2,22 @@
 
 Base URL: `http://localhost:4200`
 
+## Auth
+
+### `POST /api/auth/otp/request`
+```json
+{ "phone": "+97455123456" }
+```
+Issues a 4-digit code (SMS in production; the demo build returns it as `demoCode`, fixed
+to `0000`). 30-second resend cooldown, 5-minute TTL, 5 attempts max.
+
+### `POST /api/auth/otp/verify`
+```json
+{ "phone": "+97455123456", "code": "0000", "role": "customer" }
+```
+Returns a 24-hour session token. Production swaps the token store for JWT + rotating
+refresh tokens with the same request/verify semantics.
+
 ## Catalog
 
 ### `GET /api/catalog`
@@ -76,6 +92,38 @@ Admin ledger: all payments and refunds.
 AI quality score (0–100, banded) from rating, checklist completion, photo compliance,
 chat sentiment, repeat rate, refund rate and time-on-job — with actionable flags
 (e.g. `rating_below_4_3_weekly_review`).
+
+## Subscriptions, wallet & chat
+
+### `GET /api/subscriptions?customer=Amina` · `POST /api/subscriptions`
+Nest+ plans (Essential 199 · Family 449 · Villa AMC 899 QAR/mo). Subscribe with
+`{ "customer", "planId" }`, cancel with `{ "subscriptionId", "cancel": true }`.
+Active plans apply their discount (10–15%) to every booking quote.
+
+### `GET /api/wallet?customer=demo` · `POST /api/wallet`
+Ledger-derived balance (never stored), credits (`topup` / `refund_credit` / `reward` /
+`promo`) and debits with overdraft protection, plus active coupons.
+
+### `GET /api/chat/:bookingId` · `POST /api/chat/:bookingId`
+```json
+{ "sender": "provider", "text": "I am on my way" }
+```
+Messages are stored with original AND translation into the recipient's language
+(customer's booking language by default) and an emergency flag ops can act on.
+
+## Analytics
+
+### `POST /api/events`
+```json
+{ "name": "booking_started", "actor": "u42", "properties": { "serviceId": "plumbing" } }
+```
+Named taxonomy enforced: `booking_started`, `quote_viewed`, `payment_succeeded`,
+`rebook_tapped`, `ai_assistant_booked`, `provider_accepted`, `job_completed`,
+`rating_submitted`, `complaint_filed`, `subscription_started`.
+
+### `GET /api/admin/funnel`
+Cohort funnel over the golden path; any step with >20% drop is flagged `killOrFix`
+per the weekly review rule.
 
 ## AI layer
 
