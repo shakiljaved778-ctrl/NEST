@@ -10,7 +10,7 @@ products**, built from the NEST master blueprint and pitch deck.
 | --- | --- | --- |
 | **Customer app** | [`/customer`](http://localhost:4200/customer) | Full interactive phone wireframe: splash → language (6 languages, Arabic/Urdu RTL) → OTP login → zone selection → home → service & packages → add-ons → schedule → address → payment & coupons → AI matching → confirmation → live tracking → chat with AI translation → rating, plus booking history, Nest AI assistant, wallet & coupons, Nest+ subscriptions, complaints/refunds and family profiles |
 | **Provider app** | [`/provider`](http://localhost:4200/provider) | Onboarding, KYC documents, skills & tests, availability, job requests with accept/decline, job details, navigation, service checklist, before/after photos, job completion & payout, earnings, ratings/quality score, training academy |
-| **Admin & Ops** | [`/admin`](http://localhost:4200/admin) | AI daily summary, KPIs, live bookings table with manual assignment, provider management & verification queue, 15-service catalog manager, dynamic pricing engine & commissions, disputes/refunds with AI triage, coupon campaigns, demand heatmap with SLA alerts, fraud monitor |
+| **Admin & Ops** | [`/admin`](http://localhost:4200/admin) | AI daily summary, KPIs, **90-day pilot scoreboard (Seed-readiness gates)**, live bookings table with manual assignment, provider management & verification queue, 15-service catalog manager, dynamic pricing engine & commissions, disputes/refunds with AI triage, coupon campaigns, demand heatmap with SLA alerts, fraud monitor |
 | **AI layer** | `/api/ai/*` | Booking assistant (safety-aware routing to the right service), provider matching (weighted scoring), dynamic pricing, complaint classifier, admin daily summary |
 
 ## Quick start
@@ -24,6 +24,12 @@ Production build:
 
 ```bash
 npm run build && npm start
+```
+
+Verify (same as CI — `.github/workflows/ci.yml` runs this on every push):
+
+```bash
+npm run typecheck && npm test && npm run build
 ```
 
 ## Project structure
@@ -42,14 +48,33 @@ app/                    Next.js App Router
     ai/assistant/       POST /api/ai/assistant   — AI booking assistant
     ai/complaint/       POST /api/ai/complaint   — AI complaint classifier
     admin/summary/      GET  /api/admin/summary  — stats + AI daily summary
+    admin/pilot/        GET  /api/admin/pilot    — pilot scoreboard (Seed gates)
 components/             Customer / provider / admin UIs, phone frame
 lib/                    Domain layer: catalog (15 services), zones, i18n (6 languages),
-                        pricing engine, provider matching, AI modules, in-memory store
+                        pricing engine, provider matching, AI modules, pilot scoreboard,
+                        in-memory store
 prisma/schema.prisma    Production PostgreSQL schema (users, providers, KYC documents,
                         bookings, payments, refunds, complaints, coupons, subscriptions,
                         wallet, chat, notifications, AI logs, fraud flags, audit logs)
-docs/                   Architecture, API reference, roadmap
+tests/                  Vitest unit suites: pricing, matching, AI, booking store, pilot
+docs/                   PRD & personas, design system, architecture, API reference,
+                        OpenAPI spec, AI orchestration & prompt registry, store
+                        submission kit (EN/AR), launch checklist & iteration playbook,
+                        roadmap
 ```
+
+## Documentation
+
+| Doc | Contents |
+| --- | --- |
+| [`docs/PRD.md`](docs/PRD.md) | Product requirements, personas, success metrics |
+| [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md) | Brand tokens, typography, RTL, accessibility |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Production cloud architecture (AWS me-central) |
+| [`docs/API.md`](docs/API.md) · [`docs/openapi.yaml`](docs/openapi.yaml) | API reference + OpenAPI 3.1 spec |
+| [`docs/AI-ORCHESTRATION.md`](docs/AI-ORCHESTRATION.md) | AI service design + versioned prompt templates |
+| [`docs/STORE-SUBMISSION.md`](docs/STORE-SUBMISSION.md) | App Store / Play listing kit, EN + AR |
+| [`docs/LAUNCH-PLAYBOOK.md`](docs/LAUNCH-PLAYBOOK.md) | Launch checklist, iteration engine, incident response |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Phase plan through scale |
 
 ## Design language
 

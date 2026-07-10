@@ -1,0 +1,506 @@
+openapi: 3.1.0
+info:
+  title: NEST Solutions API
+  version: 0.1.0
+  description: >
+    Booking engine and AI layer for NEST — Qatar's AI-powered trusted home-services
+    super app. This spec covers the implemented MVP surface (Next.js route handlers).
+    The production NestJS platform extends it with auth/OTP, payments, payouts,
+    tracking WebSockets, subscriptions and admin RBAC per docs/ARCHITECTURE.md.
+servers:
+  - url: http://localhost:4200/api
+    description: Local development
+
+tags:
+  - name: catalog
+  - name: pricing
+  - name: matching
+  - name: bookings
+  - name: ai
+  - name: admin
+
+paths:
+  /catalog:
+    get:
+      tags: [catalog]
+      summary: Service catalog and launch zones
+      operationId: getCatalog
+      responses:
+        "200":
+          description: 15 services with packages/add-ons, and Qatar launch zones
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  services:
+                    type: array
+                    items: { $ref: "#/components/schemas/Service" }
+                  zones:
+                    type: array
+                    items: { $ref: "#/components/schemas/Zone" }
+
+  /quote:
+    post:
+      tags: [pricing]
+      summary: Price a booking (dynamic pricing engine)
+      operationId: createQuote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/QuoteInput" }
+      responses:
+        "200":
+          description: Line-item quote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quote: { $ref: "#/components/schemas/Quote" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /match:
+    post:
+      tags: [matching]
+      summary: AI provider matching (weighted scoring)
+      description: >
+        score = 0.20·distance + 0.20·availability + 0.20·skill + 0.15·rating +
+        0.10·completion + 0.05·response_time + 0.05·language + 0.05·preference
+      operationId: matchProviders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [serviceId, zoneId]
+              properties:
+                serviceId: { type: string }
+                zoneId: { $ref: "#/components/schemas/ZoneId" }
+                language: { $ref: "#/components/schemas/LanguageCode" }
+                genderPreference: { type: string, enum: [male, female] }
+                urgent: { type: boolean }
+      responses:
+        "200":
+          description: Top-ranked verified providers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  matches:
+                    type: array
+                    items: { $ref: "#/components/schemas/MatchResult" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /bookings:
+    get:
+      tags: [bookings]
+      summary: List bookings (newest first)
+      operationId: listBookings
+      responses:
+        "200":
+          description: All bookings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bookings:
+                    type: array
+                    items: { $ref: "#/components/schemas/Booking" }
+    post:
+      tags: [bookings]
+      summary: Create a booking (quotes, matches and assigns in one call)
+      operationId: createBooking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingInput" }
+      responses:
+        "201":
+          description: Booking created, best provider match attached
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  booking: { $ref: "#/components/schemas/Booking" }
+                  match:
+                    oneOf:
+                      - { $ref: "#/components/schemas/MatchResult" }
+                      - { type: "null" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /bookings/{id}:
+    get:
+      tags: [bookings]
+      summary: Get a booking
+      operationId: getBooking
+      parameters: [{ $ref: "#/components/parameters/BookingId" }]
+      responses:
+        "200":
+          description: The booking
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  booking: { $ref: "#/components/schemas/Booking" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [bookings]
+      summary: Update booking status / rating (golden-path lifecycle)
+      operationId: updateBooking
+      parameters: [{ $ref: "#/components/parameters/BookingId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { $ref: "#/components/schemas/BookingStatus" }
+                rating: { type: integer, minimum: 1, maximum: 5 }
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  booking: { $ref: "#/components/schemas/Booking" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /ai/assistant:
+    post:
+      tags: [ai]
+      summary: Nest AI booking assistant
+      description: >
+        Conversational diagnosis in 6 languages. Emergencies are escalated to humans
+        and never produce a booking suggestion (hard guardrail).
+      operationId: aiAssistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string }
+                language: { $ref: "#/components/schemas/LanguageCode" }
+      responses:
+        "200":
+          description: Assistant reply
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AssistantReply" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /ai/complaint:
+    post:
+      tags: [ai]
+      summary: AI complaint classifier
+      operationId: aiComplaint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string }
+      responses:
+        "200":
+          description: Classification
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ComplaintClassification" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /admin/summary:
+    get:
+      tags: [admin]
+      summary: Marketplace stats + AI daily summary
+      operationId: adminSummary
+      responses:
+        "200":
+          description: Live stats and the ops-copilot summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stats: { $ref: "#/components/schemas/MarketplaceStats" }
+                  summary: { type: string }
+
+  /admin/pilot:
+    get:
+      tags: [admin]
+      summary: 90-day Doha pilot scoreboard (Seed-readiness gates)
+      operationId: adminPilot
+      responses:
+        "200":
+          description: Gate-by-gate pilot progress
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PilotScoreboard" }
+
+components:
+  parameters:
+    BookingId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+      example: NB-1041
+
+  responses:
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: { type: string }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: { type: string }
+
+  schemas:
+    LanguageCode:
+      type: string
+      enum: [en, ar, hi, ur, ml, tl]
+
+    ZoneId:
+      type: string
+      enum: [west-bay, the-pearl, lusail, al-sadd, al-rayyan, al-wakrah, msheireb, al-khor]
+
+    Zone:
+      type: object
+      properties:
+        id: { $ref: "#/components/schemas/ZoneId" }
+        name: { type: string }
+        nameAr: { type: string }
+        wave: { type: integer, enum: [1, 2] }
+
+    ServicePackage:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        nameAr: { type: string }
+        description: { type: string }
+        price: { type: number, description: "QAR" }
+        duration: { type: integer, description: "minutes" }
+        popular: { type: boolean }
+
+    ServiceAddon:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        nameAr: { type: string }
+        price: { type: number }
+        duration: { type: integer }
+
+    Service:
+      type: object
+      properties:
+        id: { type: string }
+        icon: { type: string }
+        name: { type: string }
+        nameAr: { type: string }
+        tagline: { type: string }
+        accent: { type: string, enum: [navy, teal, gold] }
+        genderPreference: { type: boolean }
+        safetyNote: { type: string }
+        packages:
+          type: array
+          items: { $ref: "#/components/schemas/ServicePackage" }
+        addons:
+          type: array
+          items: { $ref: "#/components/schemas/ServiceAddon" }
+
+    QuoteInput:
+      type: object
+      required: [serviceId, packageId]
+      properties:
+        serviceId: { type: string }
+        packageId: { type: string }
+        addonIds:
+          type: array
+          items: { type: string }
+        slot: { type: string, example: "18:00" }
+        urgent: { type: boolean }
+        couponCode: { type: string, example: NEST10 }
+        nestPlus: { type: boolean }
+
+    QuoteLine:
+      type: object
+      properties:
+        label: { type: string }
+        amount: { type: number }
+
+    Quote:
+      type: object
+      properties:
+        lines:
+          type: array
+          items: { $ref: "#/components/schemas/QuoteLine" }
+        subtotal: { type: number }
+        surcharge: { type: number, description: "peak uplift + urgency fee" }
+        discount: { type: number, description: "coupons + Nest+ (capped at subtotal)" }
+        total: { type: number }
+        currency: { type: string, const: QAR }
+        slotLabel: { type: string }
+        peak: { type: boolean }
+
+    Provider:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        avatarInitials: { type: string }
+        gender: { type: string, enum: [male, female] }
+        rating: { type: number }
+        jobsDone: { type: integer }
+        completionRate: { type: number }
+        responseMinutes: { type: integer }
+        skills:
+          type: array
+          items: { type: string }
+        zones:
+          type: array
+          items: { $ref: "#/components/schemas/ZoneId" }
+        languages:
+          type: array
+          items: { $ref: "#/components/schemas/LanguageCode" }
+        verified: { type: boolean }
+        yearsExperience: { type: integer }
+
+    MatchResult:
+      type: object
+      properties:
+        provider: { $ref: "#/components/schemas/Provider" }
+        score: { type: number }
+        breakdown:
+          type: object
+          additionalProperties: { type: number }
+
+    BookingStatus:
+      type: string
+      enum: [pending_match, matched, accepted, en_route, arrived, in_progress, completed, cancelled]
+
+    BookingInput:
+      type: object
+      required: [serviceId, packageId, zoneId, date, slot, customerName]
+      properties:
+        serviceId: { type: string }
+        packageId: { type: string }
+        addonIds:
+          type: array
+          items: { type: string }
+        zoneId: { $ref: "#/components/schemas/ZoneId" }
+        address: { type: string, description: "Qatar zone/street/building format" }
+        date: { type: string, format: date }
+        slot: { type: string }
+        urgent: { type: boolean }
+        couponCode: { type: string }
+        nestPlus: { type: boolean }
+        paymentMethod: { type: string, default: card }
+        customerName: { type: string }
+        language: { $ref: "#/components/schemas/LanguageCode" }
+        genderPreference: { type: string, enum: [male, female] }
+
+    Booking:
+      type: object
+      properties:
+        id: { type: string, example: NB-1042 }
+        serviceId: { type: string }
+        packageId: { type: string }
+        addonIds:
+          type: array
+          items: { type: string }
+        zoneId: { $ref: "#/components/schemas/ZoneId" }
+        address: { type: string }
+        date: { type: string, format: date }
+        slot: { type: string }
+        urgent: { type: boolean }
+        couponCode: { type: string }
+        paymentMethod: { type: string }
+        quote: { $ref: "#/components/schemas/Quote" }
+        providerId: { type: string }
+        status: { $ref: "#/components/schemas/BookingStatus" }
+        customerName: { type: string }
+        language: { $ref: "#/components/schemas/LanguageCode" }
+        rating: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    AssistantReply:
+      type: object
+      properties:
+        reply: { type: string }
+        suggestedServiceId: { type: string }
+        suggestedPackageId: { type: string }
+        followUps:
+          type: array
+          items: { type: string }
+        safetyEscalation: { type: boolean }
+
+    ComplaintClassification:
+      type: object
+      properties:
+        category:
+          type: string
+          enum: [late_arrival, poor_quality, damage_claim, safety_concern, payment_issue, provider_behavior, incomplete_job, other]
+        priority: { type: string, enum: [low, medium, high, critical] }
+        sentiment: { type: string, enum: [negative, neutral, positive] }
+        refundRisk: { type: number, minimum: 0, maximum: 1 }
+        humanEscalation: { type: boolean }
+        summary: { type: string, maxLength: 140 }
+
+    MarketplaceStats:
+      type: object
+      properties:
+        bookingsToday: { type: integer }
+        gmvToday: { type: number }
+        completionRate: { type: number }
+        openComplaints: { type: integer }
+        activeProviders: { type: integer }
+        avgRating: { type: number }
+
+    PilotGate:
+      type: object
+      properties:
+        id: { type: string, enum: [providers, zones, bookings, repeat, gmv] }
+        label: { type: string }
+        current: { type: number }
+        target: { type: number }
+        targetMax: { type: number }
+        unit: { type: string, enum: [count, percent, qar] }
+        status: { type: string, enum: [achieved, on_track, at_risk] }
+        detail: { type: string }
+
+    PilotScoreboard:
+      type: object
+      properties:
+        day: { type: integer }
+        daysRemaining: { type: integer }
+        seedReady: { type: boolean }
+        gates:
+          type: array
+          items: { $ref: "#/components/schemas/PilotGate" }
