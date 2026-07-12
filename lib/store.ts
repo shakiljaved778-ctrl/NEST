@@ -22,6 +22,7 @@ function seedBookings(): Booking[] {
     customerName: string,
     daysAgo: number,
     slot: string,
+    providerId?: string,
     rating?: number,
   ): Booking => {
     const date = new Date();
@@ -38,7 +39,7 @@ function seedBookings(): Booking[] {
       urgent: false,
       paymentMethod: "card",
       quote: buildQuote({ serviceId, packageId, slot }),
-      providerId: undefined,
+      providerId,
       status,
       customerName,
       language: "en",
@@ -48,16 +49,16 @@ function seedBookings(): Booking[] {
   };
 
   return [
-    mk("NB-1041", "ac-technician", "ac-service", "west-bay", "in_progress", "Sara Al-Kuwari", 0, "10:00"),
-    mk("NB-1040", "house-cleaning", "hc-2h", "the-pearl", "en_route", "James Wilson", 0, "09:30"),
-    mk("NB-1039", "deep-cleaning", "dc-2br", "lusail", "accepted", "Ayesha Rahman", 0, "14:00"),
+    mk("NB-1041", "ac-technician", "ac-service", "west-bay", "in_progress", "Sara Al-Kuwari", 0, "10:00", "p1"),
+    mk("NB-1040", "house-cleaning", "hc-2h", "the-pearl", "en_route", "James Wilson", 0, "09:30", "p2"),
+    mk("NB-1039", "deep-cleaning", "dc-2br", "lusail", "accepted", "Ayesha Rahman", 0, "14:00", "p9"),
     mk("NB-1038", "plumbing", "pl-leak", "al-sadd", "pending_match", "Mohammed Al-Thani", 0, "18:00"),
-    mk("NB-1037", "salon", "sl-mani", "the-pearl", "completed", "Elena Petrova", 1, "16:00", 5),
-    mk("NB-1036", "pest-control", "pc-apt", "al-wakrah", "completed", "Ravi Menon", 1, "11:00", 4),
-    mk("NB-1035", "electrical", "el-fixture", "west-bay", "completed", "Fatima Noor", 2, "19:00", 5),
+    mk("NB-1037", "salon", "sl-mani", "the-pearl", "completed", "Elena Petrova", 1, "16:00", "p6", 5),
+    mk("NB-1036", "pest-control", "pc-apt", "al-wakrah", "completed", "Ravi Menon", 1, "11:00", "p7", 4),
+    mk("NB-1035", "electrical", "el-fixture", "west-bay", "completed", "Fatima Noor", 2, "19:00", "p10", 5),
     mk("NB-1034", "car-wash", "cw-full", "lusail", "cancelled", "Daniel Reyes", 2, "08:00"),
-    mk("NB-1033", "nanny", "nn-4h", "the-pearl", "completed", "Hannah Lee", 3, "13:00", 5),
-    mk("NB-1032", "ac-technician", "ac-deep", "al-rayyan", "completed", "Omar Farouk", 3, "17:30", 4),
+    mk("NB-1033", "nanny", "nn-4h", "the-pearl", "completed", "Hannah Lee", 3, "13:00", "p4", 5),
+    mk("NB-1032", "ac-technician", "ac-deep", "al-rayyan", "completed", "Omar Farouk", 3, "17:30", "p7", 4),
   ];
 }
 

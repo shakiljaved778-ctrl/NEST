@@ -86,7 +86,30 @@ Partial or full; over-refunds are rejected.
 ### `GET /api/payments`
 Admin ledger: all payments and refunds.
 
+## Tracking
+
+### `GET /api/bookings/:id/tracking`
+Live-tracking snapshot: phase (`assigning` → `preparing` → `en_route` → `on_site` →
+`finished`), interpolated position, decreasing ETA, drive progress, and the
+trust-forward safety panel (provider identity, QID/background-check labels, SOS 999).
+Production pushes the identical payload over WebSocket.
+
 ## Providers
+
+### `POST /api/providers/onboarding` · `GET /api/providers/onboarding`
+Submit a provider application (name, phone, gender, skills, zones, languages).
+
+### `POST /api/providers/onboarding/:id/documents`
+```json
+{ "type": "qid" }
+```
+Register a KYC document (`qid` | `passport` | `work_permit` | `certificate`).
+Identity (QID or passport) + work permit moves the application to `under_review`.
+
+### `GET /api/admin/verification` · `PATCH /api/admin/verification/:id`
+The ops KYC queue. `{ "action": "approve" }` verifies documents and moves to
+`training`; `{ "action": "training_result", "score": 0.92 }` puts the provider LIVE in
+the matching network on a pass (≥80%); `{ "action": "reject", "note": "…" }` rejects.
 
 ### `GET /api/providers/:id/quality`
 AI quality score (0–100, banded) from rating, checklist completion, photo compliance,

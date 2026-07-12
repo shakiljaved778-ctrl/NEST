@@ -581,6 +581,151 @@ paths:
                   quality: { $ref: "#/components/schemas/QualityScore" }
         "404": { $ref: "#/components/responses/NotFound" }
 
+  /bookings/{id}/tracking:
+    get:
+      tags: [bookings]
+      summary: Live-tracking snapshot (production pushes the same payload over WebSocket)
+      operationId: trackBooking
+      parameters: [{ $ref: "#/components/parameters/BookingId" }]
+      responses:
+        "200":
+          description: Phase, position, ETA and safety panel
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackingSnapshot" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /providers/onboarding:
+    get:
+      tags: [providers]
+      summary: List provider applications
+      operationId: listApplications
+      responses:
+        "200":
+          description: All applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    items: { $ref: "#/components/schemas/ProviderApplication" }
+    post:
+      tags: [providers]
+      summary: Submit a provider application (KYC onboarding entry point)
+      operationId: submitApplication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, phone, gender, skills, zones, languages]
+              properties:
+                name: { type: string }
+                phone: { type: string }
+                gender: { type: string, enum: [male, female] }
+                skills:
+                  type: array
+                  items: { type: string }
+                zones:
+                  type: array
+                  items: { $ref: "#/components/schemas/ZoneId" }
+                languages:
+                  type: array
+                  items: { $ref: "#/components/schemas/LanguageCode" }
+                yearsExperience: { type: integer }
+      responses:
+        "201":
+          description: Application created (documents_pending)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  application: { $ref: "#/components/schemas/ProviderApplication" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /providers/onboarding/{id}/documents:
+    post:
+      tags: [providers]
+      summary: Register a KYC document upload (S3 pre-signed + KMS in production)
+      operationId: uploadDocument
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type]
+              properties:
+                type: { type: string, enum: [qid, passport, work_permit, certificate] }
+      responses:
+        "201":
+          description: Document registered; identity + work permit ⇒ under_review
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  application: { $ref: "#/components/schemas/ProviderApplication" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /admin/verification:
+    get:
+      tags: [admin]
+      summary: Ops KYC review queue
+      operationId: verificationQueue
+      responses:
+        "200":
+          description: Applications pending documents or review
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queue:
+                    type: array
+                    items: { $ref: "#/components/schemas/ProviderApplication" }
+
+  /admin/verification/{id}:
+    patch:
+      tags: [admin]
+      summary: Review an application or record its training assessment
+      operationId: reviewApplication
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string, enum: [approve, reject, training_result] }
+                note: { type: string }
+                score: { type: number, minimum: 0, maximum: 1, description: "training_result only; ≥0.8 passes ⇒ provider goes LIVE" }
+      responses:
+        "200":
+          description: Updated application
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  application: { $ref: "#/components/schemas/ProviderApplication" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
   /ai/translate:
     post:
       tags: [ai]
@@ -918,6 +1063,71 @@ components:
         refundRisk: { type: number, minimum: 0, maximum: 1 }
         humanEscalation: { type: boolean }
         summary: { type: string, maxLength: 140 }
+
+    LatLng:
+      type: object
+      properties:
+        lat: { type: number }
+        lng: { type: number }
+
+    TrackingSnapshot:
+      type: object
+      properties:
+        bookingId: { type: string }
+        phase: { type: string, enum: [assigning, preparing, en_route, on_site, finished, cancelled] }
+        position:
+          oneOf:
+            - { $ref: "#/components/schemas/LatLng" }
+            - { type: "null" }
+        destination: { $ref: "#/components/schemas/LatLng" }
+        etaMinutes:
+          oneOf:
+            - { type: integer }
+            - { type: "null" }
+        progress: { type: number, minimum: 0, maximum: 1 }
+        safetyPanel:
+          type: object
+          properties:
+            providerName:
+              oneOf:
+                - { type: string }
+                - { type: "null" }
+            verified: { type: boolean }
+            checks:
+              type: array
+              items: { type: string }
+            sosNumber: { type: string, example: "999" }
+
+    ProviderApplication:
+      type: object
+      properties:
+        id: { type: string, example: APP-201 }
+        name: { type: string }
+        phone: { type: string }
+        gender: { type: string, enum: [male, female] }
+        skills:
+          type: array
+          items: { type: string }
+        zones:
+          type: array
+          items: { $ref: "#/components/schemas/ZoneId" }
+        languages:
+          type: array
+          items: { $ref: "#/components/schemas/LanguageCode" }
+        yearsExperience: { type: integer }
+        status: { type: string, enum: [documents_pending, under_review, training, approved, rejected] }
+        documents:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string, enum: [qid, passport, work_permit, certificate] }
+              status: { type: string, enum: [pending_review, verified, rejected] }
+              uploadedAt: { type: string, format: date-time }
+        trainingScore: { type: number }
+        reviewNote: { type: string }
+        providerId: { type: string, description: "set once LIVE in the matching network" }
+        createdAt: { type: string, format: date-time }
 
     Session:
       type: object

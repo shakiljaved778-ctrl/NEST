@@ -53,10 +53,13 @@ app/                    Next.js App Router
     payments/           POST /api/payments/intent|confirm, GET /api/payments
     refunds/            POST /api/refunds        — partial/full refunds
     providers/          GET  /api/providers/:id/quality — AI quality score
+                        POST /api/providers/onboarding[/…/documents] — KYC pipeline
+    bookings/…/tracking GET  /api/bookings/:id/tracking — live tracking + safety panel
     subscriptions/      GET/POST /api/subscriptions — Nest+ plans
     wallet/             GET/POST /api/wallet     — ledger, coupons
     chat/               GET/POST /api/chat/:bookingId — auto-translated chat
     events/             POST /api/events         — named analytics taxonomy
+    admin/verification/ GET/PATCH — ops KYC review queue
     admin/summary/      GET  /api/admin/summary  — stats + AI daily summary
     admin/pilot/        GET  /api/admin/pilot    — pilot scoreboard (Seed gates)
     admin/fraud/        GET  /api/admin/fraud    — live fraud scan

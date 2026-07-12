@@ -15,6 +15,7 @@ type Tab =
   | "providers"
   | "catalog"
   | "pricing"
+  | "revenue"
   | "complaints"
   | "coupons"
   | "heatmap"
@@ -27,6 +28,7 @@ const TABS: { id: Tab; icon: string; label: string }[] = [
   { id: "providers", icon: "🪪", label: "Providers" },
   { id: "catalog", icon: "🗂️", label: "Service catalog" },
   { id: "pricing", icon: "💰", label: "Pricing engine" },
+  { id: "revenue", icon: "💳", label: "Revenue & funnel" },
   { id: "complaints", icon: "🛟", label: "Disputes & refunds" },
   { id: "coupons", icon: "🎟️", label: "Coupons" },
   { id: "heatmap", icon: "🗺️", label: "Ops heatmap" },
@@ -66,6 +68,32 @@ interface FraudFlagRow {
   suggestedAction: string;
 }
 
+interface VerificationRow {
+  id: string;
+  name: string;
+  skills: string[];
+  zones: string[];
+  status: string;
+  documents: { type: string; status: string }[];
+}
+
+interface PaymentRow {
+  id: string;
+  bookingId: string;
+  method: string;
+  status: string;
+  amount: number;
+  split: { commission: number; providerNet: number; commissionRate: number };
+  invoice?: { number: string };
+}
+
+interface FunnelRow {
+  step: string;
+  actors: number;
+  conversion: number;
+  killOrFix: boolean;
+}
+
 export default function AdminDashboard() {
   const [tab, setTab] = useState<Tab>("overview");
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -73,6 +101,9 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<{ bookingsToday: number; gmvToday: number; activeProviders: number; avgRating: number } | null>(null);
   const [pilot, setPilot] = useState<PilotScoreboard | null>(null);
   const [fraudFlags, setFraudFlags] = useState<FraudFlagRow[]>([]);
+  const [queue, setQueue] = useState<VerificationRow[]>([]);
+  const [payments, setPayments] = useState<PaymentRow[]>([]);
+  const [funnel, setFunnel] = useState<FunnelRow[]>([]);
 
   useEffect(() => {
     fetch("/api/admin/pilot")
@@ -83,6 +114,18 @@ export default function AdminDashboard() {
       .then((r) => r.json())
       .then((d) => setFraudFlags(d.flags ?? []))
       .catch(() => setFraudFlags([]));
+    fetch("/api/admin/verification")
+      .then((r) => r.json())
+      .then((d) => setQueue(d.queue ?? []))
+      .catch(() => setQueue([]));
+    fetch("/api/payments")
+      .then((r) => r.json())
+      .then((d) => setPayments(d.payments ?? []))
+      .catch(() => setPayments([]));
+    fetch("/api/admin/funnel")
+      .then((r) => r.json())
+      .then((d) => setFunnel(d.steps ?? []))
+      .catch(() => setFunnel([]));
     fetch("/api/bookings")
       .then((r) => r.json())
       .then((d) => setBookings(d.bookings ?? []))
@@ -255,9 +298,27 @@ export default function AdminDashboard() {
       case "providers":
         return (
           <div className="space-y-4">
-            <div className="card p-4 flex items-center justify-between bg-gold-soft !border-gold/40">
-              <p className="text-sm font-semibold text-navy">🪪 Verification queue: <b>3 providers</b> awaiting document review</p>
-              <button className="chip bg-navy text-white">Open queue</button>
+            <div className="card p-4 bg-gold-soft !border-gold/40">
+              <p className="text-sm font-semibold text-navy mb-2">
+                🪪 Verification queue: <b>{queue.length} provider{queue.length === 1 ? "" : "s"}</b> awaiting document review
+              </p>
+              <div className="space-y-2">
+                {queue.map((a) => (
+                  <div key={a.id} className="flex flex-wrap items-center gap-2 rounded-xl bg-white/70 px-3 py-2 text-xs">
+                    <span className="font-bold text-navy">{a.name}</span>
+                    <span className="text-navy-400">{a.skills.join(", ")}</span>
+                    <span className="text-navy-400">· {a.documents.length} docs</span>
+                    <span className={`chip ${a.status === "under_review" ? "bg-navy text-white" : "bg-gold-soft text-gold-dark"}`}>
+                      {a.status.replace(/_/g, " ")}
+                    </span>
+                    <span className="ms-auto flex gap-1.5">
+                      <button className="chip bg-teal text-white">Approve → training</button>
+                      <button className="chip bg-white border border-navy-200 text-navy">Reject</button>
+                    </span>
+                  </div>
+                ))}
+                {queue.length === 0 && <p className="text-xs text-navy-400">Queue is clear.</p>}
+              </div>
             </div>
             <div className="card overflow-x-auto">
               <table className="w-full text-sm min-w-[760px]">
@@ -365,6 +426,75 @@ export default function AdminDashboard() {
             </div>
           </div>
         );
+
+      case "revenue": {
+        const captured = payments.filter((p) => p.status === "captured" || p.status === "partially_refunded" || p.status === "refunded");
+        const gross = captured.reduce((s, p) => s + p.amount, 0);
+        const commission = captured.reduce((s, p) => s + p.split.commission, 0);
+        return (
+          <div className="space-y-6">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Kpi label="Captured GMV" value={`QAR ${gross.toLocaleString()}`} sub={`${captured.length} captured payments`} tone="text-teal-dark" />
+              <Kpi label="Nest commission" value={`QAR ${commission.toLocaleString()}`} sub="tiered 12–25% by category" tone="text-gold-dark" />
+              <Kpi label="Provider payouts" value={`QAR ${(gross - commission).toLocaleString()}`} sub="weekly payout cycle" />
+            </div>
+            <div className="card overflow-x-auto">
+              <table className="w-full text-sm min-w-[760px]">
+                <thead>
+                  <tr className="bg-navy text-white">
+                    {["Payment", "Booking", "Method", "Status", "Gross", "Commission", "Provider net", "Invoice"].map((h) => (
+                      <th key={h} className="px-4 py-3 text-start font-semibold">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.length === 0 && (
+                    <tr><td colSpan={8} className="px-4 py-6 text-center text-navy-400 text-xs">
+                      No payments yet this session — payments appear as bookings are paid and completed.
+                    </td></tr>
+                  )}
+                  {payments.map((p) => (
+                    <tr key={p.id} className="border-b border-navy-50 last:border-0 hover:bg-pearl">
+                      <td className="px-4 py-3 font-semibold text-navy">{p.id}</td>
+                      <td className="px-4 py-3 text-navy-500">{p.bookingId}</td>
+                      <td className="px-4 py-3 text-navy-500">{p.method.replace(/_/g, " ")}</td>
+                      <td className="px-4 py-3"><span className={`chip ${p.status === "captured" ? "bg-teal text-white" : p.status === "authorized" ? "bg-gold-soft text-gold-dark" : "bg-navy-50 text-navy-500"}`}>{p.status.replace(/_/g, " ")}</span></td>
+                      <td className="px-4 py-3 font-semibold text-navy">QAR {p.amount}</td>
+                      <td className="px-4 py-3 text-navy-500">QAR {p.split.commission} ({Math.round(p.split.commissionRate * 100)}%)</td>
+                      <td className="px-4 py-3 text-navy-500">QAR {p.split.providerNet}</td>
+                      <td className="px-4 py-3 text-xs text-navy-400">{p.invoice?.number ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="card p-5">
+              <p className="font-display font-bold text-navy mb-1">Booking funnel (weekly review)</p>
+              <p className="text-xs text-navy-400 mb-4">Blueprint rule: kill or fix any step with a &gt;20% drop.</p>
+              <div className="space-y-2.5">
+                {funnel.map((s, i) => {
+                  const max = Math.max(1, funnel[0]?.actors ?? 1);
+                  return (
+                    <div key={s.step} className="flex items-center gap-3 text-sm">
+                      <span className="w-44 shrink-0 text-navy-600">{s.step.replace(/_/g, " ")}</span>
+                      <div className="flex-1 h-4 rounded bg-navy-50 overflow-hidden">
+                        <span className={`block h-full ${s.killOrFix ? "bg-red-500" : "bg-teal"}`} style={{ width: `${(s.actors / max) * 100}%` }} />
+                      </div>
+                      <span className="w-24 text-end text-navy-500 text-xs">
+                        {s.actors}{i > 0 ? ` · ${Math.round(s.conversion * 100)}%` : ""}
+                      </span>
+                      {s.killOrFix && <span className="chip bg-red-50 text-red-600">kill or fix</span>}
+                    </div>
+                  );
+                })}
+                {funnel.every((s) => s.actors === 0) && (
+                  <p className="text-xs text-navy-400">No events tracked yet — the funnel fills as customers move through the golden path.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
 
       case "complaints":
         return (
