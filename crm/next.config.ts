@@ -5,8 +5,20 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Node-only libraries that must not be bundled (they use Node core modules).
+  serverExternalPackages: ["nodemailer", "@aws-sdk/client-s3", "bcryptjs"],
   experimental: {
     serverActions: { bodySizeLimit: "10mb" },
+  },
+  webpack: (config, { nextRuntime }) => {
+    // nodemailer (reached via the job worker) is Node-only. Keep it out of the
+    // edge/client bundles so Next doesn't try to resolve Node core modules there.
+    if (nextRuntime !== "nodejs") {
+      config.resolve = config.resolve ?? {};
+      const nodeBuiltins = ["stream", "crypto", "fs", "net", "tls", "dns", "path", "os", "zlib", "http", "https", "http2", "url", "util", "child_process", "dgram", "events", "buffer", "string_decoder", "assert", "querystring"];
+      config.resolve.fallback = { ...config.resolve.fallback, ...Object.fromEntries(nodeBuiltins.map((m) => [m, false])) };
+    }
+    return config;
   },
   headers: async () => [
     {
