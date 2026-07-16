@@ -14,6 +14,7 @@ import { QuickActions } from "@/components/entity/quick-actions";
 import { KycChecklist } from "@/components/clients/kyc-checklist";
 import { SubscriptionsCard } from "@/components/clients/subscriptions-card";
 import { MaskedId } from "@/components/clients/masked-id";
+import { EraseClientButton } from "@/components/clients/erase-client-button";
 import { fmtDateTime, fmtMoney } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -50,13 +51,16 @@ export default async function ContactPage({ params }: { params: Promise<{ id: st
         {contact.clientStatus && (
           <Badge variant={STATUS_VARIANT[contact.clientStatus]}>{contact.clientStatus}</Badge>
         )}
-        {isB2C && isManagerial(user.role) && (
-          <div className="ms-auto">
+        {isManagerial(user.role) && (
+          <div className="ms-auto flex gap-2">
             <Button variant="outline" size="sm" asChild>
               <a href={`/api/clients/contact/${contact.id}/export`} download>
                 Export data (PDPPL)
               </a>
             </Button>
+            {user.role === "ADMIN" && (
+              <EraseClientButton clientType="contact" clientId={contact.id} name={`${contact.firstName} ${contact.lastName}`} />
+            )}
           </div>
         )}
       </div>

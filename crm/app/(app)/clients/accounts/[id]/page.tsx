@@ -12,6 +12,7 @@ import { DocumentsCard } from "@/components/entity/documents-card";
 import { QuickActions } from "@/components/entity/quick-actions";
 import { KycChecklist } from "@/components/clients/kyc-checklist";
 import { SubscriptionsCard } from "@/components/clients/subscriptions-card";
+import { EraseClientButton } from "@/components/clients/erase-client-button";
 import { fmtMoney } from "@/lib/utils";
 import { isManagerial } from "@/lib/rbac";
 
@@ -46,12 +47,13 @@ export default async function AccountPage({ params }: { params: Promise<{ id: st
         <Badge variant={STATUS_VARIANT[account.status]}>{account.status}</Badge>
         <Badge variant="outline">B2B</Badge>
         {isManagerial(user.role) && (
-          <div className="ms-auto">
+          <div className="ms-auto flex gap-2">
             <Button variant="outline" size="sm" asChild>
               <a href={`/api/clients/account/${account.id}/export`} download>
                 Export data (PDPPL)
               </a>
             </Button>
+            {user.role === "ADMIN" && <EraseClientButton clientType="account" clientId={account.id} name={account.legalName} />}
           </div>
         )}
       </div>
