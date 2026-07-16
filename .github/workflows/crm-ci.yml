@@ -1,0 +1,56 @@
+name: CRM CI
+
+on:
+  push:
+    paths:
+      - "crm/**"
+      - ".github/workflows/crm-ci.yml"
+  pull_request:
+    paths:
+      - "crm/**"
+      - ".github/workflows/crm-ci.yml"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: crm
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: crm
+          POSTGRES_PASSWORD: crm
+          POSTGRES_DB: crm
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U crm -d crm"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://crm:crm@localhost:5432/crm
+      AUTH_SECRET: ci-secret-not-for-production-000000000000
+      AUTH_URL: http://localhost:3000
+      AUTH_TRUST_HOST: "true"
+      FIELD_ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      JOBS_DISABLE_WORKER: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: crm/package-lock.json
+      - run: npm ci
+      - run: npx prisma db push --skip-generate
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run db:seed
+      - run: npm run build
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - name: E2E
+        run: npm run test:e2e

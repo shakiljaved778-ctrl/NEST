@@ -4,7 +4,9 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Standalone output is only needed for the Docker image (smaller runtime).
+  // Enabled via env so `next start` (local/dev) keeps working normally.
+  ...(process.env.BUILD_STANDALONE === "true" ? { output: "standalone" as const } : {}),
   // Node-only libraries that must not be bundled (they use Node core modules).
   serverExternalPackages: ["nodemailer", "@aws-sdk/client-s3", "bcryptjs"],
   experimental: {

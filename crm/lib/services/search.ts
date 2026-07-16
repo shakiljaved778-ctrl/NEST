@@ -2,6 +2,9 @@ import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import type { SessionUser } from "@/lib/rbac";
 import { leadScope, accountScope, contactScope, dealScope } from "@/lib/rbac";
+import { toTsQuery } from "@/lib/fts";
+
+export { toTsQuery };
 
 export type SearchResult = {
   type: "lead" | "account" | "contact" | "deal";
@@ -10,17 +13,6 @@ export type SearchResult = {
   subtitle: string | null;
   href: string;
 };
-
-/** Build a prefix-matching tsquery ("fin:* & tech:*") from user input. */
-export function toTsQuery(q: string): string {
-  return q
-    .split(/\s+/)
-    .map((t) => t.replace(/[^\p{L}\p{N}@.+-]/gu, ""))
-    .filter((t) => t.length > 0)
-    .slice(0, 6)
-    .map((t) => `${t.replace(/[':]/g, "")}:*`)
-    .join(" & ");
-}
 
 // Global search uses Postgres full-text search over expression GIN indexes
 // (created by scripts/fts.sql). Raw SQL returns candidate ids ranked by
