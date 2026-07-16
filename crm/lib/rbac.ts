@@ -52,15 +52,20 @@ async function teamMemberIds(teamId: string): Promise<string[]> {
   return members.map((m) => m.id);
 }
 
+/** Shape shared by Lead and Deal where-inputs for owner/team scoping. */
+type OwnedTeamWhere = {
+  OR?: { ownerId?: string | { in: string[] } | null; teamId?: string | null }[];
+};
+
 /** Scope for entities that carry ownerId + teamId (Lead, Deal). */
-export async function ownedTeamScope(user: SessionUser): Promise<Prisma.LeadWhereInput & Prisma.DealWhereInput> {
+export async function ownedTeamScope(user: SessionUser): Promise<OwnedTeamWhere> {
   if (seesAll(user.role)) return {};
   if (user.role === "TEAM_LEAD" && user.teamId) {
     const ids = await teamMemberIds(user.teamId);
     return { OR: [{ teamId: user.teamId }, { ownerId: { in: ids } }] };
   }
   // REP: own records plus unassigned records shared with their team
-  const or: Prisma.LeadWhereInput[] = [{ ownerId: user.id }];
+  const or: OwnedTeamWhere["OR"] = [{ ownerId: user.id }];
   if (user.teamId) or.push({ teamId: user.teamId, ownerId: null });
   return { OR: or };
 }

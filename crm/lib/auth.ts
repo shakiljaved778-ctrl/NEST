@@ -18,7 +18,9 @@ const credentialsSchema = z.object({
   totp: z.string().optional(),
 });
 
-const providers: Parameters<typeof NextAuth>[0] extends { providers: infer P } ? P : never = [
+import type { Provider } from "next-auth/providers";
+
+const providers: Provider[] = [
   Credentials({
     credentials: { email: {}, password: {}, totp: {} },
     async authorize(raw) {
