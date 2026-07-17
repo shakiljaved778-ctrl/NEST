@@ -5,9 +5,6 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
-  Funnel,
-  FunnelChart,
-  LabelList,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -38,17 +35,37 @@ function ChartTooltip({ active, payload, label, money }: { active?: boolean; pay
   );
 }
 
-export function FunnelChartCard({ data }: { data: { name: string; value: number; fill: string }[] }) {
+// A CSS funnel of tapering, centered bars. Recharts' <Funnel> ignores per-slice
+// fill in this version, and stacked bars read more clearly anyway: each stage is
+// a bar whose width is proportional to its count, with the step-to-step
+// conversion rate shown between stages.
+export function FunnelChartCard({ data }: { data: { name: string; value: number; fill?: string }[] }) {
+  const max = Math.max(...data.map((d) => d.value), 1);
+  // Color by index from the shared palette (kept here so it never depends on a
+  // fill prop crossing the server/client-component boundary).
+  const colors = [PALETTE[0], PALETTE[1], PALETTE[2], PALETTE[3], PALETTE[5]];
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <FunnelChart>
-        <Tooltip content={<ChartTooltip />} />
-        <Funnel dataKey="value" data={data} isAnimationActive>
-          <LabelList position="right" fill="hsl(var(--foreground))" stroke="none" dataKey="name" fontSize={12} />
-          <LabelList position="left" fill="hsl(var(--muted-foreground))" stroke="none" dataKey="value" fontSize={12} />
-        </Funnel>
-      </FunnelChart>
-    </ResponsiveContainer>
+    <div className="space-y-2 py-2">
+      {data.map((d, i) => {
+        const pct = Math.max((d.value / max) * 100, 6);
+        const prev = i > 0 ? data[i - 1].value : null;
+        const step = prev && prev > 0 ? Math.round((d.value / prev) * 100) : null;
+        return (
+          <div key={d.name} className="flex items-center gap-3">
+            <span className="w-24 shrink-0 text-sm text-muted-foreground">{d.name}</span>
+            <div className="flex flex-1 items-center gap-2">
+              <div
+                className="flex h-8 items-center justify-end rounded-md px-2 text-xs font-semibold text-white transition-all"
+                style={{ width: `${pct}%`, backgroundColor: d.fill ?? colors[i % colors.length] }}
+              >
+                {d.value}
+              </div>
+              {step !== null && <span className="shrink-0 text-xs text-muted-foreground">{step}%</span>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
