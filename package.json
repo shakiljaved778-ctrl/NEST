@@ -1,30 +1,35 @@
 {
-  "name": "nest-solutions-super-app",
+  "name": "voyara",
   "version": "0.1.0",
   "private": true,
-  "description": "NEST Solutions — Qatar's AI-powered trusted home-services super app. Customer app, provider app, admin & operations dashboards, and AI layer.",
+  "description": "Voyara — the agentic travel company. Web + Mobile + Machine Rails.",
+  "packageManager": "pnpm@10.33.0",
   "scripts": {
-    "dev": "next dev -p 4200",
-    "build": "next build",
-    "start": "next start -p 4200",
-    "lint": "next lint",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "next": "15.1.6",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "demo": "tsx scripts/demo-istanbul.ts",
+    "db:generate": "prisma generate",
+    "db:seed": "tsx prisma/seed.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
+    "prisma": "^6.2.0",
+    "tsx": "^4.19.2",
+    "turbo": "^2.3.3",
     "typescript": "^5.7.0",
-    "vitest": "^4.1.10"
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.0",
+    "@voyara/agent-core": "workspace:*",
+    "@voyara/contracts": "workspace:*",
+    "@voyara/forecast": "workspace:*",
+    "@voyara/inventory-mesh": "workspace:*",
+    "@voyara/ledger": "workspace:*",
+    "zod": "^3.24.1"
   }
 }

@@ -6,5 +6,9 @@ dist/
 *.log
 .env
 .env.local
+.env.*.local
+.turbo/
 .DS_Store
 *.tsbuildinfo
+coverage/
+prisma/dev.db
