@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(201, 162, 39, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, rgba(107, 125, 168, 0.1), transparent 55%),
+    #0a1128;
+  color: #f5efe1;
+}
+
+/* Web-safe display/body stacks approximating Fraunces + Inter without a
+   network font fetch (kept offline-safe for zero-key demos). */
+.font-display {
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background: rgba(201, 162, 39, 0.35);
+}
+
+.narration-cursor::after {
+  content: "▍";
+  color: #c9a227;
+  animation: blink 1s steps(2) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}

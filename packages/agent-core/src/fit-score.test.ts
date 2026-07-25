@@ -17,16 +17,16 @@ describe("fit scorer margin-blindness (the trust moat)", () => {
     expect(r.score).toBeLessThanOrEqual(1);
   });
 
-  it("a smuggled supplier-margin field cannot change the score", () => {
+  it("the input type structurally rejects a supplier-margin field (compile-time moat)", () => {
+    // @ts-expect-error — margin/commission/sponsorship are not FitScoreInput fields
+    const _rejected: FitScoreInput = { ...base, margin: 0.99, sponsoredBid: 999999 };
+    void _rejected;
+  });
+
+  it("a smuggled supplier-margin field cannot change the score at runtime", () => {
     const clean = fitScore(base);
-    // Force a margin/commission field onto the input at runtime.
-    const dirty = fitScore({
-      ...base,
-      // @ts-expect-error — margin is not part of FitScoreInput and must be rejected
-      margin: 0.99,
-      // @ts-expect-error — sponsorship is likewise not a scoring signal
-      sponsoredBid: 999999,
-    });
+    // Force margin/sponsorship onto the object at runtime; parse must strip it.
+    const dirty = fitScore({ ...base, margin: 0.99, sponsoredBid: 999999 } as unknown as FitScoreInput);
     expect(dirty.score).toBe(clean.score);
   });
 
