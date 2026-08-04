@@ -1,0 +1,793 @@
+// Fintech Sales CRM — Prisma schema
+// All timestamps are stored in UTC. Money values are floats in the deal's
+// currency with an fx rate to QAR captured at edit time (see DECISIONS.md).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  MANAGER
+  TEAM_LEAD
+  REP
+  READ_ONLY
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  DISQUALIFIED
+}
+
+enum ClientStatus {
+  PROSPECT
+  ACTIVE
+  CHURNED
+}
+
+enum DealStatus {
+  OPEN
+  WON
+  LOST
+}
+
+enum StageType {
+  OPEN
+  WON
+  LOST
+}
+
+enum PricingModel {
+  ONE_TIME
+  MONTHLY
+  ANNUAL
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum ActivityType {
+  CALL
+  MEETING
+  NOTE
+  EMAIL
+}
+
+enum TaskStatus {
+  OPEN
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum DocCategory {
+  KYC
+  AGREEMENT
+  PROPOSAL
+  OTHER
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  RESTORE
+  VIEW
+  DOWNLOAD
+  REVEAL
+  LOGIN
+  LOGIN_FAILED
+  LOCKOUT
+  EXPORT
+  ERASE
+  ASSIGN
+  CONVERT
+  MERGE
+  STAGE_CHANGE
+  SLA_BREACH
+}
+
+enum EntityType {
+  USER
+  TEAM
+  LEAD
+  ACCOUNT
+  CONTACT
+  DEAL
+  PRODUCT
+  SUBSCRIPTION
+  ACTIVITY
+  TASK
+  DOCUMENT
+  ROUTING_RULE
+  PIPELINE
+  STAGE
+  SAVED_VIEW
+  CUSTOM_FIELD
+  KYC_ITEM
+  SETTING
+  CAPTURE_TOKEN
+  NOTIFICATION
+}
+
+enum RoutingTargetType {
+  REP
+  TEAM_ROUND_ROBIN
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  DONE
+  FAILED
+}
+
+enum IdDocType {
+  QID
+  PASSPORT
+}
+
+enum Language {
+  EN
+  AR
+}
+
+enum LawfulBasis {
+  CONSENT
+  CONTRACT
+  LEGITIMATE_INTEREST
+}
+
+enum CaptureKind {
+  FORM
+  WEBHOOK
+}
+
+enum CustomFieldType {
+  TEXT
+  NUMBER
+  DATE
+  SELECT
+}
+
+enum KycAppliesTo {
+  ACCOUNT
+  CONTACT
+  BOTH
+}
+
+// ─── Org & auth ──────────────────────────────────────────────────────────────
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String
+  passwordHash     String?
+  role             Role      @default(REP)
+  teamId           String?
+  team             Team?     @relation("TeamMembers", fields: [teamId], references: [id])
+  territory        String?
+  active           Boolean   @default(true)
+  onLeave          Boolean   @default(false)
+  quotaMonthly     Float     @default(0) // QAR
+  failedLoginCount Int       @default(0)
+  lockedUntil      DateTime?
+  totpSecret       String? // encrypted with FIELD_ENCRYPTION_KEY
+  totpEnabled      Boolean   @default(false)
+  emailDigest      Boolean   @default(true)
+  lastLoginAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  leadsOwned    Lead[]         @relation("LeadOwner")
+  accountsOwned Account[]      @relation("AccountOwner")
+  contactsOwned Contact[]      @relation("ContactOwner")
+  dealsOwned    Deal[]         @relation("DealOwner")
+  tasksOwned    Task[]         @relation("TaskOwner")
+  tasksCreated  Task[]         @relation("TaskCreator")
+  activities    Activity[]
+  documents     Document[]     @relation("DocUploader")
+  docVersions   DocumentVersion[]
+  notifications Notification[]
+  savedViews    SavedView[]
+  teamsLed      Team[]         @relation("TeamLeadUser")
+  auditLogs     AuditLog[]
+  routingRules  LeadRoutingRule[]
+
+  @@index([teamId])
+  @@index([role, active])
+}
+
+model Team {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  territory   String?
+  productLine String?
+  teamLeadId  String?
+  teamLead    User?     @relation("TeamLeadUser", fields: [teamLeadId], references: [id])
+  rrCursor    Int       @default(0) // round-robin position for lead routing
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  members      User[]            @relation("TeamMembers")
+  leads        Lead[]
+  deals        Deal[]
+  routingRules LeadRoutingRule[]
+}
+
+// ─── Clients ─────────────────────────────────────────────────────────────────
+
+model Account {
+  id           String       @id @default(cuid())
+  legalName    String
+  tradeName    String?
+  crNumber     String? // trade license / commercial registration number
+  industry     String?
+  size         String? // e.g. 1-10, 11-50, 51-200, 200+
+  website      String?
+  address      String?
+  city         String?
+  territory    String?
+  status       ClientStatus @default(PROSPECT)
+  ownerId      String?
+  owner        User?        @relation("AccountOwner", fields: [ownerId], references: [id])
+  customFields Json         @default("{}")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+
+  contacts      Contact[]
+  deals         Deal[]
+  subscriptions Subscription[]
+  activities    Activity[]
+  tasks         Task[]
+  documents     Document[]
+  kycStatuses   KycItemStatus[]
+  leadsConverted Lead[]        @relation("LeadConvertedAccount")
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([territory])
+  @@index([legalName])
+}
+
+model Contact {
+  id                String        @id @default(cuid())
+  firstName         String
+  lastName          String
+  accountId         String?
+  account           Account?      @relation(fields: [accountId], references: [id])
+  // B2C individual clients have no account; clientStatus marks them as clients
+  clientStatus      ClientStatus?
+  position          String?
+  email             String?
+  email2            String?
+  phone             String?
+  phone2            String?
+  idDocType         IdDocType?
+  nationalIdEnc     String? // AES-256-GCM ciphertext of QID/passport number
+  nationalIdLast3   String? // for masked display without decryption
+  nationality       String?
+  preferredLanguage Language      @default(EN)
+  ownerId           String?
+  owner             User?         @relation("ContactOwner", fields: [ownerId], references: [id])
+  lawfulBasis       LawfulBasis?
+  consentAt         DateTime?
+  customFields      Json          @default("{}")
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  deletedAt         DateTime?
+
+  dealsPrimary  Deal[]         @relation("DealPrimaryContact")
+  dealContacts  DealContact[]
+  subscriptions Subscription[]
+  activities    Activity[]
+  tasks         Task[]
+  documents     Document[]
+  kycStatuses   KycItemStatus[]
+  leadsConverted Lead[]        @relation("LeadConvertedContact")
+
+  @@index([accountId])
+  @@index([ownerId])
+  @@index([email])
+  @@index([phone])
+  @@index([clientStatus])
+}
+
+// ─── Leads ───────────────────────────────────────────────────────────────────
+
+model Lead {
+  id                 String       @id @default(cuid())
+  firstName          String
+  lastName           String
+  company            String?
+  email              String?
+  phone              String?
+  source             String       @default("manual") // web-form, webhook, csv-import, referral, event, cold-call, manual
+  channel            String?
+  campaign           String?
+  territory          String?
+  productInterestId  String?
+  productInterest    Product?     @relation(fields: [productInterestId], references: [id])
+  status             LeadStatus   @default(NEW)
+  score              Int          @default(0)
+  ownerId            String?
+  owner              User?        @relation("LeadOwner", fields: [ownerId], references: [id])
+  teamId             String?
+  team               Team?        @relation(fields: [teamId], references: [id])
+  slaDueAt           DateTime?
+  firstTouchAt       DateTime?
+  slaBreachedAt      DateTime?
+  slaEscalatedAt     DateTime?
+  disqualifyReason   String?
+  lawfulBasis        LawfulBasis?
+  consentAt          DateTime?
+  notes              String?
+  customFields       Json         @default("{}")
+  convertedAt        DateTime?
+  convertedAccountId String?
+  convertedAccount   Account?     @relation("LeadConvertedAccount", fields: [convertedAccountId], references: [id])
+  convertedContactId String?
+  convertedContact   Contact?     @relation("LeadConvertedContact", fields: [convertedContactId], references: [id])
+  convertedDealId    String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  deletedAt          DateTime?
+
+  activities Activity[]
+  tasks      Task[]
+  documents  Document[]
+
+  @@index([status, ownerId])
+  @@index([teamId])
+  @@index([source])
+  @@index([email])
+  @@index([phone])
+  @@index([createdAt])
+  @@index([slaDueAt])
+  @@index([territory])
+}
+
+// ─── Pipeline & deals ────────────────────────────────────────────────────────
+
+model Pipeline {
+  id        String    @id @default(cuid())
+  name      String
+  isDefault Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  stages Stage[]
+  deals  Deal[]
+}
+
+model Stage {
+  id          String    @id @default(cuid())
+  pipelineId  String
+  pipeline    Pipeline  @relation(fields: [pipelineId], references: [id])
+  name        String
+  sortOrder   Int
+  probability Int       @default(10) // 0-100
+  type        StageType @default(OPEN)
+  deletedAt   DateTime?
+
+  deals            Deal[]
+  stageHistoryTo   DealStageHistory[] @relation("HistTo")
+  stageHistoryFrom DealStageHistory[] @relation("HistFrom")
+
+  @@index([pipelineId, sortOrder])
+}
+
+model Deal {
+  id               String     @id @default(cuid())
+  name             String
+  pipelineId       String
+  pipeline         Pipeline   @relation(fields: [pipelineId], references: [id])
+  stageId          String
+  stage            Stage      @relation(fields: [stageId], references: [id])
+  status           DealStatus @default(OPEN)
+  value            Float      @default(0)
+  currency         String     @default("QAR")
+  fxRateToQar      Float      @default(1)
+  expectedCloseAt  DateTime?
+  probability      Int? // override; falls back to stage probability
+  ownerId          String?
+  owner            User?      @relation("DealOwner", fields: [ownerId], references: [id])
+  teamId           String?
+  team             Team?      @relation(fields: [teamId], references: [id])
+  accountId        String?
+  account          Account?   @relation(fields: [accountId], references: [id])
+  primaryContactId String?
+  primaryContact   Contact?   @relation("DealPrimaryContact", fields: [primaryContactId], references: [id])
+  wonAt            DateTime?
+  lostAt           DateTime?
+  lossReason       String?
+  winReason        String?
+  customFields     Json       @default("{}")
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  deletedAt        DateTime?
+
+  products      DealProduct[]
+  contacts      DealContact[]
+  activities    Activity[]
+  tasks         Task[]
+  documents     Document[]
+  stageHistory  DealStageHistory[]
+  subscriptions Subscription[]
+
+  @@index([stageId])
+  @@index([ownerId, status])
+  @@index([teamId])
+  @@index([accountId])
+  @@index([expectedCloseAt])
+  @@index([createdAt])
+}
+
+model DealProduct {
+  id        String  @id @default(cuid())
+  dealId    String
+  deal      Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int     @default(1)
+  unitPrice Float   @default(0)
+
+  @@index([dealId])
+}
+
+model DealContact {
+  dealId    String
+  deal      Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  contactId String
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  role      String?
+
+  @@id([dealId, contactId])
+}
+
+model DealStageHistory {
+  id          String   @id @default(cuid())
+  dealId      String
+  deal        Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  fromStageId String?
+  fromStage   Stage?   @relation("HistFrom", fields: [fromStageId], references: [id])
+  toStageId   String
+  toStage     Stage    @relation("HistTo", fields: [toStageId], references: [id])
+  changedById String?
+  createdAt   DateTime @default(now())
+
+  @@index([dealId, createdAt])
+}
+
+// ─── Products & subscriptions ────────────────────────────────────────────────
+
+model Product {
+  id           String       @id @default(cuid())
+  name         String
+  description  String?
+  pricingModel PricingModel @default(MONTHLY)
+  price        Float        @default(0) // QAR
+  active       Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+
+  dealProducts  DealProduct[]
+  subscriptions Subscription[]
+  leads         Lead[]
+}
+
+model Subscription {
+  id           String             @id @default(cuid())
+  accountId    String?
+  account      Account?           @relation(fields: [accountId], references: [id])
+  contactId    String?
+  contact      Contact?           @relation(fields: [contactId], references: [id])
+  productId    String
+  product      Product            @relation(fields: [productId], references: [id])
+  dealId       String?
+  deal         Deal?              @relation(fields: [dealId], references: [id])
+  startDate    DateTime
+  renewalDate  DateTime?
+  status       SubscriptionStatus @default(ACTIVE)
+  mrrValue     Float              @default(0) // QAR / month
+  currency     String             @default("QAR")
+  // which renewal reminders have fired (60/30/7)
+  remindersSent Json              @default("[]")
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  deletedAt    DateTime?
+
+  @@index([accountId])
+  @@index([contactId])
+  @@index([renewalDate, status])
+}
+
+// ─── Activities, tasks, documents ────────────────────────────────────────────
+
+model Activity {
+  id         String       @id @default(cuid())
+  type       ActivityType
+  subject    String
+  body       String?
+  occurredAt DateTime     @default(now())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id])
+  leadId     String?
+  lead       Lead?        @relation(fields: [leadId], references: [id])
+  accountId  String?
+  account    Account?     @relation(fields: [accountId], references: [id])
+  contactId  String?
+  contact    Contact?     @relation(fields: [contactId], references: [id])
+  dealId     String?
+  deal       Deal?        @relation(fields: [dealId], references: [id])
+  createdAt  DateTime     @default(now())
+  deletedAt  DateTime?
+
+  @@index([leadId])
+  @@index([accountId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([userId, occurredAt])
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  dueAt       DateTime
+  priority    TaskPriority @default(MEDIUM)
+  status      TaskStatus   @default(OPEN)
+  ownerId     String
+  owner       User         @relation("TaskOwner", fields: [ownerId], references: [id])
+  createdById String?
+  createdBy   User?        @relation("TaskCreator", fields: [createdById], references: [id])
+  leadId      String?
+  lead        Lead?        @relation(fields: [leadId], references: [id])
+  accountId   String?
+  account     Account?     @relation(fields: [accountId], references: [id])
+  contactId   String?
+  contact     Contact?     @relation(fields: [contactId], references: [id])
+  dealId      String?
+  deal        Deal?        @relation(fields: [dealId], references: [id])
+  // recurrence: {"freq":"DAILY"|"WEEKLY"|"MONTHLY","interval":1} — next
+  // occurrence is created when the task is completed
+  recurrence  Json?
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  @@index([ownerId, status, dueAt])
+  @@index([leadId])
+  @@index([accountId])
+  @@index([contactId])
+  @@index([dealId])
+}
+
+model Document {
+  id           String      @id @default(cuid())
+  name         String
+  category     DocCategory @default(OTHER)
+  mime         String
+  size         Int
+  storageKey   String // latest version
+  version      Int         @default(1)
+  uploadedById String
+  uploadedBy   User        @relation("DocUploader", fields: [uploadedById], references: [id])
+  leadId       String?
+  lead         Lead?       @relation(fields: [leadId], references: [id])
+  accountId    String?
+  account      Account?    @relation(fields: [accountId], references: [id])
+  contactId    String?
+  contact      Contact?    @relation(fields: [contactId], references: [id])
+  dealId       String?
+  deal         Deal?       @relation(fields: [dealId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  deletedAt    DateTime?
+
+  versions       DocumentVersion[]
+  kycItemStatuses KycItemStatus[]
+
+  @@index([leadId])
+  @@index([accountId])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([category])
+}
+
+model DocumentVersion {
+  id           String   @id @default(cuid())
+  documentId   String
+  document     Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  version      Int
+  storageKey   String
+  mime         String
+  size         Int
+  uploadedById String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@unique([documentId, version])
+}
+
+// ─── KYC checklist ───────────────────────────────────────────────────────────
+
+model KycChecklistItem {
+  id        String       @id @default(cuid())
+  name      String
+  appliesTo KycAppliesTo @default(BOTH)
+  required  Boolean      @default(true)
+  sortOrder Int          @default(0)
+  active    Boolean      @default(true)
+  createdAt DateTime     @default(now())
+
+  statuses KycItemStatus[]
+}
+
+model KycItemStatus {
+  id              String           @id @default(cuid())
+  checklistItemId String
+  checklistItem   KycChecklistItem @relation(fields: [checklistItemId], references: [id], onDelete: Cascade)
+  accountId       String?
+  account         Account?         @relation(fields: [accountId], references: [id])
+  contactId       String?
+  contact         Contact?         @relation(fields: [contactId], references: [id])
+  documentId      String?
+  document        Document?        @relation(fields: [documentId], references: [id])
+  complete        Boolean          @default(false)
+  completedById   String?
+  completedAt     DateTime?
+
+  @@unique([checklistItemId, accountId])
+  @@unique([checklistItemId, contactId])
+  @@index([accountId])
+  @@index([contactId])
+}
+
+// ─── Lead routing ────────────────────────────────────────────────────────────
+
+model LeadRoutingRule {
+  id          String            @id @default(cuid())
+  name        String
+  priority    Int               @default(0) // lower first
+  active      Boolean           @default(true)
+  isFallback  Boolean           @default(false)
+  // criteria: {sources?: string[], territories?: string[], productIds?: string[], minScore?: number, maxScore?: number, channels?: string[]}
+  criteria    Json              @default("{}")
+  targetType  RoutingTargetType @default(TEAM_ROUND_ROBIN)
+  targetRepId String?
+  targetRep   User?             @relation(fields: [targetRepId], references: [id])
+  targetTeamId String?
+  targetTeam  Team?             @relation(fields: [targetTeamId], references: [id])
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+
+  @@index([active, priority])
+}
+
+// ─── Audit, notifications, saved views ───────────────────────────────────────
+
+// Append-only. The service layer exposes create + read only; no update/delete.
+model AuditLog {
+  id          String      @id @default(cuid())
+  actorId     String?
+  actor       User?       @relation(fields: [actorId], references: [id])
+  actorEmail  String?
+  action      AuditAction
+  entityType  EntityType
+  entityId    String?
+  entityLabel String?
+  before      Json?
+  after       Json?
+  ip          String?
+  createdAt   DateTime    @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String // sla_breach, lead_assigned, task_due, renewal, mention, system
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt, createdAt])
+}
+
+model SavedView {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entity    String // "lead" | "client" | "deal"
+  name      String
+  filters   Json     @default("{}")
+  shared    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, entity])
+}
+
+// ─── Lead capture tokens ─────────────────────────────────────────────────────
+
+model CaptureToken {
+  id        String      @id @default(cuid())
+  token     String      @unique
+  kind      CaptureKind @default(FORM)
+  campaign  String?
+  source    String      @default("web-form")
+  active    Boolean     @default(true)
+  createdAt DateTime    @default(now())
+}
+
+// ─── Custom fields ───────────────────────────────────────────────────────────
+
+model CustomFieldDefinition {
+  id        String          @id @default(cuid())
+  entity    EntityType // LEAD | ACCOUNT | CONTACT | DEAL
+  key       String
+  label     String
+  type      CustomFieldType @default(TEXT)
+  options   Json            @default("[]") // for SELECT
+  required  Boolean         @default(false)
+  sortOrder Int             @default(0)
+  active    Boolean         @default(true)
+  createdAt DateTime        @default(now())
+
+  @@unique([entity, key])
+}
+
+// ─── Settings & jobs ─────────────────────────────────────────────────────────
+
+model AppSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  type        String // route_lead, sla_check, renewal_check, daily_digest, send_email, recompute
+  payload     Json      @default("{}")
+  status      JobStatus @default(PENDING)
+  runAt       DateTime  @default(now())
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+  lastError   String?
+  lockedAt    DateTime?
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([status, runAt])
+}

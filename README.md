@@ -6,6 +6,11 @@
 This repository contains the working NEST Solutions super app: **one super app, four connected
 products**, built from the NEST master blueprint and pitch deck.
 
+> **Also in this repo:** [`crm/`](./crm) — a production-grade **Fintech Sales CRM** for Qatar
+> (leads, pipeline, clients, subscriptions, KYC, lead routing + SLA, dashboards, admin, PDPPL
+> compliance). Built with Next.js 15, PostgreSQL + Prisma, NextAuth, Tailwind/shadcn, Recharts.
+> See [`crm/README.md`](./crm/README.md) and [`crm/DECISIONS.md`](./crm/DECISIONS.md).
+
 | Product | Route | What it includes |
 | --- | --- | --- |
 | **Customer app** | [`/customer`](http://localhost:4200/customer) | Full interactive phone wireframe: splash → language (6 languages, Arabic/Urdu RTL) → OTP login → zone selection → home → service & packages → add-ons → schedule → address → payment & coupons → AI matching → confirmation → live tracking → chat with AI translation → rating, plus booking history, Nest AI assistant, wallet & coupons, Nest+ subscriptions, complaints/refunds and family profiles |

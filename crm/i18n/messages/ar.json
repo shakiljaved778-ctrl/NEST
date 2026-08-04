@@ -1,0 +1,38 @@
+{
+  "_comment": "Arabic translation stub — keys mirror en.json; values to be translated. Layout is RTL-ready (logical CSS properties + dir attribute switch in app/layout.tsx).",
+  "app": { "name": "", "tagline": "" },
+  "nav": {
+    "myDay": "",
+    "leads": "",
+    "deals": "",
+    "clients": "",
+    "tasks": "",
+    "reports": "",
+    "admin": "",
+    "notifications": "",
+    "settings": "",
+    "signOut": "",
+    "search": ""
+  },
+  "auth": {
+    "signIn": "",
+    "email": "",
+    "password": "",
+    "totp": "",
+    "invalidCredentials": "",
+    "accountLocked": "",
+    "totpRequired": "",
+    "signInWithGoogle": ""
+  },
+  "common": {
+    "save": "",
+    "cancel": "",
+    "delete": "",
+    "edit": "",
+    "create": "",
+    "export": "",
+    "loading": "",
+    "noResults": "",
+    "confirm": ""
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "app": {
+    "name": "Fintech CRM",
+    "tagline": "Sales platform — Qatar"
+  },
+  "nav": {
+    "myDay": "My Day",
+    "leads": "Leads",
+    "deals": "Deals",
+    "clients": "Clients",
+    "tasks": "Tasks",
+    "reports": "Reports",
+    "admin": "Admin",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "search": "Search…"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "totp": "Authenticator code",
+    "invalidCredentials": "Invalid email or password",
+    "accountLocked": "Account locked after too many failed attempts. Try again later.",
+    "totpRequired": "Enter your 6-digit authenticator code",
+    "signInWithGoogle": "Sign in with Google"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "export": "Export CSV",
+    "loading": "Loading…",
+    "noResults": "No results",
+    "confirm": "Confirm"
+  }
+}

@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: crm
+      POSTGRES_PASSWORD: crm
+      POSTGRES_DB: crm
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crm -d crm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://crm:crm@db:5432/crm"
+      AUTH_SECRET: "${AUTH_SECRET:-change-me-in-production-generate-a-random-secret}"
+      AUTH_URL: "${AUTH_URL:-http://localhost:3000}"
+      AUTH_TRUST_HOST: "true"
+      FIELD_ENCRYPTION_KEY: "${FIELD_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}"
+      STORAGE_DRIVER: "${STORAGE_DRIVER:-local}"
+      STORAGE_LOCAL_PATH: "/data/storage"
+      EMAIL_DRIVER: "${EMAIL_DRIVER:-console}"
+      NEXT_PUBLIC_APP_URL: "${AUTH_URL:-http://localhost:3000}"
+      NEXT_PUBLIC_DEFAULT_TIMEZONE: "Asia/Qatar"
+      NEXT_PUBLIC_DEFAULT_CURRENCY: "QAR"
+    ports:
+      - "3000:3000"
+    volumes:
+      - storage:/data/storage
+    # On first boot, apply the schema and seed demo data, then start the server.
+    command: >
+      sh -c "npx prisma db push --skip-generate &&
+             npx tsx prisma/seed.ts &&
+             node server.js"
+
+volumes:
+  pgdata:
+  storage:
