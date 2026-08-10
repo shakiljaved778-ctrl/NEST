@@ -7,7 +7,7 @@ on:
 
 jobs:
   verify:
-    name: Typecheck, test & build
+    name: Typecheck & build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,9 +22,6 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
-
-      - name: Unit tests (pricing · matching · AI · booking)
-        run: npm test
 
       - name: Production build
         run: npm run build

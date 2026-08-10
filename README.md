@@ -1,93 +1,97 @@
-# NEST Solutions — Qatar's AI-powered trusted home-services super app
+# QatarStore.com
 
-> One app for a trusted home — verified professionals, transparent prices, and AI that books
-> the right service in seconds.
+A premium **dark-luxury** website for a Doha web design studio. It does two
+jobs: showcases a portfolio of website designs, and acts as the primary
+client-facing interface where a corporate client can **scope, brief, and
+commission** a website project without a single phone call.
 
-This repository contains the working NEST Solutions super app: **one super app, four connected
-products**, built from the NEST master blueprint and pitch deck.
+Built with **Next.js 15 (App Router)** + **Tailwind CSS**. No CMS, no database —
+all editable content lives in one file.
 
-| Product | Route | What it includes |
-| --- | --- | --- |
-| **Customer app** | [`/customer`](http://localhost:4200/customer) | Full interactive phone wireframe: splash → language (6 languages, Arabic/Urdu RTL) → OTP login → zone selection → home → service & packages → add-ons → schedule → address → payment & coupons → AI matching → confirmation → live tracking → chat with AI translation → rating, plus booking history, Nest AI assistant, wallet & coupons, Nest+ subscriptions, complaints/refunds and family profiles |
-| **Provider app** | [`/provider`](http://localhost:4200/provider) | Onboarding, KYC documents, skills & tests, availability, job requests with accept/decline, job details, navigation, service checklist, before/after photos, job completion & payout, earnings, ratings/quality score, training academy |
-| **Admin & Ops** | [`/admin`](http://localhost:4200/admin) | AI daily summary, KPIs, **90-day pilot scoreboard (Seed-readiness gates)**, live bookings table with manual assignment, provider management & verification queue, 15-service catalog manager, dynamic pricing engine & commissions, disputes/refunds with AI triage, coupon campaigns, demand heatmap with SLA alerts, fraud monitor |
-| **AI layer** | `/api/ai/*` | Booking assistant (safety-aware routing to the right service), provider matching (weighted scoring), dynamic pricing, complaint classifier, admin daily summary |
+---
 
-## Quick start
+## Highlights
+
+- **6 pages**: Home, Work (filterable portfolio), Services & Pricing, Start (the
+  multi-step intake wizard), About, Contact — plus dynamic case studies at
+  `/work/[slug]`.
+- **Client intake wizard** (`/start`): 5 steps, progress bar, per-step
+  validation, back navigation, **localStorage draft persistence**, package
+  pre-select via `?package=`, on-screen brief summary, email + WhatsApp delivery.
+- **Bilingual-ready**: English ships fully; an `AR` toggle flips the whole
+  document to **RTL** using a stub Arabic dictionary. Every UI string is
+  translatable from `data/i18n.ts`.
+- **Dark-luxury design system**: deep navy `#0B1B33`, gold `#C9A24B`, off-white
+  `#F5F2EA`, Fraunces + Inter, thin gold rules, subtle grain, restrained
+  fade-up + hover-lift motion.
+- **WhatsApp-first**: gold floating chat button on every page.
+- **SEO**: per-page meta targeting "website design Qatar" / "web design Doha" /
+  "موقع الكتروني قطر", JSON-LD `LocalBusiness`, `sitemap.xml`, `robots.txt`,
+  auto-generated OG image.
+- **Fast**: ~105 kB shared JS, no heavy libraries, CSS-drawn portfolio mockups
+  (no stock screenshots). Targets Lighthouse 90+.
+
+## Edit content in one place
+
+Everything you'd want to change lives in:
+
+- **`data/content.ts`** — copy, portfolio items, pricing, packages, add-ons,
+  process steps, wizard options, per-page SEO, and all contact details.
+- **`data/i18n.ts`** — UI strings (English + Arabic stub).
+
+Nothing user-facing is hard-coded in components.
+
+## Run locally
 
 ```bash
 npm install
 npm run dev        # http://localhost:4200
 ```
 
-Production build:
+Other scripts:
 
 ```bash
-npm run build && npm start
+npm run build      # production build
+npm run start      # serve the production build
+npm run typecheck  # tsc --noEmit
 ```
 
-Verify (same as CI — `.github/workflows/ci.yml` runs this on every push):
+## Deploy to Vercel (one command)
 
 ```bash
-npm run typecheck && npm test && npm run build
+npm i -g vercel
+vercel --prod
 ```
+
+Then add your domain and env vars in the Vercel dashboard — see **`SETUP.md`**.
+The site deploys and runs **without any API keys**; the brief form falls back to
+WhatsApp until `RESEND_API_KEY` is set.
 
 ## Project structure
 
 ```
-app/                    Next.js App Router
-  page.tsx              Landing / product overview
-  customer/             Customer app (interactive phone wireframe)
-  provider/             Provider app (interactive phone wireframe)
-  admin/                Admin & operations dashboard
-  api/                  Booking engine + AI layer (route handlers)
-    catalog/            GET  /api/catalog
-    quote/              POST /api/quote          — pricing engine
-    match/              POST /api/match          — AI provider matching
-    bookings/           GET/POST /api/bookings, GET/PATCH /api/bookings/:id
-    ai/assistant/       POST /api/ai/assistant   — AI booking assistant
-    ai/complaint/       POST /api/ai/complaint   — AI complaint classifier
-    admin/summary/      GET  /api/admin/summary  — stats + AI daily summary
-    admin/pilot/        GET  /api/admin/pilot    — pilot scoreboard (Seed gates)
-components/             Customer / provider / admin UIs, phone frame
-lib/                    Domain layer: catalog (15 services), zones, i18n (6 languages),
-                        pricing engine, provider matching, AI modules, pilot scoreboard,
-                        in-memory store
-prisma/schema.prisma    Production PostgreSQL schema (users, providers, KYC documents,
-                        bookings, payments, refunds, complaints, coupons, subscriptions,
-                        wallet, chat, notifications, AI logs, fraud flags, audit logs)
-tests/                  Vitest unit suites: pricing, matching, AI, booking store, pilot
-docs/                   PRD & personas, design system, architecture, API reference,
-                        OpenAPI spec, AI orchestration & prompt registry, store
-                        submission kit (EN/AR), launch checklist & iteration playbook,
-                        roadmap
+app/
+  layout.tsx            # fonts, metadata, JSON-LD, nav/footer/WhatsApp shell
+  globals.css           # design system, grain, buttons, form controls
+  page.tsx              # Home  → components/views/HomeView
+  work/page.tsx         # Portfolio (filterable) → WorkView
+  work/[slug]/page.tsx  # Case study (SSG per project)
+  services/page.tsx     # Services & pricing → ServicesView
+  start/page.tsx        # Intake wizard (Suspense) → start/Wizard
+  about/page.tsx        # About → AboutView
+  contact/page.tsx      # Contact → ContactView
+  api/brief/route.ts    # Brief submission (Resend + graceful stub)
+  sitemap.ts robots.ts opengraph-image.tsx not-found.tsx
+components/
+  Navbar · Footer · WhatsAppFab · Reveal · BrowserMockup · PortfolioCard
+  LanguageProvider      # EN/AR context + RTL
+  start/                # Wizard · StyleTile · StartHeader
+  views/                # per-page client views
+data/
+  content.ts            # ← all editable content
+  i18n.ts               # ← UI strings (EN + AR stub)
+lib/
+  brief.ts              # shared brief formatter (summary/email/WhatsApp)
 ```
 
-## Documentation
-
-| Doc | Contents |
-| --- | --- |
-| [`docs/PRD.md`](docs/PRD.md) | Product requirements, personas, success metrics |
-| [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md) | Brand tokens, typography, RTL, accessibility |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Production cloud architecture (AWS me-central) |
-| [`docs/API.md`](docs/API.md) · [`docs/openapi.yaml`](docs/openapi.yaml) | API reference + OpenAPI 3.1 spec |
-| [`docs/AI-ORCHESTRATION.md`](docs/AI-ORCHESTRATION.md) | AI service design + versioned prompt templates |
-| [`docs/STORE-SUBMISSION.md`](docs/STORE-SUBMISSION.md) | App Store / Play listing kit, EN + AR |
-| [`docs/LAUNCH-PLAYBOOK.md`](docs/LAUNCH-PLAYBOOK.md) | Launch checklist, iteration engine, incident response |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Phase plan through scale |
-
-## Design language
-
-Navy `#12294B` · Gold `#C9A227` · Teal `#0F9D8A` · Pearl `#F5F7FB` — serif display headings and
-card-based layout matching the NEST investor deck. Full RTL support for Arabic and Urdu.
-
-## Demo notes
-
-- Data persists in-memory per server process; production swaps `lib/store.ts` for PostgreSQL via
-  `prisma/schema.prisma`.
-- The AI modules are deterministic rule-based MVP versions of the production LLM pipeline
-  (orchestration + RAG + guardrails + human handoff) described in `docs/ARCHITECTURE.md`.
-- Try coupon codes `NEST10`, `SALAM15`, `PEARL25` at checkout, and ask Nest AI
-  “My AC is not cooling”.
-
-— NEST Solutions · Doha, Qatar · Founders: Shakil Javed (CEO), Athar Shadab (COO)
+See **`SETUP.md`** for the full go-live checklist.

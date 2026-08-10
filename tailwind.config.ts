@@ -1,63 +1,61 @@
 import type { Config } from "tailwindcss";
 
 /**
- * NEST Solutions design tokens — taken from the investor deck:
- * deep navy, gold, teal on a pearl background, serif display type.
+ * QatarStore.com design system — dark-luxury.
+ * Deep navy base, gold accents, off-white text surfaces.
  */
 const config: Config = {
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
-    "./lib/**/*.{ts,tsx}",
+    "./data/**/*.{ts,tsx}",
   ],
   theme: {
     extend: {
       colors: {
         navy: {
-          DEFAULT: "#12294B",
-          50: "#EDF1F8",
-          100: "#D9E1EE",
-          200: "#AFC0DB",
-          300: "#7F97BD",
-          400: "#4A6591",
-          500: "#2B4A77",
-          600: "#1C3760",
-          700: "#12294B",
-          800: "#0C1D37",
-          900: "#081426",
+          DEFAULT: "#0B1B33",
+          50: "#E7ECF4",
+          100: "#C6D1E3",
+          200: "#93A6C6",
+          300: "#5E77A2",
+          400: "#3A527D",
+          500: "#213A61",
+          600: "#152B4C",
+          700: "#0B1B33",
+          800: "#081426",
+          900: "#050D19",
         },
         gold: {
-          DEFAULT: "#C9A227",
-          light: "#E8CE6F",
-          soft: "#F7EFD4",
-          dark: "#A38118",
+          DEFAULT: "#C9A24B",
+          light: "#E3C583",
+          soft: "#F3E9CF",
+          dark: "#A6842F",
         },
-        teal: {
-          DEFAULT: "#0F9D8A",
-          light: "#3FC0AE",
-          soft: "#E1F4F1",
-          dark: "#0B7A6C",
+        cream: {
+          DEFAULT: "#F5F2EA",
+          dim: "#D9D4C6",
         },
-        pearl: "#F5F7FB",
-        ink: "#0E1B2C",
       },
       fontFamily: {
-        display: ["Georgia", "Cambria", "'Times New Roman'", "serif"],
-        body: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "'Segoe UI'",
-          "Roboto",
-          "'Noto Sans Arabic'",
-          "sans-serif",
-        ],
+        display: ["var(--font-fraunces)", "Georgia", "serif"],
+        body: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(14,27,44,0.06), 0 8px 24px rgba(14,27,44,0.07)",
-        phone: "0 24px 60px rgba(8,20,38,0.35)",
+        lift: "0 24px 60px -20px rgba(5,13,25,0.6)",
+        card: "0 1px 2px rgba(5,13,25,0.4), 0 18px 40px -24px rgba(5,13,25,0.7)",
       },
       borderRadius: {
         xl2: "1.25rem",
+      },
+      keyframes: {
+        fadeUp: {
+          "0%": { opacity: "0", transform: "translateY(16px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        fadeUp: "fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both",
       },
     },
   },

@@ -3,11 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --navy: #12294b;
-  --navy-deep: #0c1d37;
-  --gold: #c9a227;
-  --teal: #0f9d8a;
-  --pearl: #f5f7fb;
+  --navy: #0b1b33;
+  --navy-deep: #050d19;
+  --gold: #c9a24b;
+  --cream: #f5f2ea;
 }
 
 html {
@@ -15,53 +14,102 @@ html {
 }
 
 body {
-  @apply bg-pearl text-ink font-body antialiased;
+  @apply bg-navy text-cream font-body antialiased;
+  /* Subtle dark-luxury gradient + fine grain, never flat. */
+  background-image:
+    radial-gradient(1200px 600px at 15% -10%, rgba(201, 162, 75, 0.1), transparent 60%),
+    radial-gradient(1000px 700px at 100% 0%, rgba(33, 58, 97, 0.55), transparent 55%),
+    linear-gradient(180deg, #0b1b33 0%, #081426 100%);
+  background-attachment: fixed;
 }
 
-/* RTL niceties for Arabic / Urdu inside the phone prototype */
-[dir="rtl"] {
-  letter-spacing: 0;
+/* Fine grain overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Respect reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+  }
+  ::selection {
+    background: rgba(201, 162, 75, 0.3);
+  }
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 @layer components {
-  .card {
-    @apply bg-white rounded-2xl shadow-card border border-navy-100/60;
+  .wrap {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
   }
-  .chip {
-    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold;
-  }
-  .btn-primary {
-    @apply inline-flex items-center justify-center rounded-xl bg-navy text-white font-semibold px-4 py-3 transition hover:bg-navy-600 disabled:opacity-40 disabled:cursor-not-allowed;
-  }
-  .btn-gold {
-    @apply inline-flex items-center justify-center rounded-xl bg-gold text-navy-800 font-semibold px-4 py-3 transition hover:bg-gold-light disabled:opacity-40;
-  }
-  .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-xl border border-navy-200 text-navy font-semibold px-4 py-3 transition hover:bg-navy-50;
+  .rule {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent;
   }
   .kicker {
-    @apply text-[11px] font-bold uppercase tracking-[0.18em] text-teal;
+    @apply inline-block text-xs font-semibold uppercase tracking-[0.2em] text-gold;
   }
-  .kicker-gold {
-    @apply text-[11px] font-bold uppercase tracking-[0.18em] text-gold;
+  .panel {
+    @apply rounded-xl2 border border-white/10 bg-white/[0.03] backdrop-blur-sm;
   }
-}
 
-/* Thin scrollbars inside phone frames */
-.phone-scroll::-webkit-scrollbar {
-  width: 4px;
-}
-.phone-scroll::-webkit-scrollbar-thumb {
-  background: rgba(18, 41, 75, 0.18);
-  border-radius: 4px;
-}
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition duration-200 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-gold {
+    @apply btn bg-gold text-navy-800 hover:bg-gold-light hover:-translate-y-0.5 shadow-[0_10px_30px_-10px_rgba(201,162,75,0.6)];
+  }
+  .btn-outline {
+    @apply btn border border-gold/50 text-cream hover:border-gold hover:bg-gold/10;
+  }
+  .btn-ghost {
+    @apply btn border border-white/15 text-cream hover:bg-white/5;
+  }
 
-/* Simple pulse for live-tracking dot */
-@keyframes nest-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(15, 157, 138, 0.45); }
-  70% { box-shadow: 0 0 0 12px rgba(15, 157, 138, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(15, 157, 138, 0); }
-}
-.pulse-dot {
-  animation: nest-pulse 1.8s infinite;
+  .link-underline {
+    @apply relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-gold after:transition-all hover:after:w-full;
+  }
+
+  /* Form controls */
+  .qs-input {
+    @apply w-full rounded-lg border border-white/15 bg-black/20 px-4 py-2.5 text-sm text-cream placeholder:text-cream/35 transition focus:border-gold focus:outline-none;
+  }
+  .qs-input option {
+    @apply bg-navy-800 text-cream;
+  }
+  .qs-error {
+    @apply mt-1.5 block text-xs text-red-300;
+  }
 }
