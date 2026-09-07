@@ -21,6 +21,14 @@ npm install
 npm run dev        # http://localhost:4200
 ```
 
+### Deploy the Qatar Market Dashboard to Vercel (one click)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/shakiljaved778-ctrl/NEST/tree/claude/qatar-market-dashboard-ao73ez&project-name=qatar-market-dashboard&repository-name=qatar-market-dashboard)
+
+No environment variables required — it runs on mock data and calls no external
+APIs. After deploy, open **`/markets`** on your Vercel URL. See
+[docs/MARKET-DASHBOARD.md](docs/MARKET-DASHBOARD.md#deploy-one-click) for details.
+
 Production build:
 
 ```bash

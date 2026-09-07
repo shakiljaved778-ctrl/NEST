@@ -16,6 +16,26 @@ dependency-free SVG components behind a swappable abstraction.
 
 ---
 
+## Deploy (one click)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/shakiljaved778-ctrl/NEST/tree/claude/qatar-market-dashboard-ao73ez&project-name=qatar-market-dashboard&repository-name=qatar-market-dashboard)
+
+Clicking the button clones this branch into your own GitHub, provisions a Vercel
+project, and deploys it. **No environment variables are required** — the app
+runs on the built-in mock data layer (`MARKET_DATA_PROVIDER=mock`), so it stays
+fully self-contained and calls no external APIs.
+
+- The dashboard is at **`/markets`** on the deployed URL
+  (e.g. `https://<your-project>.vercel.app/markets`).
+- The repo root `/` is the separate NEST Solutions app; both ship together.
+
+To connect real providers later, add the keys from
+[`.env.example`](../.env.example) in **Vercel → Project → Settings → Environment
+Variables** and set `MARKET_DATA_PROVIDER=real`. Until then everything is demo
+data.
+
+---
+
 ## Quick start
 
 ```bash
