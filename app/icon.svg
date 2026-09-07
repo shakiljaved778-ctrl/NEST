@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#0B1B33"/>
+  <rect x="4.5" y="4.5" width="55" height="55" rx="11" fill="none" stroke="#C9A24B" stroke-width="2"/>
+  <text x="32" y="33" text-anchor="middle" dominant-baseline="central"
+        font-family="Georgia, 'Times New Roman', serif" font-size="38" font-weight="600" fill="#C9A24B">Q</text>
+</svg>

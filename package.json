@@ -1,15 +1,13 @@
 {
-  "name": "nest-solutions-super-app",
-  "version": "0.1.0",
+  "name": "qatarstore-com",
+  "version": "1.0.0",
   "private": true,
-  "description": "NEST Solutions — Qatar's AI-powered trusted home-services super app. Customer app, provider app, admin & operations dashboards, and AI layer.",
+  "description": "QatarStore.com — a premium web design studio in Doha. Portfolio showcase + client intake wizard for commissioning websites without a phone call.",
   "scripts": {
     "dev": "next dev -p 4200",
     "build": "next build",
     "start": "next start -p 4200",
     "lint": "next lint",
-    "test": "vitest run",
-    "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -24,7 +22,6 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.0",
-    "vitest": "^4.1.10"
+    "typescript": "^5.7.0"
   }
 }
