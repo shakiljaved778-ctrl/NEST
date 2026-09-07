@@ -24,9 +24,9 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="text-xs font-semibold uppercase tracking-widest text-gold">
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">
             {t("footer.explore")}
-          </h4>
+          </h3>
           <ul className="mt-4 space-y-2 text-sm text-cream/75">
             <li><Link href="/work" className="link-underline">{t("nav.work")}</Link></li>
             <li><Link href="/services" className="link-underline">{t("nav.services")}</Link></li>
@@ -36,9 +36,9 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="text-xs font-semibold uppercase tracking-widest text-gold">
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-gold">
             {t("footer.contact")}
-          </h4>
+          </h3>
           <ul className="mt-4 space-y-2 text-sm text-cream/75">
             <li>
               <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="link-underline">

@@ -13,8 +13,16 @@ export default function StartPage() {
   return (
     <section className="wrap py-14 sm:py-16">
       <StartHeader />
-      <div className="mt-10">
-        <Suspense fallback={<div className="mx-auto max-w-2xl text-center text-cream/60">Loading…</div>}>
+      {/* min-height reserves the wizard's space so the client-mounted wizard
+          doesn't shift the footer (keeps CLS ~0). */}
+      <div className="mt-10 min-h-[640px]">
+        <Suspense
+          fallback={
+            <div className="mx-auto flex min-h-[640px] max-w-2xl items-start justify-center pt-20 text-cream/60">
+              Loading…
+            </div>
+          }
+        >
           <Wizard />
         </Suspense>
       </div>

@@ -55,7 +55,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <button
             onClick={toggle}
-            aria-label="Switch language"
+            aria-label={`${t("nav.lang")} — switch language`}
             className="rounded-full border border-white/20 px-3 py-1.5 text-xs font-semibold text-cream/90 transition hover:border-gold hover:text-gold"
           >
             {t("nav.lang")}
