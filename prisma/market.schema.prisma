@@ -1,0 +1,195 @@
+// Qatar Market Dashboard — production PostgreSQL schema (Prisma).
+//
+// This is the DESIGN TARGET for the market-dashboard product. The demo runs on
+// a browser localStorage store (lib/market/session.ts) + the mock data service,
+// so no database is required to run it. The SessionUser / Portfolio / Holding /
+// Subscription / Alert shapes in types/market.ts intentionally mirror these
+// models so wiring Prisma + NextAuth later is a drop-in.
+//
+// To activate: point `prisma` at this file
+//   npx prisma generate --schema prisma/market.schema.prisma
+// (a separate client output keeps it from clashing with the NEST schema.)
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/market-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlanTier {
+  free
+  premium
+}
+
+enum InvestmentHorizon {
+  days
+  weeks
+  months
+  years
+}
+
+enum InvestorGoal {
+  trading
+  long_term
+  income
+  balanced
+}
+
+enum RiskTolerance {
+  low
+  medium
+  high
+}
+
+enum AlertType {
+  price_above
+  price_below
+  pct_change
+}
+
+enum AlertChannel {
+  in_app
+  email
+  sms
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  name          String
+  // NextAuth email/password: store an argon2/bcrypt hash server-side.
+  passwordHash  String?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime      @default(now())
+
+  profile       UserProfile?
+  subscription  Subscription?
+  portfolios    Portfolio[]
+  watchlist     WatchlistItem[]
+  alerts        PriceAlert[]
+  savedLayouts  SavedLayout[]
+  accounts      OAuthAccount[]
+  events        AnalyticsEvent[]
+}
+
+// NextAuth OAuth linkage (Google/Apple/etc.).
+model OAuthAccount {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider          String
+  providerAccountId String
+  refreshToken      String?
+  accessToken       String?
+  expiresAt         Int?
+
+  @@unique([provider, providerAccountId])
+}
+
+model UserProfile {
+  id                 String            @id @default(cuid())
+  userId             String            @unique
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  horizon            InvestmentHorizon @default(years)
+  goal               InvestorGoal      @default(balanced)
+  risk               RiskTolerance     @default(medium)
+  completedOnboarding Boolean          @default(false)
+  updatedAt          DateTime          @updatedAt
+}
+
+model Subscription {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan        PlanTier @default(free)
+  status      String   @default("active") // active, past_due, canceled
+  trial       Boolean  @default(false)
+  trialEndsAt DateTime?
+  renewalDate DateTime?
+  // Payment-provider references (Stripe/Paddle).
+  provider          String? // stripe | paddle
+  providerCustomerId String?
+  providerSubId      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Portfolio {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  cash      Decimal   @default(0) @db.Decimal(18, 2)
+  createdAt DateTime  @default(now())
+  holdings  Holding[]
+
+  @@index([userId])
+}
+
+model Holding {
+  id          String    @id @default(cuid())
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  symbol      String
+  quantity    Decimal   @db.Decimal(18, 4)
+  avgPrice    Decimal   @db.Decimal(18, 4)
+  createdAt   DateTime  @default(now())
+
+  @@index([portfolioId])
+}
+
+model WatchlistItem {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symbol String
+  sort   Int    @default(0)
+
+  @@unique([userId, symbol])
+}
+
+model PriceAlert {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symbol      String
+  type        AlertType
+  threshold   Decimal      @db.Decimal(18, 4)
+  active      Boolean      @default(true)
+  // Delivery — email/SMS designed for a later release.
+  channel     AlertChannel @default(in_app)
+  triggeredAt DateTime?
+  createdAt   DateTime     @default(now())
+
+  @@index([userId])
+  @@index([symbol])
+}
+
+// Saved dashboard layouts (resizable panel arrangement).
+model SavedLayout {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  layout    Json
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// Product analytics events (view_dashboard, add_holding, click_upgrade, ...).
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name      String
+  props     Json?
+  createdAt DateTime @default(now())
+
+  @@index([name])
+  @@index([createdAt])
+}
