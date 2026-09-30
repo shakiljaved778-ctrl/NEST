@@ -1,0 +1,17 @@
+{
+  "name": "@amil/widget",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lit web components <amil-insight> and <amil-assistant>. Implemented in Phase 4.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  }
+}
