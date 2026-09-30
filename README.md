@@ -13,6 +13,10 @@ products**, built from the NEST master blueprint and pitch deck.
 | **Admin & Ops** | [`/admin`](http://localhost:4200/admin) | AI daily summary, KPIs, **90-day pilot scoreboard (Seed-readiness gates)**, live bookings table with manual assignment, provider management & verification queue, 15-service catalog manager, dynamic pricing engine & commissions, disputes/refunds with AI triage, coupon campaigns, demand heatmap with SLA alerts, fraud monitor |
 | **AI layer** | `/api/ai/*` | Booking assistant (safety-aware routing to the right service), provider matching (weighted scoring), dynamic pricing, complaint classifier, admin daily summary |
 
+> **Also in this repository:** [`amil/`](amil/README.md) is **AMIL AI**, a separate pnpm/Turborepo
+> workspace (a pre-decision intelligence layer for retail banking) with its own tooling and CI. It
+> is unrelated to the NEST app below.
+
 ## Quick start
 
 ```bash
