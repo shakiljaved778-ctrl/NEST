@@ -113,6 +113,41 @@ describe("<amil-insight> acknowledgement (critical)", () => {
     expect(ack).toHaveBeenCalledTimes(1);
   });
 
+  it("gates every continue option of the Phase 5 packs, e.g. continue_break", async () => {
+    const card = critical.card;
+    if (!card) throw new Error("fixture");
+    const el = await mount(
+      (e) =>
+        (e.result = {
+          ...critical,
+          card: {
+            ...card,
+            options: [
+              {
+                key: "keep_until_maturity",
+                label: "Keep until maturity",
+                deepLink: "ddb://deposits/d1",
+              },
+              {
+                key: "continue_break",
+                label: "Continue to break",
+                deepLink: "ddb://deposits/d1/break/confirm",
+              },
+              {
+                key: "talk_to_someone",
+                label: "Talk to someone",
+                deepLink: "ddb://support/callback",
+              },
+            ],
+          },
+        }),
+    );
+    expect(($(el, '[data-option="continue_break"]') as HTMLButtonElement).disabled).toBe(true);
+    expect(($(el, '[data-option="keep_until_maturity"]') as HTMLButtonElement).disabled).toBe(
+      false,
+    );
+  });
+
   it("does not require acknowledgement for caution", async () => {
     const el = await mount(
       (e) => (e.result = { ...critical, severity: "caution", requiresAcknowledgement: false }),
@@ -194,6 +229,28 @@ describe("<amil-insight> runs the check itself", () => {
     });
     expect(ready).toHaveBeenCalled();
     document.removeEventListener("amil-ready", ready);
+  });
+
+  it("sends the full context (deposit, amount, months) for Phase 5 actions", async () => {
+    const fetchImpl = checkFetch(200, critical);
+    await mount((e) => {
+      e.fetchImpl = fetchImpl;
+      e.apiBase = "http://api.test";
+      e.token = "tok";
+      e.action = "finance.top_up";
+      e.customerRef = "DDB-C-0005";
+      e.context = { amount: "20000.00", months: 60 };
+      e.financeId = "f1";
+      e.locale = "ar";
+    });
+    await vi.waitFor(() => expect(fetchImpl).toHaveBeenCalled());
+    const call = (fetchImpl.mock.calls as unknown as [string, RequestInit][]).at(-1);
+    expect(JSON.parse(call?.[1].body as string)).toEqual({
+      action: "finance.top_up",
+      customerRef: "DDB-C-0005",
+      context: { amount: "20000.00", months: 60, financeId: "f1" },
+      locale: "ar",
+    });
   });
 
   it("on failure shows a neutral line and emits amil-unavailable so the bank flow continues", async () => {

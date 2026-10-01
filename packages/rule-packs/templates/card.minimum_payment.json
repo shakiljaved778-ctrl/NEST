@@ -1,0 +1,469 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons. Labels and explanations are shared by both variants, so they use variant-neutral terms.",
+  "templates": [
+    {
+      "key": "card.minimum_payment.conventional.info",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Paying only the minimum of {minimumDue} adds {totalInterestMinimum} in charges",
+      "body": "Your statement balance is {statementBalance} and the minimum due is {minimumDue}. Paying only the minimum each month, at {aprPct} a year, you would pay {totalPaidMinimum} in total, of which {totalInterestMinimum} is interest. [[interestSavedComparison: Paying {comparisonPayment} a month instead clears it in {monthsToClearComparison} months and saves {interestSavedComparison}. ]]Paying the full statement balance by the due date avoids these charges.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "Pay the full balance"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "Pay a different amount"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "Continue with the minimum"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.conventional.caution",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[minimumClearsBalance: Paying only the minimum takes {monthsToClearMinimum} months and costs {totalInterestMinimum}]][[!minimumClearsBalance: Paying only the minimum does not clear this balance]]",
+      "body": "Your statement balance is {statementBalance} and the minimum due is {minimumDue}. Paying only the minimum each month, at {aprPct} a year, you would pay {totalPaidMinimum} in total, of which {totalInterestMinimum} is interest. [[interestSavedComparison: Paying {comparisonPayment} a month instead clears it in {monthsToClearComparison} months and saves {interestSavedComparison}. ]]Paying the full statement balance by the due date avoids these charges.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "Pay the full balance"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "Pay a different amount"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "Continue with the minimum"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.conventional.critical",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[minimumClearsBalance: Paying only the minimum takes {monthsToClearMinimum} months and costs {totalInterestMinimum}]][[!minimumClearsBalance: Paying only the minimum does not clear this balance]]",
+      "body": "Your statement balance is {statementBalance} and the minimum due is {minimumDue}. Paying only the minimum each month, at {aprPct} a year, you would pay {totalPaidMinimum} in total, of which {totalInterestMinimum} is interest. [[interestSavedComparison: Paying {comparisonPayment} a month instead clears it in {monthsToClearComparison} months and saves {interestSavedComparison}. ]]Paying the full statement balance by the due date avoids these charges.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "Pay the full balance"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "Pay a different amount"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "Continue with the minimum"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.conventional.info",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "سداد الحد الأدنى {minimumDue} فقط يضيف {totalInterestMinimum} من الرسوم",
+      "body": "رصيد كشف حسابك {statementBalance} والحد الأدنى المستحق {minimumDue}. إذا سددت الحد الأدنى فقط كل شهر، بمعدل {aprPct} سنوياً، فستدفع {totalPaidMinimum} إجمالاً، منها {totalInterestMinimum} فوائد. [[interestSavedComparison: سداد {comparisonPayment} شهرياً بدلاً من ذلك ينهي الرصيد خلال {monthsToClearComparison} شهراً ويوفّر {interestSavedComparison}. ]]سداد كامل رصيد الكشف قبل تاريخ الاستحقاق يجنّبك هذه الرسوم.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "سداد كامل الرصيد"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "سداد مبلغ آخر"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "متابعة سداد الحد الأدنى"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.conventional.caution",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[minimumClearsBalance: سداد الحد الأدنى فقط يستغرق {monthsToClearMinimum} شهراً ويكلّف {totalInterestMinimum}]][[!minimumClearsBalance: سداد الحد الأدنى فقط لا يكفي لسداد هذا الرصيد]]",
+      "body": "رصيد كشف حسابك {statementBalance} والحد الأدنى المستحق {minimumDue}. إذا سددت الحد الأدنى فقط كل شهر، بمعدل {aprPct} سنوياً، فستدفع {totalPaidMinimum} إجمالاً، منها {totalInterestMinimum} فوائد. [[interestSavedComparison: سداد {comparisonPayment} شهرياً بدلاً من ذلك ينهي الرصيد خلال {monthsToClearComparison} شهراً ويوفّر {interestSavedComparison}. ]]سداد كامل رصيد الكشف قبل تاريخ الاستحقاق يجنّبك هذه الرسوم.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "سداد كامل الرصيد"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "سداد مبلغ آخر"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "متابعة سداد الحد الأدنى"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.conventional.critical",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[minimumClearsBalance: سداد الحد الأدنى فقط يستغرق {monthsToClearMinimum} شهراً ويكلّف {totalInterestMinimum}]][[!minimumClearsBalance: سداد الحد الأدنى فقط لا يكفي لسداد هذا الرصيد]]",
+      "body": "رصيد كشف حسابك {statementBalance} والحد الأدنى المستحق {minimumDue}. إذا سددت الحد الأدنى فقط كل شهر، بمعدل {aprPct} سنوياً، فستدفع {totalPaidMinimum} إجمالاً، منها {totalInterestMinimum} فوائد. [[interestSavedComparison: سداد {comparisonPayment} شهرياً بدلاً من ذلك ينهي الرصيد خلال {monthsToClearComparison} شهراً ويوفّر {interestSavedComparison}. ]]سداد كامل رصيد الكشف قبل تاريخ الاستحقاق يجنّبك هذه الرسوم.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "سداد كامل الرصيد"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "سداد مبلغ آخر"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "متابعة سداد الحد الأدنى"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you pay the minimum",
+      "body": "Paying only the minimum keeps your card in good standing, but the rest of the balance carries charges until it is paid. Paying more each month, or the full statement balance, lowers what you pay overall. You can ask us before you continue.",
+      "options": [
+        {
+          "key": "continue_minimum_payment",
+          "label": "Continue with the minimum"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل سداد الحد الأدنى",
+      "body": "سداد الحد الأدنى فقط يحافظ على انتظام بطاقتك، لكن باقي الرصيد تترتب عليه رسوم حتى يُسدَّد. سداد مبلغ أكبر كل شهر أو كامل رصيد الكشف يخفّض إجمالي ما تدفعه. يمكنك سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_minimum_payment",
+          "label": "متابعة سداد الحد الأدنى"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.islamic.info",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Paying only the minimum of {minimumDue} adds {totalInterestMinimum} in charges",
+      "body": "Your statement balance is {statementBalance} and the minimum due is {minimumDue}. Paying only the minimum each month, at a profit rate of {aprPct} a year, you would pay {totalPaidMinimum} in total, of which {totalInterestMinimum} is profit. [[interestSavedComparison: Paying {comparisonPayment} a month instead clears it in {monthsToClearComparison} months and saves {interestSavedComparison}. ]]Paying the full statement balance by the due date avoids these charges.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "Pay the full balance"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "Pay a different amount"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "Continue with the minimum"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.islamic.caution",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[minimumClearsBalance: Paying only the minimum takes {monthsToClearMinimum} months and costs {totalInterestMinimum}]][[!minimumClearsBalance: Paying only the minimum does not clear this balance]]",
+      "body": "Your statement balance is {statementBalance} and the minimum due is {minimumDue}. Paying only the minimum each month, at a profit rate of {aprPct} a year, you would pay {totalPaidMinimum} in total, of which {totalInterestMinimum} is profit. [[interestSavedComparison: Paying {comparisonPayment} a month instead clears it in {monthsToClearComparison} months and saves {interestSavedComparison}. ]]Paying the full statement balance by the due date avoids these charges.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "Pay the full balance"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "Pay a different amount"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "Continue with the minimum"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.islamic.critical",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[minimumClearsBalance: Paying only the minimum takes {monthsToClearMinimum} months and costs {totalInterestMinimum}]][[!minimumClearsBalance: Paying only the minimum does not clear this balance]]",
+      "body": "Your statement balance is {statementBalance} and the minimum due is {minimumDue}. Paying only the minimum each month, at a profit rate of {aprPct} a year, you would pay {totalPaidMinimum} in total, of which {totalInterestMinimum} is profit. [[interestSavedComparison: Paying {comparisonPayment} a month instead clears it in {monthsToClearComparison} months and saves {interestSavedComparison}. ]]Paying the full statement balance by the due date avoids these charges.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "Pay the full balance"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "Pay a different amount"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "Continue with the minimum"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.islamic.info",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "سداد الحد الأدنى {minimumDue} فقط يضيف {totalInterestMinimum} من الرسوم",
+      "body": "رصيد كشف حسابك {statementBalance} والحد الأدنى المستحق {minimumDue}. إذا سددت الحد الأدنى فقط كل شهر، بمعدل ربح {aprPct} سنوياً، فستدفع {totalPaidMinimum} إجمالاً، منها {totalInterestMinimum} أرباح. [[interestSavedComparison: سداد {comparisonPayment} شهرياً بدلاً من ذلك ينهي الرصيد خلال {monthsToClearComparison} شهراً ويوفّر {interestSavedComparison}. ]]سداد كامل رصيد الكشف قبل تاريخ الاستحقاق يجنّبك هذه الرسوم.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "سداد كامل الرصيد"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "سداد مبلغ آخر"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "متابعة سداد الحد الأدنى"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.islamic.caution",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[minimumClearsBalance: سداد الحد الأدنى فقط يستغرق {monthsToClearMinimum} شهراً ويكلّف {totalInterestMinimum}]][[!minimumClearsBalance: سداد الحد الأدنى فقط لا يكفي لسداد هذا الرصيد]]",
+      "body": "رصيد كشف حسابك {statementBalance} والحد الأدنى المستحق {minimumDue}. إذا سددت الحد الأدنى فقط كل شهر، بمعدل ربح {aprPct} سنوياً، فستدفع {totalPaidMinimum} إجمالاً، منها {totalInterestMinimum} أرباح. [[interestSavedComparison: سداد {comparisonPayment} شهرياً بدلاً من ذلك ينهي الرصيد خلال {monthsToClearComparison} شهراً ويوفّر {interestSavedComparison}. ]]سداد كامل رصيد الكشف قبل تاريخ الاستحقاق يجنّبك هذه الرسوم.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "سداد كامل الرصيد"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "سداد مبلغ آخر"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "متابعة سداد الحد الأدنى"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.islamic.critical",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[minimumClearsBalance: سداد الحد الأدنى فقط يستغرق {monthsToClearMinimum} شهراً ويكلّف {totalInterestMinimum}]][[!minimumClearsBalance: سداد الحد الأدنى فقط لا يكفي لسداد هذا الرصيد]]",
+      "body": "رصيد كشف حسابك {statementBalance} والحد الأدنى المستحق {minimumDue}. إذا سددت الحد الأدنى فقط كل شهر، بمعدل ربح {aprPct} سنوياً، فستدفع {totalPaidMinimum} إجمالاً، منها {totalInterestMinimum} أرباح. [[interestSavedComparison: سداد {comparisonPayment} شهرياً بدلاً من ذلك ينهي الرصيد خلال {monthsToClearComparison} شهراً ويوفّر {interestSavedComparison}. ]]سداد كامل رصيد الكشف قبل تاريخ الاستحقاق يجنّبك هذه الرسوم.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "سداد كامل الرصيد"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "سداد مبلغ آخر"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "متابعة سداد الحد الأدنى"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you pay the minimum",
+      "body": "Paying only the minimum keeps your card in good standing, but the rest of the balance carries charges until it is paid. Paying more each month, or the full statement balance, lowers what you pay overall. You can ask us before you continue.",
+      "options": [
+        {
+          "key": "continue_minimum_payment",
+          "label": "Continue with the minimum"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.minimum_payment.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "card.minimum_payment",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل سداد الحد الأدنى",
+      "body": "سداد الحد الأدنى فقط يحافظ على انتظام بطاقتك، لكن باقي الرصيد تترتب عليه رسوم حتى يُسدَّد. سداد مبلغ أكبر كل شهر أو كامل رصيد الكشف يخفّض إجمالي ما تدفعه. يمكنك سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_minimum_payment",
+          "label": "متابعة سداد الحد الأدنى"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "statementBalance": "Statement balance",
+      "minimumDue": "Minimum due",
+      "aprPct": "Annual rate",
+      "monthsToClearMinimum": "Months to clear (minimum)",
+      "totalInterestMinimum": "Charges paying the minimum",
+      "totalPaidMinimum": "Total paid (minimum)",
+      "minimumClearsBalance": "Minimum clears the balance",
+      "comparisonPayment": "Comparison payment",
+      "monthsToClearComparison": "Months to clear (comparison)",
+      "totalInterestComparison": "Charges (comparison)",
+      "interestSavedComparison": "Charges saved",
+      "monthsSavedComparison": "Months saved"
+    },
+    "ar": {
+      "statementBalance": "رصيد الكشف",
+      "minimumDue": "الحد الأدنى المستحق",
+      "aprPct": "المعدل السنوي",
+      "monthsToClearMinimum": "أشهر السداد (بالحد الأدنى)",
+      "totalInterestMinimum": "الرسوم بسداد الحد الأدنى",
+      "totalPaidMinimum": "إجمالي المدفوع (بالحد الأدنى)",
+      "minimumClearsBalance": "الحد الأدنى يسدد الرصيد",
+      "comparisonPayment": "مبلغ المقارنة",
+      "monthsToClearComparison": "أشهر السداد (المقارنة)",
+      "totalInterestComparison": "الرسوم (المقارنة)",
+      "interestSavedComparison": "الرسوم الموفَّرة",
+      "monthsSavedComparison": "الأشهر الموفَّرة"
+    }
+  },
+  "explanations": {
+    "en": {
+      "minimum_payment_extends_repayment": "Paying only the minimum spreads the balance over many months, and charges apply to what remains each month.",
+      "minimum_payment_does_not_clear_balance": "At the minimum, the balance is not cleared within the period the bank checks.",
+      "severity_critical": "The charges are above the level your bank has set for an important notice.",
+      "severity_caution": "Your bank shows a notice for this situation."
+    },
+    "ar": {
+      "minimum_payment_extends_repayment": "سداد الحد الأدنى فقط يوزّع الرصيد على أشهر كثيرة، وتُحتسب الرسوم على المتبقي كل شهر.",
+      "minimum_payment_does_not_clear_balance": "بسداد الحد الأدنى لا يُسدَّد الرصيد خلال الفترة التي يفحصها البنك.",
+      "severity_critical": "الرسوم أعلى من الحد الذي حدده البنك لإظهار تنبيه مهم.",
+      "severity_caution": "يُظهر البنك تنبيهاً في هذه الحالة."
+    }
+  }
+}

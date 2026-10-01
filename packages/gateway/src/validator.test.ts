@@ -104,8 +104,14 @@ describe("number validator: rejects injected or altered figures (adversarial)", 
     ["spelled-out number (en)", "You save four thousand riyals.", F, ["four", "thousand"]],
     ["spelled-out number (ar)", "توفّر أربعة آلاف ريال", F, ["أربعة", "آلاف"]],
     ["spelled-out number with prefix (ar)", "وثلاثة أقساط", F, ["وثلاثة"]],
+    ["spelled-out number with diacritics (ar)", "ستّة أشهر", F, ["ستة"]],
   ] as const)("%s", (_name, text, facts, offending) => {
     expect(validateNumbers(text, facts)).toEqual({ ok: false, offending });
+  });
+
+  it("Arabic words that merely start with a number word are not numbers", () => {
+    // ستُعاد "will be returned", ستتوقف "will stop": the future prefix سـ + تـ, not ست (six)
+    expect(validateNumbers("الشيكات ستُعاد دون صرف وستتوقف الأوامر", K).ok).toBe(true);
   });
 
   it("a text with no figures at all is fine", () => {

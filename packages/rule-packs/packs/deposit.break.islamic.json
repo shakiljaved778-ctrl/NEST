@@ -1,0 +1,100 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "deposit.break",
+  "version": "1.0.0",
+  "variant": "islamic",
+  "productFamily": "deposits",
+  "triggers": [
+    {
+      "type": "action",
+      "event": "deposit.break"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Deposit",
+      "fields": [
+        "principal",
+        "ratePct",
+        "startAt",
+        "maturityAt",
+        "breakPenaltyRule",
+        "profitOnBreakRule",
+        "variant",
+        "status"
+      ]
+    }
+  ],
+  "parameters": {
+    "dayCountBasis": 365,
+    "roundingMode": "half_up"
+  },
+  "facts": [
+    {
+      "key": "principal",
+      "unit": "QAR",
+      "source": "deposit",
+      "description": "Amount placed"
+    },
+    {
+      "key": "ratePct",
+      "unit": "percent",
+      "source": "deposit",
+      "description": "Contract rate (expected profit rate for Islamic deposits)"
+    },
+    {
+      "key": "maturityDate",
+      "unit": "date",
+      "source": "deposit",
+      "description": "Maturity date"
+    },
+    {
+      "key": "daysToMaturity",
+      "unit": "days",
+      "source": "computed",
+      "description": "Days left to maturity"
+    },
+    {
+      "key": "profitAtMaturity",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Return at maturity"
+    },
+    {
+      "key": "profitIfBrokenToday",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Return paid if broken today"
+    },
+    {
+      "key": "profitForfeited",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Return accrued so far at the contract rate that breaking gives up"
+    },
+    {
+      "key": "breakPenalty",
+      "unit": "QAR",
+      "source": "deposit",
+      "description": "Early-break penalty"
+    },
+    {
+      "key": "netReceivedNow",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Amount received if broken today"
+    },
+    {
+      "key": "netAtMaturity",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Amount received at maturity"
+    },
+    {
+      "key": "differenceIfKeptToMaturity",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Extra received by keeping the deposit to maturity"
+    }
+  ]
+}

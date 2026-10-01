@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { currentLocale } from "@/i18n/request";
 import { currentCustomer, financeOf } from "@/lib/bank";
+import { actHref } from "@/lib/actions";
+import { DEMO_AMOUNTS } from "@/lib/demo";
 import { date, money, num } from "@/lib/format";
 
 export default async function FinanceDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -45,6 +47,17 @@ export default async function FinanceDetail({ params }: { params: Promise<{ id: 
           </div>
         </CardContent>
       </Card>
+      <Link
+        href={actHref("finance.top_up", {
+          financeId: f.id,
+          amount: DEMO_AMOUNTS.topUp,
+          months: DEMO_AMOUNTS.topUpMonths,
+        })}
+        className={buttonVariants({ variant: "outline", block: true })}
+        data-testid="top-up"
+      >
+        {t("actions.topUp")}
+      </Link>
       <Link
         href={`/finance/${id}/settle`}
         className={buttonVariants({ block: true })}

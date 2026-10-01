@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { CONTINUE_OPTIONS } from "./contract";
 import { FactBuilder } from "./facts";
 import { D } from "./money";
 import { maxSeverity, severityForAmount } from "./severity";
@@ -52,5 +53,13 @@ describe("FactBuilder", () => {
   it("rejects duplicate fact keys", () => {
     const b = new FactBuilder<"a">().add("a", "1", "count", "computed", "2026-09-30");
     expect(() => b.add("a", "2", "count", "computed", "2026-09-30")).toThrow(/Duplicate/);
+  });
+});
+
+describe("CONTINUE_OPTIONS", () => {
+  it("follows the naming the widget relies on: continue_* plus the flagship settle_now", () => {
+    for (const key of CONTINUE_OPTIONS)
+      expect(key.startsWith("continue_") || key === "settle_now", key).toBe(true);
+    expect(CONTINUE_OPTIONS.size).toBe(10);
   });
 });

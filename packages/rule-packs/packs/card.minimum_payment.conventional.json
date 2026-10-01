@@ -1,0 +1,100 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "card.minimum_payment",
+  "version": "1.0.0",
+  "variant": "conventional",
+  "productFamily": "cards",
+  "triggers": [
+    {
+      "type": "action",
+      "event": "card.minimum_payment"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Card",
+      "fields": ["statementBalance", "minDue", "profitOrInterestRateApr", "type"]
+    }
+  ],
+  "parameters": {
+    "minDuePct": "5.00",
+    "minDueFloor": "100.00",
+    "comparisonMultiple": "3",
+    "maxMonths": 600,
+    "roundingMode": "half_up"
+  },
+  "facts": [
+    {
+      "key": "statementBalance",
+      "unit": "QAR",
+      "source": "card",
+      "description": "Statement balance"
+    },
+    {
+      "key": "minimumDue",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Minimum due under the bank's formula"
+    },
+    {
+      "key": "aprPct",
+      "unit": "percent",
+      "source": "card",
+      "description": "Annual rate on revolving balances"
+    },
+    {
+      "key": "monthsToClearMinimum",
+      "unit": "months",
+      "source": "computed",
+      "description": "Months to clear the statement balance paying only the minimum"
+    },
+    {
+      "key": "totalInterestMinimum",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Total charges paying only the minimum"
+    },
+    {
+      "key": "totalPaidMinimum",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Total paid paying only the minimum"
+    },
+    {
+      "key": "minimumClearsBalance",
+      "unit": "boolean",
+      "source": "computed",
+      "description": "Whether the minimum clears the balance within the horizon"
+    },
+    {
+      "key": "comparisonPayment",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Higher fixed monthly amount used for comparison"
+    },
+    {
+      "key": "monthsToClearComparison",
+      "unit": "months",
+      "source": "computed",
+      "description": "Months to clear paying the comparison amount"
+    },
+    {
+      "key": "totalInterestComparison",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Total charges paying the comparison amount"
+    },
+    {
+      "key": "interestSavedComparison",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Charges saved by paying the comparison amount"
+    },
+    {
+      "key": "monthsSavedComparison",
+      "unit": "months",
+      "source": "computed",
+      "description": "Months saved by paying the comparison amount"
+    }
+  ]
+}

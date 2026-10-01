@@ -1,0 +1,419 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons. Labels and explanations are shared by both variants, so they use variant-neutral terms.",
+  "templates": [
+    {
+      "key": "deposit.break.conventional.info",
+      "rulePackKey": "deposit.break",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Breaking this deposit today pays {netReceivedNow}",
+      "body": "Breaking it today pays {netReceivedNow}[[breakPenalty: , after a break penalty of {breakPenalty}]][[profitIfBrokenToday:  and including {profitIfBrokenToday} in interest at the reduced rate]]. At maturity on {maturityDate} you would receive {netAtMaturity}, including {profitAtMaturity} in interest at {ratePct}. [[profitForfeited: Breaking now gives up {profitForfeited} of the interest earned so far.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "Keep until maturity"
+        },
+        {
+          "key": "continue_break",
+          "label": "Continue to break"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.conventional.caution",
+      "rulePackKey": "deposit.break",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "Keeping this deposit {daysToMaturity} more days pays {differenceIfKeptToMaturity} more",
+      "body": "Breaking it today pays {netReceivedNow}[[breakPenalty: , after a break penalty of {breakPenalty}]][[profitIfBrokenToday:  and including {profitIfBrokenToday} in interest at the reduced rate]]. At maturity on {maturityDate} you would receive {netAtMaturity}, including {profitAtMaturity} in interest at {ratePct}. [[profitForfeited: Breaking now gives up {profitForfeited} of the interest earned so far.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "Keep until maturity"
+        },
+        {
+          "key": "continue_break",
+          "label": "Continue to break"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.conventional.critical",
+      "rulePackKey": "deposit.break",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "Keeping this deposit {daysToMaturity} more days pays {differenceIfKeptToMaturity} more",
+      "body": "Breaking it today pays {netReceivedNow}[[breakPenalty: , after a break penalty of {breakPenalty}]][[profitIfBrokenToday:  and including {profitIfBrokenToday} in interest at the reduced rate]]. At maturity on {maturityDate} you would receive {netAtMaturity}, including {profitAtMaturity} in interest at {ratePct}. [[profitForfeited: Breaking now gives up {profitForfeited} of the interest earned so far.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "Keep until maturity"
+        },
+        {
+          "key": "continue_break",
+          "label": "Continue to break"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.conventional.info",
+      "rulePackKey": "deposit.break",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "كسر هذه الوديعة اليوم يمنحك {netReceivedNow}",
+      "body": "كسرها اليوم يمنحك {netReceivedNow}[[breakPenalty: ، بعد خصم غرامة كسر بقيمة {breakPenalty}]][[profitIfBrokenToday: ، شاملاً {profitIfBrokenToday} فوائد بالمعدل المخفّض]]. عند الاستحقاق في {maturityDate} تحصل على {netAtMaturity}، شاملاً {profitAtMaturity} فوائد بمعدل {ratePct}. [[profitForfeited: الكسر الآن يُفقدك {profitForfeited} من الفوائد المكتسبة حتى اليوم.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "الإبقاء حتى الاستحقاق"
+        },
+        {
+          "key": "continue_break",
+          "label": "متابعة الكسر"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.conventional.caution",
+      "rulePackKey": "deposit.break",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "إبقاء هذه الوديعة {daysToMaturity} يوماً إضافياً يمنحك {differenceIfKeptToMaturity} أكثر",
+      "body": "كسرها اليوم يمنحك {netReceivedNow}[[breakPenalty: ، بعد خصم غرامة كسر بقيمة {breakPenalty}]][[profitIfBrokenToday: ، شاملاً {profitIfBrokenToday} فوائد بالمعدل المخفّض]]. عند الاستحقاق في {maturityDate} تحصل على {netAtMaturity}، شاملاً {profitAtMaturity} فوائد بمعدل {ratePct}. [[profitForfeited: الكسر الآن يُفقدك {profitForfeited} من الفوائد المكتسبة حتى اليوم.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "الإبقاء حتى الاستحقاق"
+        },
+        {
+          "key": "continue_break",
+          "label": "متابعة الكسر"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.conventional.critical",
+      "rulePackKey": "deposit.break",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "إبقاء هذه الوديعة {daysToMaturity} يوماً إضافياً يمنحك {differenceIfKeptToMaturity} أكثر",
+      "body": "كسرها اليوم يمنحك {netReceivedNow}[[breakPenalty: ، بعد خصم غرامة كسر بقيمة {breakPenalty}]][[profitIfBrokenToday: ، شاملاً {profitIfBrokenToday} فوائد بالمعدل المخفّض]]. عند الاستحقاق في {maturityDate} تحصل على {netAtMaturity}، شاملاً {profitAtMaturity} فوائد بمعدل {ratePct}. [[profitForfeited: الكسر الآن يُفقدك {profitForfeited} من الفوائد المكتسبة حتى اليوم.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "الإبقاء حتى الاستحقاق"
+        },
+        {
+          "key": "continue_break",
+          "label": "متابعة الكسر"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "deposit.break",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you break your deposit",
+      "body": "Breaking a term deposit before maturity usually pays a reduced return and may have a penalty. You can see what you would receive in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_break",
+          "label": "Continue to break"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "deposit.break",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل كسر وديعتك",
+      "body": "كسر الوديعة لأجل قبل استحقاقها يمنح عادةً عائداً أقل وقد تترتب عليه غرامة. يمكنك الاطلاع على ما ستحصل عليه في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_break",
+          "label": "متابعة الكسر"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.islamic.info",
+      "rulePackKey": "deposit.break",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Breaking this investment today pays {netReceivedNow}",
+      "body": "Breaking it today pays {netReceivedNow}[[breakPenalty: , after a break penalty of {breakPenalty}]][[profitIfBrokenToday:  and including {profitIfBrokenToday} in profit at the reduced rate]]. At maturity on {maturityDate} you would receive {netAtMaturity}, including expected profit of {profitAtMaturity} at {ratePct}. [[profitForfeited: Breaking now gives up {profitForfeited} of the profit earned so far.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "Keep until maturity"
+        },
+        {
+          "key": "continue_break",
+          "label": "Continue to break"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.islamic.caution",
+      "rulePackKey": "deposit.break",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "Keeping this investment {daysToMaturity} more days pays {differenceIfKeptToMaturity} more",
+      "body": "Breaking it today pays {netReceivedNow}[[breakPenalty: , after a break penalty of {breakPenalty}]][[profitIfBrokenToday:  and including {profitIfBrokenToday} in profit at the reduced rate]]. At maturity on {maturityDate} you would receive {netAtMaturity}, including expected profit of {profitAtMaturity} at {ratePct}. [[profitForfeited: Breaking now gives up {profitForfeited} of the profit earned so far.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "Keep until maturity"
+        },
+        {
+          "key": "continue_break",
+          "label": "Continue to break"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.islamic.critical",
+      "rulePackKey": "deposit.break",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "Keeping this investment {daysToMaturity} more days pays {differenceIfKeptToMaturity} more",
+      "body": "Breaking it today pays {netReceivedNow}[[breakPenalty: , after a break penalty of {breakPenalty}]][[profitIfBrokenToday:  and including {profitIfBrokenToday} in profit at the reduced rate]]. At maturity on {maturityDate} you would receive {netAtMaturity}, including expected profit of {profitAtMaturity} at {ratePct}. [[profitForfeited: Breaking now gives up {profitForfeited} of the profit earned so far.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "Keep until maturity"
+        },
+        {
+          "key": "continue_break",
+          "label": "Continue to break"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.islamic.info",
+      "rulePackKey": "deposit.break",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "كسر هذا الاستثمار اليوم يمنحك {netReceivedNow}",
+      "body": "كسره اليوم يمنحك {netReceivedNow}[[breakPenalty: ، بعد خصم غرامة كسر بقيمة {breakPenalty}]][[profitIfBrokenToday: ، شاملاً {profitIfBrokenToday} أرباحاً بالمعدل المخفّض]]. عند الاستحقاق في {maturityDate} تحصل على {netAtMaturity}، شاملاً ربحاً متوقعاً {profitAtMaturity} بمعدل {ratePct}. [[profitForfeited: الكسر الآن يُفقدك {profitForfeited} من الأرباح المكتسبة حتى اليوم.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "الإبقاء حتى الاستحقاق"
+        },
+        {
+          "key": "continue_break",
+          "label": "متابعة الكسر"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.islamic.caution",
+      "rulePackKey": "deposit.break",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "إبقاء هذا الاستثمار {daysToMaturity} يوماً إضافياً يمنحك {differenceIfKeptToMaturity} أكثر",
+      "body": "كسره اليوم يمنحك {netReceivedNow}[[breakPenalty: ، بعد خصم غرامة كسر بقيمة {breakPenalty}]][[profitIfBrokenToday: ، شاملاً {profitIfBrokenToday} أرباحاً بالمعدل المخفّض]]. عند الاستحقاق في {maturityDate} تحصل على {netAtMaturity}، شاملاً ربحاً متوقعاً {profitAtMaturity} بمعدل {ratePct}. [[profitForfeited: الكسر الآن يُفقدك {profitForfeited} من الأرباح المكتسبة حتى اليوم.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "الإبقاء حتى الاستحقاق"
+        },
+        {
+          "key": "continue_break",
+          "label": "متابعة الكسر"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.islamic.critical",
+      "rulePackKey": "deposit.break",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "إبقاء هذا الاستثمار {daysToMaturity} يوماً إضافياً يمنحك {differenceIfKeptToMaturity} أكثر",
+      "body": "كسره اليوم يمنحك {netReceivedNow}[[breakPenalty: ، بعد خصم غرامة كسر بقيمة {breakPenalty}]][[profitIfBrokenToday: ، شاملاً {profitIfBrokenToday} أرباحاً بالمعدل المخفّض]]. عند الاستحقاق في {maturityDate} تحصل على {netAtMaturity}، شاملاً ربحاً متوقعاً {profitAtMaturity} بمعدل {ratePct}. [[profitForfeited: الكسر الآن يُفقدك {profitForfeited} من الأرباح المكتسبة حتى اليوم.]]",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "الإبقاء حتى الاستحقاق"
+        },
+        {
+          "key": "continue_break",
+          "label": "متابعة الكسر"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "deposit.break",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you break your investment",
+      "body": "Breaking a term investment before maturity usually pays a reduced profit and may have a penalty. You can see what you would receive in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_break",
+          "label": "Continue to break"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "deposit.break.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "deposit.break",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل كسر استثمارك",
+      "body": "كسر الاستثمار لأجل قبل استحقاقه يمنح عادةً ربحاً أقل وقد تترتب عليه غرامة. يمكنك الاطلاع على ما ستحصل عليه في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_break",
+          "label": "متابعة الكسر"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "principal": "Amount placed",
+      "ratePct": "Rate",
+      "maturityDate": "Maturity date",
+      "daysToMaturity": "Days to maturity",
+      "profitAtMaturity": "Return at maturity",
+      "profitIfBrokenToday": "Return if broken today",
+      "profitForfeited": "Return given up",
+      "breakPenalty": "Break penalty",
+      "netReceivedNow": "You receive today",
+      "netAtMaturity": "You receive at maturity",
+      "differenceIfKeptToMaturity": "Difference"
+    },
+    "ar": {
+      "principal": "المبلغ المودَع",
+      "ratePct": "المعدل",
+      "maturityDate": "تاريخ الاستحقاق",
+      "daysToMaturity": "الأيام حتى الاستحقاق",
+      "profitAtMaturity": "العائد عند الاستحقاق",
+      "profitIfBrokenToday": "العائد عند الكسر اليوم",
+      "profitForfeited": "العائد المفقود",
+      "breakPenalty": "غرامة الكسر",
+      "netReceivedNow": "تحصل عليه اليوم",
+      "netAtMaturity": "تحصل عليه عند الاستحقاق",
+      "differenceIfKeptToMaturity": "الفرق"
+    }
+  },
+  "explanations": {
+    "en": {
+      "breaking_reduces_profit": "Breaking before maturity pays a reduced return under your deposit's terms.",
+      "break_penalty_applies": "Breaking early has a penalty under your deposit's terms.",
+      "severity_critical": "The difference is above the level your bank has set for an important notice.",
+      "severity_caution": "Your bank shows a notice for this situation."
+    },
+    "ar": {
+      "breaking_reduces_profit": "الكسر قبل الاستحقاق يمنح عائداً أقل وفق شروط وديعتك.",
+      "break_penalty_applies": "تترتب على الكسر المبكر غرامة وفق شروط وديعتك.",
+      "severity_critical": "الفرق أعلى من الحد الذي حدده البنك لإظهار تنبيه مهم.",
+      "severity_caution": "يُظهر البنك تنبيهاً في هذه الحالة."
+    }
+  }
+}

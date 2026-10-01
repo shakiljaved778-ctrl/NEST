@@ -34,7 +34,12 @@ export default async function Home() {
         </CardHeader>
         <CardContent className="divide-y divide-black/5">
           {customer.accounts.map((a) => (
-            <div key={a.id} className={row}>
+            <Link
+              key={a.id}
+              href={`/accounts/${a.id}`}
+              className={row}
+              data-testid={`account-${a.id}`}
+            >
               <div>
                 <p className="text-sm">{a.productName}</p>
                 <p className="text-xs text-ink-muted">
@@ -44,10 +49,11 @@ export default async function Home() {
                   ) : null}
                 </p>
               </div>
-              <p className="text-sm font-semibold">
+              <span className="flex items-center gap-1 text-sm font-semibold">
                 <bdi>{money(a.balance, locale)}</bdi>
-              </p>
-            </div>
+                <ChevronRight size={14} className="rtl:rotate-180" />
+              </span>
+            </Link>
           ))}
         </CardContent>
       </Card>
@@ -125,17 +131,23 @@ export default async function Home() {
           </CardHeader>
           <CardContent className="divide-y divide-black/5">
             {customer.deposits.map((d) => (
-              <div key={d.id} className={row}>
+              <Link
+                key={d.id}
+                href={`/deposits/${d.id}`}
+                className={row}
+                data-testid={`deposit-${d.id}`}
+              >
                 <div>
                   <p className="text-sm">{d.productName}</p>
                   <p className="text-xs text-ink-muted">
                     {t("home.matures", { date: date(d.maturityAt, locale) })}
                   </p>
                 </div>
-                <p className="text-sm font-semibold">
+                <span className="flex items-center gap-1 text-sm font-semibold">
                   <bdi>{money(d.principal, locale)}</bdi>
-                </p>
-              </div>
+                  <ChevronRight size={14} className="rtl:rotate-180" />
+                </span>
+              </Link>
             ))}
           </CardContent>
         </Card>

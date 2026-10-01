@@ -5,6 +5,7 @@
 import {
   cardClosePacks,
   financeEarlySettlementPacks,
+  RULE_PACK_KEYS,
   renderTemplate,
   TEMPLATES,
   variantForFinanceType,
@@ -158,19 +159,16 @@ describe("every seeded card and finance evaluates and renders with approved copy
 });
 
 describe("seeded rule packs and templates", () => {
-  it("seeds both flagship packs in both variants, enabled", () => {
-    expect(data.rulePacks.map((p) => `${p.key}/${p.variant}`).sort()).toEqual([
-      "card.close/conventional",
-      "card.close/islamic",
-      "finance.early_settlement/conventional",
-      "finance.early_settlement/islamic",
-    ]);
+  it("seeds all twelve packs in both variants, enabled", () => {
+    expect(data.rulePacks).toHaveLength(24);
+    expect(new Set(data.rulePacks.map((p) => p.key))).toEqual(new Set(RULE_PACK_KEYS));
     expect(data.rulePacks.every((p) => p.enabled && p.status === "active")).toBe(true);
   });
 
-  it("seeds 24 insight + 8 generic templates; Islamic ones are sharia_approved (non-negotiable 8)", () => {
-    expect(data.templates).toHaveLength(32);
-    expect(data.templates.filter((t) => t.key.endsWith(".generic"))).toHaveLength(8);
+  it("seeds 144 insight + 48 generic templates; Islamic ones are sharia_approved (non-negotiable 8)", () => {
+    // 12 packs × 2 variants × 2 locales × (3 severities + 1 generic)
+    expect(data.templates).toHaveLength(192);
+    expect(data.templates.filter((t) => t.key.endsWith(".generic"))).toHaveLength(48);
     for (const t of data.templates) {
       expect(t.status).toBe(t.variant === "islamic" ? "sharia_approved" : "approved");
       expect(t.approvedBy).toBeTruthy();

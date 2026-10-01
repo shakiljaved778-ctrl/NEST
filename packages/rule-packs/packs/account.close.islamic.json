@@ -1,0 +1,109 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "account.close",
+  "version": "1.0.0",
+  "variant": "islamic",
+  "productFamily": "accounts",
+  "triggers": [
+    {
+      "type": "action",
+      "event": "account.close"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Account",
+      "fields": ["balance", "closureFee", "chequesOutstanding", "receivesSalary", "variant"]
+    },
+    {
+      "entity": "StandingOrder",
+      "fields": ["amount", "nextRunAt", "active"]
+    },
+    {
+      "entity": "Card",
+      "fields": ["settlementAccountId"]
+    },
+    {
+      "entity": "Finance",
+      "fields": ["salaryLinked", "status"]
+    }
+  ],
+  "parameters": {
+    "standingOrderHorizonDays": 30,
+    "roundingMode": "half_up"
+  },
+  "facts": [
+    {
+      "key": "currentBalance",
+      "unit": "QAR",
+      "source": "account",
+      "description": "Account balance"
+    },
+    {
+      "key": "closureFee",
+      "unit": "QAR",
+      "source": "fee_schedule",
+      "description": "Account closure fee"
+    },
+    {
+      "key": "netPayout",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Balance paid out after the closure fee"
+    },
+    {
+      "key": "chequesOutstanding",
+      "unit": "count",
+      "source": "account",
+      "description": "Issued cheques not yet presented"
+    },
+    {
+      "key": "activeStandingOrders",
+      "unit": "count",
+      "source": "standing_order",
+      "description": "Active standing orders"
+    },
+    {
+      "key": "standingOrdersTotal",
+      "unit": "QAR",
+      "source": "standing_order",
+      "description": "Total of one run of every active standing order"
+    },
+    {
+      "key": "nextStandingOrderDate",
+      "unit": "date",
+      "source": "standing_order",
+      "description": "Next standing order date"
+    },
+    {
+      "key": "nextStandingOrderAmount",
+      "unit": "QAR",
+      "source": "standing_order",
+      "description": "Next standing order amount"
+    },
+    {
+      "key": "standingOrdersDueSoon",
+      "unit": "count",
+      "source": "standing_order",
+      "description": "Standing orders due within the horizon"
+    },
+    {
+      "key": "linkedCards",
+      "unit": "count",
+      "source": "card",
+      "description": "Cards that settle from this account"
+    },
+    {
+      "key": "receivesSalary",
+      "unit": "boolean",
+      "source": "account",
+      "description": "Whether the salary is paid into this account"
+    },
+    {
+      "key": "salaryLinkedFinances",
+      "unit": "count",
+      "source": "finance",
+      "description": "Salary-linked finances"
+    }
+  ]
+}

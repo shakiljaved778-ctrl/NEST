@@ -1,5 +1,6 @@
 "use client";
 
+import type { CheckAction, CheckContext } from "@amil/sdk";
 import type { AmilOptionDetail, AmilReadyDetail } from "@amil/widget";
 import { useRouter } from "next/navigation";
 import { createElement, useEffect, useRef, useState } from "react";
@@ -8,10 +9,12 @@ import { deepLinkToPath } from "@/lib/format";
 interface Props {
   apiBase: string;
   token: string | null;
-  action: "card.close" | "finance.early_settlement";
+  action: CheckAction;
   customerRef: string;
   cardId?: string;
   financeId?: string;
+  /** Any other context (depositId, accountId, amount, months, …), passed as JSON. */
+  context?: CheckContext;
   locale: "en" | "ar";
   /** The bank's own continue path, shown when AMIL has nothing to show or is unavailable. */
   fallbackHref: string;
@@ -72,6 +75,7 @@ export function InsightPanel(props: Props) {
             "customer-ref": props.customerRef,
             ...(props.cardId ? { "card-id": props.cardId } : {}),
             ...(props.financeId ? { "finance-id": props.financeId } : {}),
+            ...(props.context ? { context: JSON.stringify(props.context) } : {}),
             locale: props.locale,
           })
         : null}

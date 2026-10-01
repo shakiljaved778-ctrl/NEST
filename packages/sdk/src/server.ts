@@ -6,8 +6,14 @@
 import { createHmac } from "node:crypto";
 import { parseResponse } from "./http";
 import {
+  Alert,
+  AlertList,
+  ChargeExplanation,
   type CheckRequest,
   CheckResponse,
+  type EventRequest,
+  EventAck,
+  type ExplainChargeRequest,
   ConsentList,
   type ConsentRequest,
   Consent,
@@ -92,5 +98,25 @@ export class AmilServerClient {
       ),
       ConsentList,
     );
+  }
+  async listAlerts(customerRef: string, locale?: "en" | "ar") {
+    const q = `customerRef=${encodeURIComponent(customerRef)}${locale ? `&locale=${locale}` : ""}`;
+    return parseResponse(await this.call("GET", `/v1/alerts?${q}`), AlertList);
+  }
+
+  async markAlertRead(alertId: string) {
+    return parseResponse(
+      await this.call("POST", `/v1/alerts/${encodeURIComponent(alertId)}/read`, {}),
+      Alert,
+    );
+  }
+
+  async explainCharge(req: ExplainChargeRequest) {
+    return parseResponse(await this.call("POST", "/v1/explain-charge", req), ChargeExplanation);
+  }
+
+  /** Push a product event (bank backend only). Safe to retry with the same idempotency key. */
+  async pushEvent(req: EventRequest) {
+    return parseResponse(await this.call("POST", "/v1/events", req), EventAck);
   }
 }

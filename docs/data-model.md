@@ -166,9 +166,13 @@ and customer deletion.
 
 ### Alert, ProactiveJob and InboundEvent
 
-`Alert` is the proactive inbox (`dedupeKey` is unique per customer). `ProactiveJob` holds the cron
-schedule per proactive pack (`account.dormancy`, `rewards.expiry`). `InboundEvent` stores bank
-webhook events with a unique `(bankId, idempotencyKey)`.
+`Alert` is the proactive inbox (`dedupeKey`, product + event date, is unique per customer).
+`insightEventId` points at the audited insight in the customer's preferred language and
+`localeEventIds` (`{"en": …, "ar": …}`, migration `20261001090000_alert_locale_events`) at the same
+alert worded in every bank locale (D-038). `ProactiveJob` holds the cron schedule per proactive pack
+(`account.dormancy`, `rewards.expiry`); the worker mirrors enabled rows into BullMQ schedulers
+(D-039). `InboundEvent` stores bank webhook events (`POST /v1/events`) with a unique
+`(bankId, idempotencyKey)`.
 
 ### ConsoleUser and ApprovalLog
 

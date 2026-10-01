@@ -1,0 +1,429 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons. Labels and explanations are shared by both variants, so they use variant-neutral terms.",
+  "templates": [
+    {
+      "key": "account.close.conventional.info",
+      "rulePackKey": "account.close",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Closing this account has a fee of {closureFee}",
+      "body": "[[chequesOutstanding: Cheques you have written that are not yet presented ({chequesOutstanding}) would be returned unpaid. ]][[activeStandingOrders: Your standing orders ({activeStandingOrders}, totalling {standingOrdersTotal}) would stop; the next is {nextStandingOrderAmount} on {nextStandingOrderDate}. ]][[linkedCards: Cards paid from this account ({linkedCards}) need a new account to pay from. ]][[receivesSalary: Your salary is paid into this account. ]][[salaryLinkedFinances: Finance linked to your salary may be repriced if your salary stops arriving here. ]]The balance of {currentBalance} is paid out[[closureFee:  less the closure fee of {closureFee}, so you receive {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "Review standing orders"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "Continue closing the account"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.close.conventional.caution",
+      "rulePackKey": "account.close",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "Some payments and products still use this account",
+      "body": "[[chequesOutstanding: Cheques you have written that are not yet presented ({chequesOutstanding}) would be returned unpaid. ]][[activeStandingOrders: Your standing orders ({activeStandingOrders}, totalling {standingOrdersTotal}) would stop; the next is {nextStandingOrderAmount} on {nextStandingOrderDate}. ]][[linkedCards: Cards paid from this account ({linkedCards}) need a new account to pay from. ]][[receivesSalary: Your salary is paid into this account. ]][[salaryLinkedFinances: Finance linked to your salary may be repriced if your salary stops arriving here. ]]The balance of {currentBalance} is paid out[[closureFee:  less the closure fee of {closureFee}, so you receive {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "Review standing orders"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "Continue closing the account"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.close.conventional.critical",
+      "rulePackKey": "account.close",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "Closing this account affects payments still linked to it",
+      "body": "[[chequesOutstanding: Cheques you have written that are not yet presented ({chequesOutstanding}) would be returned unpaid. ]][[activeStandingOrders: Your standing orders ({activeStandingOrders}, totalling {standingOrdersTotal}) would stop; the next is {nextStandingOrderAmount} on {nextStandingOrderDate}. ]][[linkedCards: Cards paid from this account ({linkedCards}) need a new account to pay from. ]][[receivesSalary: Your salary is paid into this account. ]][[salaryLinkedFinances: Finance linked to your salary may be repriced if your salary stops arriving here. ]]The balance of {currentBalance} is paid out[[closureFee:  less the closure fee of {closureFee}, so you receive {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "Review standing orders"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "Continue closing the account"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.close.conventional.info",
+      "rulePackKey": "account.close",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "إغلاق هذا الحساب تترتب عليه رسوم {closureFee}",
+      "body": "[[chequesOutstanding: الشيكات التي حررتها ولم تُقدَّم بعد ({chequesOutstanding}) ستُعاد دون صرف. ]][[activeStandingOrders: ستتوقف أوامر الدفع الدائمة ({activeStandingOrders}، بإجمالي {standingOrdersTotal})، وأقربها {nextStandingOrderAmount} في {nextStandingOrderDate}. ]][[linkedCards: البطاقات التي تُسدَّد من هذا الحساب ({linkedCards}) تحتاج إلى حساب جديد للسداد منه. ]][[receivesSalary: يُحوَّل راتبك إلى هذا الحساب. ]][[salaryLinkedFinances: قد يتغير تسعير التمويل المرتبط براتبك إذا توقف تحويل الراتب إلى هنا. ]]يُصرف الرصيد البالغ {currentBalance}[[closureFee:  بعد خصم رسوم الإغلاق {closureFee}، فتحصل على {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "مراجعة أوامر الدفع الدائمة"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "متابعة إغلاق الحساب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.close.conventional.caution",
+      "rulePackKey": "account.close",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "ما زالت بعض المدفوعات والمنتجات تستخدم هذا الحساب",
+      "body": "[[chequesOutstanding: الشيكات التي حررتها ولم تُقدَّم بعد ({chequesOutstanding}) ستُعاد دون صرف. ]][[activeStandingOrders: ستتوقف أوامر الدفع الدائمة ({activeStandingOrders}، بإجمالي {standingOrdersTotal})، وأقربها {nextStandingOrderAmount} في {nextStandingOrderDate}. ]][[linkedCards: البطاقات التي تُسدَّد من هذا الحساب ({linkedCards}) تحتاج إلى حساب جديد للسداد منه. ]][[receivesSalary: يُحوَّل راتبك إلى هذا الحساب. ]][[salaryLinkedFinances: قد يتغير تسعير التمويل المرتبط براتبك إذا توقف تحويل الراتب إلى هنا. ]]يُصرف الرصيد البالغ {currentBalance}[[closureFee:  بعد خصم رسوم الإغلاق {closureFee}، فتحصل على {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "مراجعة أوامر الدفع الدائمة"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "متابعة إغلاق الحساب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.close.conventional.critical",
+      "rulePackKey": "account.close",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "إغلاق هذا الحساب يؤثر على مدفوعات ما زالت مرتبطة به",
+      "body": "[[chequesOutstanding: الشيكات التي حررتها ولم تُقدَّم بعد ({chequesOutstanding}) ستُعاد دون صرف. ]][[activeStandingOrders: ستتوقف أوامر الدفع الدائمة ({activeStandingOrders}، بإجمالي {standingOrdersTotal})، وأقربها {nextStandingOrderAmount} في {nextStandingOrderDate}. ]][[linkedCards: البطاقات التي تُسدَّد من هذا الحساب ({linkedCards}) تحتاج إلى حساب جديد للسداد منه. ]][[receivesSalary: يُحوَّل راتبك إلى هذا الحساب. ]][[salaryLinkedFinances: قد يتغير تسعير التمويل المرتبط براتبك إذا توقف تحويل الراتب إلى هنا. ]]يُصرف الرصيد البالغ {currentBalance}[[closureFee:  بعد خصم رسوم الإغلاق {closureFee}، فتحصل على {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "مراجعة أوامر الدفع الدائمة"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "متابعة إغلاق الحساب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.close.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "account.close",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you close your account",
+      "body": "Closing an account stops standing orders and returns cheques that have not been presented, and cards paid from it need a new account. A closure fee may apply. You can review what uses this account in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_account_close",
+          "label": "Continue closing the account"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.close.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "account.close",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل إغلاق حسابك",
+      "body": "إغلاق الحساب يوقف أوامر الدفع الدائمة ويعيد الشيكات التي لم تُقدَّم، وتحتاج البطاقات التي تُسدَّد منه إلى حساب جديد. قد تُطبَّق رسوم إغلاق. يمكنك مراجعة ما يستخدم هذا الحساب في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_account_close",
+          "label": "متابعة إغلاق الحساب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.close.islamic.info",
+      "rulePackKey": "account.close",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Closing this account has a fee of {closureFee}",
+      "body": "[[chequesOutstanding: Cheques you have written that are not yet presented ({chequesOutstanding}) would be returned unpaid. ]][[activeStandingOrders: Your standing orders ({activeStandingOrders}, totalling {standingOrdersTotal}) would stop; the next is {nextStandingOrderAmount} on {nextStandingOrderDate}. ]][[linkedCards: Cards paid from this account ({linkedCards}) need a new account to pay from. ]][[receivesSalary: Your salary is paid into this account. ]][[salaryLinkedFinances: Finance linked to your salary may be repriced if your salary stops arriving here. ]]The balance of {currentBalance} is paid out[[closureFee:  less the closure fee of {closureFee}, so you receive {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "Review standing orders"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "Continue closing the account"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.close.islamic.caution",
+      "rulePackKey": "account.close",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "Some payments and products still use this account",
+      "body": "[[chequesOutstanding: Cheques you have written that are not yet presented ({chequesOutstanding}) would be returned unpaid. ]][[activeStandingOrders: Your standing orders ({activeStandingOrders}, totalling {standingOrdersTotal}) would stop; the next is {nextStandingOrderAmount} on {nextStandingOrderDate}. ]][[linkedCards: Cards paid from this account ({linkedCards}) need a new account to pay from. ]][[receivesSalary: Your salary is paid into this account. ]][[salaryLinkedFinances: Finance linked to your salary may be repriced if your salary stops arriving here. ]]The balance of {currentBalance} is paid out[[closureFee:  less the closure fee of {closureFee}, so you receive {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "Review standing orders"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "Continue closing the account"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.close.islamic.critical",
+      "rulePackKey": "account.close",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "Closing this account affects payments still linked to it",
+      "body": "[[chequesOutstanding: Cheques you have written that are not yet presented ({chequesOutstanding}) would be returned unpaid. ]][[activeStandingOrders: Your standing orders ({activeStandingOrders}, totalling {standingOrdersTotal}) would stop; the next is {nextStandingOrderAmount} on {nextStandingOrderDate}. ]][[linkedCards: Cards paid from this account ({linkedCards}) need a new account to pay from. ]][[receivesSalary: Your salary is paid into this account. ]][[salaryLinkedFinances: Finance linked to your salary may be repriced if your salary stops arriving here. ]]The balance of {currentBalance} is paid out[[closureFee:  less the closure fee of {closureFee}, so you receive {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "Review standing orders"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "Continue closing the account"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.close.islamic.info",
+      "rulePackKey": "account.close",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "إغلاق هذا الحساب تترتب عليه رسوم {closureFee}",
+      "body": "[[chequesOutstanding: الشيكات التي حررتها ولم تُقدَّم بعد ({chequesOutstanding}) ستُعاد دون صرف. ]][[activeStandingOrders: ستتوقف أوامر الدفع الدائمة ({activeStandingOrders}، بإجمالي {standingOrdersTotal})، وأقربها {nextStandingOrderAmount} في {nextStandingOrderDate}. ]][[linkedCards: البطاقات التي تُسدَّد من هذا الحساب ({linkedCards}) تحتاج إلى حساب جديد للسداد منه. ]][[receivesSalary: يُحوَّل راتبك إلى هذا الحساب. ]][[salaryLinkedFinances: قد يتغير تسعير التمويل المرتبط براتبك إذا توقف تحويل الراتب إلى هنا. ]]يُصرف الرصيد البالغ {currentBalance}[[closureFee:  بعد خصم رسوم الإغلاق {closureFee}، فتحصل على {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "مراجعة أوامر الدفع الدائمة"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "متابعة إغلاق الحساب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.close.islamic.caution",
+      "rulePackKey": "account.close",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "ما زالت بعض المدفوعات والمنتجات تستخدم هذا الحساب",
+      "body": "[[chequesOutstanding: الشيكات التي حررتها ولم تُقدَّم بعد ({chequesOutstanding}) ستُعاد دون صرف. ]][[activeStandingOrders: ستتوقف أوامر الدفع الدائمة ({activeStandingOrders}، بإجمالي {standingOrdersTotal})، وأقربها {nextStandingOrderAmount} في {nextStandingOrderDate}. ]][[linkedCards: البطاقات التي تُسدَّد من هذا الحساب ({linkedCards}) تحتاج إلى حساب جديد للسداد منه. ]][[receivesSalary: يُحوَّل راتبك إلى هذا الحساب. ]][[salaryLinkedFinances: قد يتغير تسعير التمويل المرتبط براتبك إذا توقف تحويل الراتب إلى هنا. ]]يُصرف الرصيد البالغ {currentBalance}[[closureFee:  بعد خصم رسوم الإغلاق {closureFee}، فتحصل على {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "مراجعة أوامر الدفع الدائمة"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "متابعة إغلاق الحساب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.close.islamic.critical",
+      "rulePackKey": "account.close",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "إغلاق هذا الحساب يؤثر على مدفوعات ما زالت مرتبطة به",
+      "body": "[[chequesOutstanding: الشيكات التي حررتها ولم تُقدَّم بعد ({chequesOutstanding}) ستُعاد دون صرف. ]][[activeStandingOrders: ستتوقف أوامر الدفع الدائمة ({activeStandingOrders}، بإجمالي {standingOrdersTotal})، وأقربها {nextStandingOrderAmount} في {nextStandingOrderDate}. ]][[linkedCards: البطاقات التي تُسدَّد من هذا الحساب ({linkedCards}) تحتاج إلى حساب جديد للسداد منه. ]][[receivesSalary: يُحوَّل راتبك إلى هذا الحساب. ]][[salaryLinkedFinances: قد يتغير تسعير التمويل المرتبط براتبك إذا توقف تحويل الراتب إلى هنا. ]]يُصرف الرصيد البالغ {currentBalance}[[closureFee:  بعد خصم رسوم الإغلاق {closureFee}، فتحصل على {netPayout}]].",
+      "options": [
+        {
+          "key": "review_standing_orders",
+          "label": "مراجعة أوامر الدفع الدائمة"
+        },
+        {
+          "key": "continue_account_close",
+          "label": "متابعة إغلاق الحساب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.close.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "account.close",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you close your account",
+      "body": "Closing an account stops standing orders and returns cheques that have not been presented, and cards paid from it need a new account. A closure fee may apply. You can review what uses this account in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_account_close",
+          "label": "Continue closing the account"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.close.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "account.close",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل إغلاق حسابك",
+      "body": "إغلاق الحساب يوقف أوامر الدفع الدائمة ويعيد الشيكات التي لم تُقدَّم، وتحتاج البطاقات التي تُسدَّد منه إلى حساب جديد. قد تُطبَّق رسوم إغلاق. يمكنك مراجعة ما يستخدم هذا الحساب في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_account_close",
+          "label": "متابعة إغلاق الحساب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "currentBalance": "Balance",
+      "closureFee": "Closure fee",
+      "netPayout": "You receive",
+      "chequesOutstanding": "Cheques not yet presented",
+      "activeStandingOrders": "Standing orders",
+      "standingOrdersTotal": "Standing orders total",
+      "nextStandingOrderDate": "Next standing order",
+      "nextStandingOrderAmount": "Next standing order amount",
+      "standingOrdersDueSoon": "Standing orders due soon",
+      "linkedCards": "Cards paid from this account",
+      "receivesSalary": "Salary account",
+      "salaryLinkedFinances": "Salary-linked finances"
+    },
+    "ar": {
+      "currentBalance": "الرصيد",
+      "closureFee": "رسوم الإغلاق",
+      "netPayout": "تحصل على",
+      "chequesOutstanding": "شيكات لم تُقدَّم بعد",
+      "activeStandingOrders": "أوامر الدفع الدائمة",
+      "standingOrdersTotal": "إجمالي أوامر الدفع",
+      "nextStandingOrderDate": "أمر الدفع القادم",
+      "nextStandingOrderAmount": "مبلغ أمر الدفع القادم",
+      "standingOrdersDueSoon": "أوامر دفع مستحقة قريباً",
+      "linkedCards": "بطاقات تُسدَّد من هذا الحساب",
+      "receivesSalary": "حساب الراتب",
+      "salaryLinkedFinances": "تمويلات مرتبطة بالراتب"
+    }
+  },
+  "explanations": {
+    "en": {
+      "cheques_outstanding_may_bounce": "Cheques written on this account have not been presented yet.",
+      "salary_linked_finance_depends_on_account": "You have finance priced on your salary, which is paid into this account.",
+      "standing_orders_stop": "Standing orders run from this account.",
+      "linked_cards_need_new_account": "Cards are paid from this account.",
+      "salary_account_closing": "This is the account your salary is paid into.",
+      "closure_fee_applies": "Closing the account has a fee under the bank's fee schedule.",
+      "severity_critical": "Something linked to this account could fail or change, so your bank shows an important notice.",
+      "severity_caution": "Your bank shows a notice for this situation."
+    },
+    "ar": {
+      "cheques_outstanding_may_bounce": "هناك شيكات محررة على هذا الحساب لم تُقدَّم بعد.",
+      "salary_linked_finance_depends_on_account": "لديك تمويل مسعَّر على أساس راتبك الذي يُحوَّل إلى هذا الحساب.",
+      "standing_orders_stop": "تُنفَّذ أوامر دفع دائمة من هذا الحساب.",
+      "linked_cards_need_new_account": "تُسدَّد بطاقات من هذا الحساب.",
+      "salary_account_closing": "هذا هو الحساب الذي يُحوَّل إليه راتبك.",
+      "closure_fee_applies": "تترتب على إغلاق الحساب رسوم وفق جدول رسوم البنك.",
+      "severity_critical": "قد يتعطل أو يتغير أمر مرتبط بهذا الحساب، لذا يُظهر البنك تنبيهاً مهماً.",
+      "severity_caution": "يُظهر البنك تنبيهاً في هذه الحالة."
+    }
+  }
+}

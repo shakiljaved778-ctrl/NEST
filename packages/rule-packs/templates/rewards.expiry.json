@@ -1,0 +1,379 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons. Labels and explanations are shared by both variants, so they use variant-neutral terms.",
+  "templates": [
+    {
+      "key": "rewards.expiry.conventional.info",
+      "rulePackKey": "rewards.expiry",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "{nextExpiryPoints} points worth {nextExpiryValue} expire on {nextExpiryDate}",
+      "body": "Within {longWindowDays} days, {pointsExpiringLong} points worth {pointsExpiringLongValue} expire[[pointsExpiringShort: , {pointsExpiringShort} of them within {shortWindowDays} days]]. Your balance is {pointsBalance} points, worth {pointsValue}. Redeeming before the expiry date keeps their value.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.conventional.caution",
+      "rulePackKey": "rewards.expiry",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "{nextExpiryPoints} points worth {nextExpiryValue} expire on {nextExpiryDate}",
+      "body": "Within {longWindowDays} days, {pointsExpiringLong} points worth {pointsExpiringLongValue} expire[[pointsExpiringShort: , {pointsExpiringShort} of them within {shortWindowDays} days]]. Your balance is {pointsBalance} points, worth {pointsValue}. Redeeming before the expiry date keeps their value.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.conventional.critical",
+      "rulePackKey": "rewards.expiry",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "{nextExpiryPoints} points worth {nextExpiryValue} expire on {nextExpiryDate}",
+      "body": "Within {longWindowDays} days, {pointsExpiringLong} points worth {pointsExpiringLongValue} expire[[pointsExpiringShort: , {pointsExpiringShort} of them within {shortWindowDays} days]]. Your balance is {pointsBalance} points, worth {pointsValue}. Redeeming before the expiry date keeps their value.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.conventional.info",
+      "rulePackKey": "rewards.expiry",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "تنتهي صلاحية {nextExpiryPoints} نقطة بقيمة {nextExpiryValue} في {nextExpiryDate}",
+      "body": "خلال {longWindowDays} يوماً تنتهي صلاحية {pointsExpiringLong} نقطة بقيمة {pointsExpiringLongValue}[[pointsExpiringShort: ، منها {pointsExpiringShort} نقطة خلال {shortWindowDays} يوماً]]. رصيدك {pointsBalance} نقطة بقيمة {pointsValue}. الاستبدال قبل تاريخ انتهاء الصلاحية يحفظ قيمتها.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدال النقاط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.conventional.caution",
+      "rulePackKey": "rewards.expiry",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "تنتهي صلاحية {nextExpiryPoints} نقطة بقيمة {nextExpiryValue} في {nextExpiryDate}",
+      "body": "خلال {longWindowDays} يوماً تنتهي صلاحية {pointsExpiringLong} نقطة بقيمة {pointsExpiringLongValue}[[pointsExpiringShort: ، منها {pointsExpiringShort} نقطة خلال {shortWindowDays} يوماً]]. رصيدك {pointsBalance} نقطة بقيمة {pointsValue}. الاستبدال قبل تاريخ انتهاء الصلاحية يحفظ قيمتها.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدال النقاط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.conventional.critical",
+      "rulePackKey": "rewards.expiry",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "تنتهي صلاحية {nextExpiryPoints} نقطة بقيمة {nextExpiryValue} في {nextExpiryDate}",
+      "body": "خلال {longWindowDays} يوماً تنتهي صلاحية {pointsExpiringLong} نقطة بقيمة {pointsExpiringLongValue}[[pointsExpiringShort: ، منها {pointsExpiringShort} نقطة خلال {shortWindowDays} يوماً]]. رصيدك {pointsBalance} نقطة بقيمة {pointsValue}. الاستبدال قبل تاريخ انتهاء الصلاحية يحفظ قيمتها.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدال النقاط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "rewards.expiry",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Your reward points have expiry dates",
+      "body": "Reward points expire on the dates shown in your rewards summary. Redeeming before then keeps their value. You can see your points in the app, or ask us.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "rewards.expiry",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لنقاط المكافآت تواريخ انتهاء صلاحية",
+      "body": "تنتهي صلاحية نقاط المكافآت في التواريخ الظاهرة في ملخص مكافآتك. الاستبدال قبل ذلك يحفظ قيمتها. يمكنك الاطلاع على نقاطك في التطبيق أو سؤالنا.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدال النقاط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.islamic.info",
+      "rulePackKey": "rewards.expiry",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "{nextExpiryPoints} points worth {nextExpiryValue} expire on {nextExpiryDate}",
+      "body": "Within {longWindowDays} days, {pointsExpiringLong} points worth {pointsExpiringLongValue} expire[[pointsExpiringShort: , {pointsExpiringShort} of them within {shortWindowDays} days]]. Your balance is {pointsBalance} points, worth {pointsValue}. Redeeming before the expiry date keeps their value.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.islamic.caution",
+      "rulePackKey": "rewards.expiry",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "{nextExpiryPoints} points worth {nextExpiryValue} expire on {nextExpiryDate}",
+      "body": "Within {longWindowDays} days, {pointsExpiringLong} points worth {pointsExpiringLongValue} expire[[pointsExpiringShort: , {pointsExpiringShort} of them within {shortWindowDays} days]]. Your balance is {pointsBalance} points, worth {pointsValue}. Redeeming before the expiry date keeps their value.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.islamic.critical",
+      "rulePackKey": "rewards.expiry",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "{nextExpiryPoints} points worth {nextExpiryValue} expire on {nextExpiryDate}",
+      "body": "Within {longWindowDays} days, {pointsExpiringLong} points worth {pointsExpiringLongValue} expire[[pointsExpiringShort: , {pointsExpiringShort} of them within {shortWindowDays} days]]. Your balance is {pointsBalance} points, worth {pointsValue}. Redeeming before the expiry date keeps their value.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.islamic.info",
+      "rulePackKey": "rewards.expiry",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "تنتهي صلاحية {nextExpiryPoints} نقطة بقيمة {nextExpiryValue} في {nextExpiryDate}",
+      "body": "خلال {longWindowDays} يوماً تنتهي صلاحية {pointsExpiringLong} نقطة بقيمة {pointsExpiringLongValue}[[pointsExpiringShort: ، منها {pointsExpiringShort} نقطة خلال {shortWindowDays} يوماً]]. رصيدك {pointsBalance} نقطة بقيمة {pointsValue}. الاستبدال قبل تاريخ انتهاء الصلاحية يحفظ قيمتها.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدال النقاط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.islamic.caution",
+      "rulePackKey": "rewards.expiry",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "تنتهي صلاحية {nextExpiryPoints} نقطة بقيمة {nextExpiryValue} في {nextExpiryDate}",
+      "body": "خلال {longWindowDays} يوماً تنتهي صلاحية {pointsExpiringLong} نقطة بقيمة {pointsExpiringLongValue}[[pointsExpiringShort: ، منها {pointsExpiringShort} نقطة خلال {shortWindowDays} يوماً]]. رصيدك {pointsBalance} نقطة بقيمة {pointsValue}. الاستبدال قبل تاريخ انتهاء الصلاحية يحفظ قيمتها.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدال النقاط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.islamic.critical",
+      "rulePackKey": "rewards.expiry",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "تنتهي صلاحية {nextExpiryPoints} نقطة بقيمة {nextExpiryValue} في {nextExpiryDate}",
+      "body": "خلال {longWindowDays} يوماً تنتهي صلاحية {pointsExpiringLong} نقطة بقيمة {pointsExpiringLongValue}[[pointsExpiringShort: ، منها {pointsExpiringShort} نقطة خلال {shortWindowDays} يوماً]]. رصيدك {pointsBalance} نقطة بقيمة {pointsValue}. الاستبدال قبل تاريخ انتهاء الصلاحية يحفظ قيمتها.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدال النقاط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "rewards.expiry",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Your reward points have expiry dates",
+      "body": "Reward points expire on the dates shown in your rewards summary. Redeeming before then keeps their value. You can see your points in the app, or ask us.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "rewards.expiry.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "rewards.expiry",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لنقاط المكافآت تواريخ انتهاء صلاحية",
+      "body": "تنتهي صلاحية نقاط المكافآت في التواريخ الظاهرة في ملخص مكافآتك. الاستبدال قبل ذلك يحفظ قيمتها. يمكنك الاطلاع على نقاطك في التطبيق أو سؤالنا.",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدال النقاط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "pointsBalance": "Points balance",
+      "pointsValue": "Value of your points",
+      "shortWindowDays": "Short window (days)",
+      "pointsExpiringShort": "Expiring soonest",
+      "pointsExpiringShortValue": "Value expiring soonest",
+      "midWindowDays": "Middle window (days)",
+      "pointsExpiringMid": "Expiring in the middle window",
+      "pointsExpiringMidValue": "Value (middle window)",
+      "longWindowDays": "Window (days)",
+      "pointsExpiringLong": "Points expiring",
+      "pointsExpiringLongValue": "Value expiring",
+      "nextExpiryDate": "Next expiry",
+      "nextExpiryPoints": "Points on next expiry",
+      "nextExpiryValue": "Value on next expiry",
+      "daysUntilNextExpiry": "Days until next expiry"
+    },
+    "ar": {
+      "pointsBalance": "رصيد النقاط",
+      "pointsValue": "قيمة نقاطك",
+      "shortWindowDays": "الفترة القصيرة (بالأيام)",
+      "pointsExpiringShort": "الأقرب انتهاءً",
+      "pointsExpiringShortValue": "قيمة الأقرب انتهاءً",
+      "midWindowDays": "الفترة المتوسطة (بالأيام)",
+      "pointsExpiringMid": "تنتهي في الفترة المتوسطة",
+      "pointsExpiringMidValue": "القيمة (الفترة المتوسطة)",
+      "longWindowDays": "الفترة (بالأيام)",
+      "pointsExpiringLong": "نقاط تنتهي صلاحيتها",
+      "pointsExpiringLongValue": "القيمة المنتهية",
+      "nextExpiryDate": "أقرب انتهاء",
+      "nextExpiryPoints": "نقاط أقرب انتهاء",
+      "nextExpiryValue": "قيمة أقرب انتهاء",
+      "daysUntilNextExpiry": "الأيام حتى أقرب انتهاء"
+    }
+  },
+  "explanations": {
+    "en": {
+      "points_expiring_within_N_days": "Some of your points reach their expiry date soon.",
+      "redeeming_before_expiry_keeps_value": "Points redeemed before their expiry date keep their value.",
+      "severity_critical": "The value expiring is above the level your bank has set for an important notice.",
+      "severity_caution": "Your bank shows a notice for this situation."
+    },
+    "ar": {
+      "points_expiring_within_N_days": "تقترب بعض نقاطك من تاريخ انتهاء صلاحيتها.",
+      "redeeming_before_expiry_keeps_value": "النقاط المستبدلة قبل تاريخ انتهاء صلاحيتها تحتفظ بقيمتها.",
+      "severity_critical": "القيمة المنتهية أعلى من الحد الذي حدده البنك لإظهار تنبيه مهم.",
+      "severity_caution": "يُظهر البنك تنبيهاً في هذه الحالة."
+    }
+  }
+}

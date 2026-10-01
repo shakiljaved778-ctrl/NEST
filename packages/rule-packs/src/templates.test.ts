@@ -1,5 +1,11 @@
 import { formatDate, formatMoney, formatNumber, formatPercent, type Locale } from "@amil/i18n";
-import type { AnyEvaluation, Fact, Severity } from "@amil/rules-engine";
+import {
+  type AnyEvaluation,
+  CONTINUE_OPTIONS,
+  type Fact,
+  type OptionKey,
+  type Severity,
+} from "@amil/rules-engine";
 import { describe, expect, it } from "vitest";
 import { CARD_CLOSE_FACT_KEYS } from "./card-close/types";
 import {
@@ -18,6 +24,7 @@ import {
   financeEarlySettlementPacks,
   variantForFinanceType,
 } from "./registry";
+import { PROACTIVE_RULE_PACK_KEYS, RULE_PACK_KEYS, type RulePackKey } from "./index";
 import { renderTemplate, stripTemplateSyntax, templateFactKeys } from "./template";
 import {
   copyPolicy,
@@ -31,7 +38,7 @@ import {
 
 const SEVERITIES: Severity[] = ["info", "caution", "critical"];
 const LOCALES: Locale[] = ["en", "ar"];
-const CONTINUE_OPTIONS = new Set(["continue_closure", "settle_now"]);
+const isContinue = (key: string | undefined) => CONTINUE_OPTIONS.has(key as OptionKey);
 
 /** Formatter used for test rendering; Phase 3 wires the same i18n functions into the API. */
 const formatter = (locale: Locale) => (f: Fact) => {
@@ -54,13 +61,17 @@ const formatter = (locale: Locale) => (f: Fact) => {
 };
 
 describe("pack definitions", () => {
-  it("loads all four definitions with semver versions", () => {
-    expect(ALL_PACK_DEFINITIONS.map((d) => `${d.key}@${d.version}/${d.variant}`)).toEqual([
-      "card.close@1.0.0/conventional",
-      "card.close@1.0.0/islamic",
-      "finance.early_settlement@1.0.0/conventional",
-      "finance.early_settlement@1.0.0/islamic",
-    ]);
+  it("loads both variants of all twelve packs with semver versions", () => {
+    expect(ALL_PACK_DEFINITIONS).toHaveLength(24);
+    expect(new Set(ALL_PACK_DEFINITIONS.map((d) => d.key))).toEqual(new Set(RULE_PACK_KEYS));
+    for (const d of ALL_PACK_DEFINITIONS) expect(d.version).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+
+  it("proactive packs are triggered by a schedule, the others by an action", () => {
+    for (const d of ALL_PACK_DEFINITIONS) {
+      const proactive = PROACTIVE_RULE_PACK_KEYS.includes(d.key as RulePackKey);
+      expect(d.triggers.map((t) => t.type)).toEqual([proactive ? "schedule" : "action"]);
+    }
   });
 
   it("card.close declares exactly the facts the calculator emits", () => {
@@ -157,7 +168,11 @@ describe.each(TEMPLATES.map((t) => [`${t.key}/${t.locale}`, t] as const))(
     it("orders options: loss-avoiding first, then continue, then talk to someone", () => {
       const keys = t.options.map((o) => o.key);
       expect(keys.at(-1)).toBe("talk_to_someone");
-      expect(CONTINUE_OPTIONS.has(keys.at(-2) ?? "")).toBe(true);
+      const continues = keys.filter(isContinue);
+      // Proactive packs have no action to continue; every other pack has exactly one.
+      const proactive = PROACTIVE_RULE_PACK_KEYS.includes(t.rulePackKey as RulePackKey);
+      expect(continues).toHaveLength(proactive ? 0 : 1);
+      if (!proactive) expect(isContinue(keys.at(-2))).toBe(true);
     });
 
     it("has the same option keys as its other-locale twin", () => {
@@ -407,5 +422,17 @@ describe("fact labels and explanations", () => {
         const all = [...explain(pack, locale, ["severity:critical", "severity:caution"])];
         for (const s of all) expect(copyViolations(s, locale, "conventional")).toEqual([]);
       }
+  });
+
+  it("Phase 5 labels and explanations are variant-neutral (they serve Islamic cards too)", () => {
+    for (const d of ALL_PACK_DEFINITIONS) {
+      if (d.key === "card.close" || d.key === "finance.early_settlement") continue;
+      for (const locale of LOCALES) {
+        for (const f of d.facts)
+          expect(copyViolations(factLabel(d.key, locale, f.key), locale, "islamic"), f.key).toEqual(
+            [],
+          );
+      }
+    }
   });
 });

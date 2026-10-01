@@ -3,7 +3,9 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { currentLocale } from "@/i18n/request";
-import { cardOf, currentCustomer } from "@/lib/bank";
+import { cardOf, currentCustomer, largestRecentPurchase } from "@/lib/bank";
+import { actHref } from "@/lib/actions";
+import { DEMO_AMOUNTS } from "@/lib/demo";
 import { money, num } from "@/lib/format";
 
 export default async function CardDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -22,6 +24,7 @@ export default async function CardDetail({ params }: { params: Promise<{ id: str
     [t("card.annualFee"), money(card.annualFee, locale)],
     [t("card.supplementary"), num(card.supplementaryCount, locale)],
   ];
+  const purchase = await largestRecentPurchase(card.id);
   if (card.rewards) rows.splice(1, 0, [t("card.points"), num(card.rewards.balance, locale)]);
   return (
     <AppShell title={card.productName} back="/" path={`/cards/${id}`}>
@@ -54,8 +57,57 @@ export default async function CardDetail({ params }: { params: Promise<{ id: str
           {t("card.instalments")}
         </Link>
       ) : null}
+      <div className="grid grid-cols-2 gap-2" data-testid="card-actions">
+        <Link
+          href={actHref("card.minimum_payment", { cardId: card.id })}
+          className={buttonVariants({ variant: "outline" })}
+          data-testid="action-pay"
+        >
+          {t("actions.pay")}
+        </Link>
+        <Link
+          href={`/cards/${id}/statement`}
+          className={buttonVariants({ variant: "outline" })}
+          data-testid="action-statement"
+        >
+          {t("actions.statement")}
+        </Link>
+        <Link
+          href={actHref("card.cash_withdrawal", {
+            cardId: card.id,
+            amount: DEMO_AMOUNTS.cashWithdrawal,
+          })}
+          className={buttonVariants({ variant: "outline" })}
+          data-testid="action-withdraw"
+        >
+          {t("actions.withdraw")}
+        </Link>
+        <Link
+          href={actHref("card.balance_transfer", {
+            cardId: card.id,
+            amount: DEMO_AMOUNTS.balanceTransfer,
+          })}
+          className={buttonVariants({ variant: "outline" })}
+          data-testid="action-transfer"
+        >
+          {t("actions.transfer")}
+        </Link>
+        {purchase ? (
+          <Link
+            href={actHref("card.epp_conversion", {
+              cardId: card.id,
+              transactionId: purchase.id,
+              months: DEMO_AMOUNTS.eppMonths,
+            })}
+            className={`${buttonVariants({ variant: "outline" })} col-span-2`}
+            data-testid="action-convert"
+          >
+            {t("actions.convert")}
+          </Link>
+        ) : null}
+      </div>
       <Link
-        href={`/cards/${id}/close`}
+        href={actHref("card.close", { cardId: card.id })}
         className={buttonVariants({ variant: "destructive", block: true })}
         data-testid="close-card"
       >

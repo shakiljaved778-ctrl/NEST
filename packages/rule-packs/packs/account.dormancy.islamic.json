@@ -1,0 +1,61 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "account.dormancy",
+  "version": "1.0.0",
+  "variant": "islamic",
+  "productFamily": "accounts",
+  "triggers": [
+    {
+      "type": "schedule",
+      "event": "0 6 * * *"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Account",
+      "fields": ["balance", "status", "lastActivityAt", "dormancyDays", "variant"]
+    }
+  ],
+  "parameters": {
+    "warnWithinDays": 60,
+    "criticalWithinDays": 30
+  },
+  "facts": [
+    {
+      "key": "currentBalance",
+      "unit": "QAR",
+      "source": "account",
+      "description": "Account balance"
+    },
+    {
+      "key": "lastActivityDate",
+      "unit": "date",
+      "source": "account",
+      "description": "Last customer-initiated activity"
+    },
+    {
+      "key": "daysSinceLastActivity",
+      "unit": "days",
+      "source": "computed",
+      "description": "Days since that activity"
+    },
+    {
+      "key": "dormancyPeriodDays",
+      "unit": "days",
+      "source": "account",
+      "description": "Inactivity period after which the account turns dormant"
+    },
+    {
+      "key": "dormancyDate",
+      "unit": "date",
+      "source": "computed",
+      "description": "Date the account turns dormant without activity"
+    },
+    {
+      "key": "daysUntilDormancy",
+      "unit": "days",
+      "source": "computed",
+      "description": "Days until then"
+    }
+  ]
+}

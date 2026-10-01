@@ -1,0 +1,415 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons. Labels and explanations are shared by both variants, so they use variant-neutral terms.",
+  "templates": [
+    {
+      "key": "card.epp_conversion.conventional.info",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Paying {purchaseAmount} in {planMonths} instalments costs {extraCostVsPayInFull}",
+      "body": "Converting {purchaseAmount} into {planMonths} monthly instalments of {planMonthlyInstalment} costs {planTotalCost} in total, including a processing fee of {planProcessingFee}[[planCharge:  and interest of {planCharge}]]. Paying the purchase in full by your due date has no charge. [[chargeIfRevolved: Leaving it on the card and paying {planMonthlyInstalment} a month would cost {chargeIfRevolved} in interest instead. ]]Closing the plan early has a fee of {planEarlyClosureFeePct} of the remaining amount.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "Pay in full by the due date"
+        },
+        {
+          "key": "continue_epp",
+          "label": "Continue with the instalment plan"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.conventional.caution",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "This instalment plan costs {extraCostVsPayInFull} more than paying in full",
+      "body": "Converting {purchaseAmount} into {planMonths} monthly instalments of {planMonthlyInstalment} costs {planTotalCost} in total, including a processing fee of {planProcessingFee}[[planCharge:  and interest of {planCharge}]]. Paying the purchase in full by your due date has no charge. [[chargeIfRevolved: Leaving it on the card and paying {planMonthlyInstalment} a month would cost {chargeIfRevolved} in interest instead. ]]Closing the plan early has a fee of {planEarlyClosureFeePct} of the remaining amount.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "Pay in full by the due date"
+        },
+        {
+          "key": "continue_epp",
+          "label": "Continue with the instalment plan"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.conventional.critical",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "This instalment plan costs {extraCostVsPayInFull} more than paying in full",
+      "body": "Converting {purchaseAmount} into {planMonths} monthly instalments of {planMonthlyInstalment} costs {planTotalCost} in total, including a processing fee of {planProcessingFee}[[planCharge:  and interest of {planCharge}]]. Paying the purchase in full by your due date has no charge. [[chargeIfRevolved: Leaving it on the card and paying {planMonthlyInstalment} a month would cost {chargeIfRevolved} in interest instead. ]]Closing the plan early has a fee of {planEarlyClosureFeePct} of the remaining amount.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "Pay in full by the due date"
+        },
+        {
+          "key": "continue_epp",
+          "label": "Continue with the instalment plan"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.conventional.info",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "تقسيط {purchaseAmount} على {planMonths} أقساط يكلّف {extraCostVsPayInFull}",
+      "body": "تحويل {purchaseAmount} إلى {planMonths} أقساط شهرية بقيمة {planMonthlyInstalment} يكلّف {planTotalCost} إجمالاً، شاملاً رسوم معالجة {planProcessingFee}[[planCharge:  وفوائد {planCharge}]]. سداد المشتريات كاملة قبل تاريخ الاستحقاق لا تترتب عليه رسوم. [[chargeIfRevolved: إبقاؤها على البطاقة مع سداد {planMonthlyInstalment} شهرياً سيكلّف {chargeIfRevolved} فوائد بدلاً من ذلك. ]]إغلاق الخطة مبكراً تترتب عليه رسوم {planEarlyClosureFeePct} من المبلغ المتبقي.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "السداد الكامل قبل تاريخ الاستحقاق"
+        },
+        {
+          "key": "continue_epp",
+          "label": "متابعة خطة التقسيط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.conventional.caution",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "خطة التقسيط هذه تكلّف {extraCostVsPayInFull} أكثر من السداد الكامل",
+      "body": "تحويل {purchaseAmount} إلى {planMonths} أقساط شهرية بقيمة {planMonthlyInstalment} يكلّف {planTotalCost} إجمالاً، شاملاً رسوم معالجة {planProcessingFee}[[planCharge:  وفوائد {planCharge}]]. سداد المشتريات كاملة قبل تاريخ الاستحقاق لا تترتب عليه رسوم. [[chargeIfRevolved: إبقاؤها على البطاقة مع سداد {planMonthlyInstalment} شهرياً سيكلّف {chargeIfRevolved} فوائد بدلاً من ذلك. ]]إغلاق الخطة مبكراً تترتب عليه رسوم {planEarlyClosureFeePct} من المبلغ المتبقي.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "السداد الكامل قبل تاريخ الاستحقاق"
+        },
+        {
+          "key": "continue_epp",
+          "label": "متابعة خطة التقسيط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.conventional.critical",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "خطة التقسيط هذه تكلّف {extraCostVsPayInFull} أكثر من السداد الكامل",
+      "body": "تحويل {purchaseAmount} إلى {planMonths} أقساط شهرية بقيمة {planMonthlyInstalment} يكلّف {planTotalCost} إجمالاً، شاملاً رسوم معالجة {planProcessingFee}[[planCharge:  وفوائد {planCharge}]]. سداد المشتريات كاملة قبل تاريخ الاستحقاق لا تترتب عليه رسوم. [[chargeIfRevolved: إبقاؤها على البطاقة مع سداد {planMonthlyInstalment} شهرياً سيكلّف {chargeIfRevolved} فوائد بدلاً من ذلك. ]]إغلاق الخطة مبكراً تترتب عليه رسوم {planEarlyClosureFeePct} من المبلغ المتبقي.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "السداد الكامل قبل تاريخ الاستحقاق"
+        },
+        {
+          "key": "continue_epp",
+          "label": "متابعة خطة التقسيط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you convert a purchase to instalments",
+      "body": "Instalment plans spread a purchase over several months and usually have a processing fee. Paying the purchase in full by the due date has no charge. You can see the plan's terms in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_epp",
+          "label": "Continue with the instalment plan"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل تحويل مشترياتك إلى أقساط",
+      "body": "خطط التقسيط توزّع قيمة المشتريات على عدة أشهر، وعادةً تترتب عليها رسوم معالجة. سداد المشتريات كاملة قبل تاريخ الاستحقاق لا تترتب عليه رسوم. يمكنك الاطلاع على شروط الخطة في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_epp",
+          "label": "متابعة خطة التقسيط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.islamic.info",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Paying {purchaseAmount} in {planMonths} instalments costs {extraCostVsPayInFull}",
+      "body": "Converting {purchaseAmount} into {planMonths} monthly instalments of {planMonthlyInstalment} costs {planTotalCost} in total, including a processing fee of {planProcessingFee}[[planCharge:  and profit of {planCharge}]]. Paying the purchase in full by your due date has no charge. [[chargeIfRevolved: Leaving it on the card and paying {planMonthlyInstalment} a month would cost {chargeIfRevolved} in profit charges instead. ]]Closing the plan early has a fee of {planEarlyClosureFeePct} of the remaining amount.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "Pay in full by the due date"
+        },
+        {
+          "key": "continue_epp",
+          "label": "Continue with the instalment plan"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.islamic.caution",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "This instalment plan costs {extraCostVsPayInFull} more than paying in full",
+      "body": "Converting {purchaseAmount} into {planMonths} monthly instalments of {planMonthlyInstalment} costs {planTotalCost} in total, including a processing fee of {planProcessingFee}[[planCharge:  and profit of {planCharge}]]. Paying the purchase in full by your due date has no charge. [[chargeIfRevolved: Leaving it on the card and paying {planMonthlyInstalment} a month would cost {chargeIfRevolved} in profit charges instead. ]]Closing the plan early has a fee of {planEarlyClosureFeePct} of the remaining amount.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "Pay in full by the due date"
+        },
+        {
+          "key": "continue_epp",
+          "label": "Continue with the instalment plan"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.islamic.critical",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "This instalment plan costs {extraCostVsPayInFull} more than paying in full",
+      "body": "Converting {purchaseAmount} into {planMonths} monthly instalments of {planMonthlyInstalment} costs {planTotalCost} in total, including a processing fee of {planProcessingFee}[[planCharge:  and profit of {planCharge}]]. Paying the purchase in full by your due date has no charge. [[chargeIfRevolved: Leaving it on the card and paying {planMonthlyInstalment} a month would cost {chargeIfRevolved} in profit charges instead. ]]Closing the plan early has a fee of {planEarlyClosureFeePct} of the remaining amount.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "Pay in full by the due date"
+        },
+        {
+          "key": "continue_epp",
+          "label": "Continue with the instalment plan"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.islamic.info",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "تقسيط {purchaseAmount} على {planMonths} أقساط يكلّف {extraCostVsPayInFull}",
+      "body": "تحويل {purchaseAmount} إلى {planMonths} أقساط شهرية بقيمة {planMonthlyInstalment} يكلّف {planTotalCost} إجمالاً، شاملاً رسوم معالجة {planProcessingFee}[[planCharge:  وأرباحاً {planCharge}]]. سداد المشتريات كاملة قبل تاريخ الاستحقاق لا تترتب عليه رسوم. [[chargeIfRevolved: إبقاؤها على البطاقة مع سداد {planMonthlyInstalment} شهرياً سيكلّف {chargeIfRevolved} أرباحاً بدلاً من ذلك. ]]إغلاق الخطة مبكراً تترتب عليه رسوم {planEarlyClosureFeePct} من المبلغ المتبقي.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "السداد الكامل قبل تاريخ الاستحقاق"
+        },
+        {
+          "key": "continue_epp",
+          "label": "متابعة خطة التقسيط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.islamic.caution",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "خطة التقسيط هذه تكلّف {extraCostVsPayInFull} أكثر من السداد الكامل",
+      "body": "تحويل {purchaseAmount} إلى {planMonths} أقساط شهرية بقيمة {planMonthlyInstalment} يكلّف {planTotalCost} إجمالاً، شاملاً رسوم معالجة {planProcessingFee}[[planCharge:  وأرباحاً {planCharge}]]. سداد المشتريات كاملة قبل تاريخ الاستحقاق لا تترتب عليه رسوم. [[chargeIfRevolved: إبقاؤها على البطاقة مع سداد {planMonthlyInstalment} شهرياً سيكلّف {chargeIfRevolved} أرباحاً بدلاً من ذلك. ]]إغلاق الخطة مبكراً تترتب عليه رسوم {planEarlyClosureFeePct} من المبلغ المتبقي.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "السداد الكامل قبل تاريخ الاستحقاق"
+        },
+        {
+          "key": "continue_epp",
+          "label": "متابعة خطة التقسيط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.islamic.critical",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "خطة التقسيط هذه تكلّف {extraCostVsPayInFull} أكثر من السداد الكامل",
+      "body": "تحويل {purchaseAmount} إلى {planMonths} أقساط شهرية بقيمة {planMonthlyInstalment} يكلّف {planTotalCost} إجمالاً، شاملاً رسوم معالجة {planProcessingFee}[[planCharge:  وأرباحاً {planCharge}]]. سداد المشتريات كاملة قبل تاريخ الاستحقاق لا تترتب عليه رسوم. [[chargeIfRevolved: إبقاؤها على البطاقة مع سداد {planMonthlyInstalment} شهرياً سيكلّف {chargeIfRevolved} أرباحاً بدلاً من ذلك. ]]إغلاق الخطة مبكراً تترتب عليه رسوم {planEarlyClosureFeePct} من المبلغ المتبقي.",
+      "options": [
+        {
+          "key": "pay_in_full",
+          "label": "السداد الكامل قبل تاريخ الاستحقاق"
+        },
+        {
+          "key": "continue_epp",
+          "label": "متابعة خطة التقسيط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you convert a purchase to instalments",
+      "body": "Instalment plans spread a purchase over several months and usually have a processing fee. Paying the purchase in full by the due date has no charge. You can see the plan's terms in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_epp",
+          "label": "Continue with the instalment plan"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.epp_conversion.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "card.epp_conversion",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل تحويل مشترياتك إلى أقساط",
+      "body": "خطط التقسيط توزّع قيمة المشتريات على عدة أشهر، وعادةً تترتب عليها رسوم معالجة. سداد المشتريات كاملة قبل تاريخ الاستحقاق لا تترتب عليه رسوم. يمكنك الاطلاع على شروط الخطة في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_epp",
+          "label": "متابعة خطة التقسيط"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "purchaseAmount": "Purchase",
+      "planMonths": "Plan length (months)",
+      "planMonthlyInstalment": "Monthly instalment",
+      "planProcessingFee": "Processing fee",
+      "planCharge": "Plan charges",
+      "planTotalCost": "Total cost of the plan",
+      "extraCostVsPayInFull": "Extra vs paying in full",
+      "chargeIfRevolved": "Charges if left on the card",
+      "planEarlyClosureFeePct": "Early-closure fee"
+    },
+    "ar": {
+      "purchaseAmount": "المشتريات",
+      "planMonths": "مدة الخطة (بالأشهر)",
+      "planMonthlyInstalment": "القسط الشهري",
+      "planProcessingFee": "رسوم المعالجة",
+      "planCharge": "رسوم الخطة",
+      "planTotalCost": "إجمالي تكلفة الخطة",
+      "extraCostVsPayInFull": "الزيادة مقارنة بالسداد الكامل",
+      "chargeIfRevolved": "الرسوم إن بقيت على البطاقة",
+      "planEarlyClosureFeePct": "رسوم الإغلاق المبكر"
+    }
+  },
+  "explanations": {
+    "en": {
+      "instalment_plan_has_fee": "This instalment plan has a processing fee.",
+      "paying_in_full_by_due_date_has_no_charge": "Purchases paid in full by the due date have no charge.",
+      "severity_critical": "The extra cost is above the level your bank has set for an important notice.",
+      "severity_caution": "Your bank shows a notice for this situation."
+    },
+    "ar": {
+      "instalment_plan_has_fee": "تترتب على خطة التقسيط هذه رسوم معالجة.",
+      "paying_in_full_by_due_date_has_no_charge": "المشتريات المسددة كاملة قبل تاريخ الاستحقاق لا تترتب عليها رسوم.",
+      "severity_critical": "التكلفة الإضافية أعلى من الحد الذي حدده البنك لإظهار تنبيه مهم.",
+      "severity_caution": "يُظهر البنك تنبيهاً في هذه الحالة."
+    }
+  }
+}

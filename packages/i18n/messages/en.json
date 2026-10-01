@@ -11,5 +11,19 @@
     "footerFigures": "Figures from {bankName} records as of {asOf}.",
     "footerAi": "Wording assisted by AI.",
     "genericFooter": "General information. No account data was used."
+  },
+  "charge": {
+    "base": "Transaction it applies to",
+    "rate": "Fee rate",
+    "minimum": "Minimum fee",
+    "computed": "Fee under the published rule",
+    "fixed": "Published fee",
+    "annualRate": "Annual rate on your card",
+    "monthlyRate": "Monthly rate",
+    "productFee": "Annual fee for this card",
+    "charged": "Charged",
+    "disclosure": "Explained from {bankName}'s published fee schedule (version {version}) and your own transactions. No AI is used for charge explanations.",
+    "generic": "General information. No account data was used. Ask us about any charge on your statement.",
+    "notAFee": "This line is not a fee or charge."
   }
 }

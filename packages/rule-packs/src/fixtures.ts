@@ -2,7 +2,17 @@
 import { D, toMoneyString } from "@amil/rules-engine";
 import type { CardCloseInput } from "./card-close/types";
 import type { FinanceSettlementInput } from "./finance-early-settlement/types";
+import type { AccountCloseInput } from "./account-close/pack";
+import type { AccountDormancyInput } from "./account-dormancy/pack";
+import type { BalanceTransferInput } from "./balance-transfer/pack";
+import type { CashWithdrawalInput } from "./cash-withdrawal/pack";
+import type { DepositBreakInput } from "./deposit-break/pack";
+import type { EppConversionInput } from "./epp-conversion/pack";
+import type { MinimumPaymentInput } from "./minimum-payment/pack";
+import type { RewardsExpiryInput } from "./rewards-expiry/pack";
 import type { ScheduleEntry } from "./rules";
+import type { SalaryChangeInput } from "./salary-change/pack";
+import type { TopUpInput } from "./top-up/pack";
 
 export const NOW = new Date("2026-09-30T09:00:00Z");
 export const thresholds = { cautionAtQar: "50.00", criticalAtQar: "250.00" };
@@ -196,6 +206,207 @@ export function smallLoan(
         refundRule: { type: "pro_rata_months_unexpired" },
       },
       salaryLinked: false,
+      ...overrides,
+    },
+  };
+}
+
+// ── Phase 5 packs ──────────────────────────────────────────────────────────────────────────
+
+/** 1,000.00 cash on a card with 8,000.00 available, 30% APR, fee 3% min 60. */
+export function cashWithdrawal(overrides: Partial<CashWithdrawalInput> = {}): CashWithdrawalInput {
+  return {
+    dataAsOf: day("2026-09-30"),
+    card: {
+      id: "card_test_cash",
+      variant: "conventional",
+      balance: "2000.00",
+      creditLimit: "10000.00",
+      aprPct: "30.0000",
+      cashAdvanceFeePct: "3.0000",
+      cashAdvanceMinFee: "60.00",
+    },
+    amount: "1000.00",
+    ...overrides,
+  };
+}
+
+/** 1,000.00 statement at 24% with a 100.00 minimum. */
+export function minimumPayment(overrides: Partial<MinimumPaymentInput> = {}): MinimumPaymentInput {
+  return {
+    dataAsOf: day("2026-09-30"),
+    card: {
+      id: "card_test_min",
+      variant: "conventional",
+      statementBalance: "1000.00",
+      minDue: "100.00",
+      aprPct: "24.0000",
+    },
+    ...overrides,
+  };
+}
+
+/** 4,800.00 purchase over 6 months on a 30% card. */
+export function eppConversion(overrides: Partial<EppConversionInput> = {}): EppConversionInput {
+  return {
+    dataAsOf: day("2026-09-30"),
+    card: { id: "card_test_epp", variant: "conventional", aprPct: "30.0000" },
+    purchase: { amount: "4800.00", transactionId: "txn_test_tv" },
+    months: 6,
+    ...overrides,
+  };
+}
+
+export function balanceTransfer(
+  overrides: Partial<BalanceTransferInput> = {},
+): BalanceTransferInput {
+  return {
+    dataAsOf: day("2026-09-30"),
+    card: { id: "card_test_bt", variant: "conventional", aprPct: "30.0000" },
+    amount: "2000.00",
+    ...overrides,
+  };
+}
+
+/** Aisha's term deposit as seeded: 200,000 at 4.25%, 9 days from maturity on NOW. */
+export function aishaDeposit(
+  overrides: Partial<DepositBreakInput["deposit"]> = {},
+): DepositBreakInput {
+  return {
+    dataAsOf: day("2026-09-30"),
+    deposit: {
+      id: "dep_aisha_fixed",
+      variant: "conventional",
+      principal: "200000.00",
+      ratePct: "4.2500",
+      startAt: day("2025-10-09"),
+      maturityAt: day("2026-10-09"),
+      breakPenaltyRule: { type: "pct_of_principal", pct: "0.50", min: "250.00" },
+      profitOnBreakRule: { type: "reduced_rate", ratePct: "0.2500" },
+      ...overrides,
+    },
+  };
+}
+
+export function topUp(overrides: Partial<TopUpInput> = {}): TopUpInput {
+  return { ...smallLoan(), topUpAmount: "1000.00", newTenorMonths: 12, ...overrides };
+}
+
+/** 12 unpaid level instalments of 1,032.80 on 12,000.00 at 6% (annuity). */
+export function levelSchedule(
+  principal: string,
+  instalment: string,
+  months: number,
+): ScheduleEntry[] {
+  const each = D(principal).dividedBy(months);
+  return Array.from({ length: months }, (_, i) => ({
+    n: i + 1,
+    dueAt: `2026-${String(10 + Math.floor(i / 12)).padStart(2, "0")}-15`,
+    principal: toMoneyString(each),
+    profitOrInterest: "0.00",
+    instalment,
+    balanceAfter: "0.00",
+    paid: false,
+  }));
+}
+
+export function salaryChange(overrides: Partial<SalaryChangeInput> = {}): SalaryChangeInput {
+  return {
+    dataAsOf: day("2026-09-30"),
+    variant: "conventional",
+    salaryTransfer: true,
+    accounts: [
+      { id: "acc_test_salary", maintenanceFee: "25.00", maintenanceFeeWaived: true },
+      { id: "acc_test_savings", maintenanceFee: "10.00", maintenanceFeeWaived: false },
+    ],
+    cards: [{ id: "card_test_gold", annualFee: "500.00", annualFeeWaived: true }],
+    finances: [
+      {
+        id: "fin_test_personal",
+        type: "conventional",
+        ratePct: "6.0000",
+        salaryLinked: true,
+        schedule: levelSchedule("12000.00", "1032.80", 12),
+      },
+      {
+        id: "fin_test_auto",
+        type: "murabaha",
+        ratePct: "4.0000",
+        salaryLinked: true,
+        schedule: levelSchedule("6000.00", "520.00", 12),
+      },
+      {
+        id: "fin_test_unlinked",
+        type: "conventional",
+        ratePct: "9.0000",
+        salaryLinked: false,
+        schedule: levelSchedule("3000.00", "262.36", 12),
+      },
+    ],
+    ...overrides,
+  };
+}
+
+/** Hessa's salary account: cheques outstanding and two standing orders. */
+export function accountClose(
+  overrides: Partial<AccountCloseInput["account"]> = {},
+  extra: Partial<Omit<AccountCloseInput, "account">> = {},
+): AccountCloseInput {
+  return {
+    dataAsOf: day("2026-09-30"),
+    account: {
+      id: "acc_hessa_current",
+      variant: "conventional",
+      balance: "14250.00",
+      closureFee: "25.00",
+      chequesOutstanding: 3,
+      isSalaryAccount: true,
+      standingOrders: [
+        { amount: "450.00", nextRunAt: day("2026-10-20"), active: true },
+        { amount: "3500.00", nextRunAt: day("2026-10-05"), active: true },
+        { amount: "99.00", nextRunAt: day("2026-10-01"), active: false },
+      ],
+      ...overrides,
+    },
+    linkedCards: 1,
+    salaryLinkedFinances: 0,
+    ...extra,
+  };
+}
+
+export function dormancy(
+  lastActivityDaysAgo: number,
+  overrides: Partial<AccountDormancyInput["account"]> = {},
+): AccountDormancyInput {
+  return {
+    dataAsOf: day("2026-09-30"),
+    account: {
+      id: "acc_test_dormant",
+      variant: "conventional",
+      balance: "3150.00",
+      status: "active",
+      lastActivityAt: new Date(day("2026-09-30").getTime() - lastActivityDaysAgo * 86_400_000),
+      dormancyDays: 365,
+      ...overrides,
+    },
+  };
+}
+
+/** Khalid's rewards as seeded. */
+export function rewardsExpiry(
+  overrides: Partial<RewardsExpiryInput["rewards"]> = {},
+): RewardsExpiryInput {
+  return {
+    dataAsOf: day("2026-09-30"),
+    card: { id: "card_khalid_platinum", variant: "conventional", status: "active" },
+    rewards: {
+      balance: 42000,
+      pointValueQar: "0.0100",
+      expiryBuckets: [
+        { points: 8000, expiresAt: "2026-11-14" },
+        { points: 34000, expiresAt: "2027-11-04" },
+      ],
+      asOf: day("2026-09-30"),
       ...overrides,
     },
   };

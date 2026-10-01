@@ -25,25 +25,35 @@ To run the full stack in containers instead: `docker compose up --build`.
 Checks: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Audit chain: `pnpm audit:verify`.
 End-to-end: `pnpm --filter @amil/demo-bank e2e` (Playwright; starts the API and the demo bank).
 
-Try it: open http://localhost:3000, pick **Khalid** in the persona switcher, open his Platinum card
-and tap **Close card**. Switch to Arabic with the header toggle.
+Try it: open http://localhost:3000, pick a persona in the switcher, and switch to Arabic at any time
+with the header toggle.
+
+- **Khalid**: Platinum card → **Close card**, **Withdraw cash**, **Convert a purchase to instalments**.
+- **Aisha**: her term deposit → **Break deposit** (9 days from maturity).
+- **Omar**: Settings → **Move my salary to another bank**.
+- **Hessa**: her current account → **Close account** (cheques and standing orders).
+- **Ravi**: Gold card → **Pay card**, or **Statement** → tap a fee line to see how it was worked out.
+- **Alerts**: run `pnpm proactive:run` (what the 06:00 schedule does), then open **Alerts** as
+  Khalid (points expiring) or Grace (account about to become dormant).
+
+`pnpm worker` runs the proactive packs on their BullMQ schedules.
 
 Without `ANTHROPIC_API_KEY` the model gateway uses an offline mock that serves the bank-approved
 wording, so everything works with no network.
 
 ## Layout
 
-| Path                           | What                                                                |
-| ------------------------------ | ------------------------------------------------------------------- |
-| `apps/api`                     | Fastify API (`/healthz`, `/readyz`; insight endpoints from Phase 3) |
-| `apps/demo-bank`               | Doha Demo Bank phone-framed app (Next.js 15)                        |
-| `apps/console`                 | Bank staff console (Next.js 15)                                     |
-| `packages/db`                  | Prisma schema, migrations, synthetic seed                           |
-| `packages/rules-engine`        | Pure TypeScript engine; decimal money and date helpers              |
-| `packages/rule-packs`          | The 12 rule packs (Phase 2 onwards)                                 |
-| `packages/gateway`             | Model gateway, redactor, number validator (Phase 3)                 |
-| `packages/i18n`                | en/ar formatting, Arabic-Indic digits, glossary                     |
-| `packages/widget`, `sdk`, `ui` | Web components, API client, shared UI (later phases)                |
+| Path                           | What                                                                 |
+| ------------------------------ | -------------------------------------------------------------------- |
+| `apps/api`                     | Fastify API (checks, alerts, explain-charge, events) + BullMQ worker |
+| `apps/demo-bank`               | Doha Demo Bank phone-framed app (Next.js 15)                         |
+| `apps/console`                 | Bank staff console (Next.js 15)                                      |
+| `packages/db`                  | Prisma schema, migrations, synthetic seed                            |
+| `packages/rules-engine`        | Pure TypeScript engine; decimal money and date helpers               |
+| `packages/rule-packs`          | The 12 rule packs, conventional + Islamic, with approved en/ar copy  |
+| `packages/gateway`             | Model gateway, redactor, number validator                            |
+| `packages/i18n`                | en/ar formatting, Arabic-Indic digits, glossary                      |
+| `packages/widget`, `sdk`, `ui` | `<amil-insight>` web component, typed API client, shared UI          |
 
 ## Docs
 

@@ -1,0 +1,121 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "rewards.expiry",
+  "version": "1.0.0",
+  "variant": "conventional",
+  "productFamily": "cards",
+  "triggers": [
+    {
+      "type": "schedule",
+      "event": "15 6 * * *"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Card",
+      "fields": ["status", "type"]
+    },
+    {
+      "entity": "RewardsLedger",
+      "fields": ["balance", "pointValueQar", "expiryBuckets", "asOf"]
+    }
+  ],
+  "parameters": {
+    "shortWindowDays": 30,
+    "midWindowDays": 60,
+    "longWindowDays": 90,
+    "roundingMode": "half_up"
+  },
+  "facts": [
+    {
+      "key": "pointsBalance",
+      "unit": "points",
+      "source": "rewards_ledger",
+      "description": "Reward points balance"
+    },
+    {
+      "key": "pointsValue",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "QAR value of the balance"
+    },
+    {
+      "key": "shortWindowDays",
+      "unit": "days",
+      "source": "rule_pack",
+      "description": "Shortest look-ahead window"
+    },
+    {
+      "key": "pointsExpiringShort",
+      "unit": "points",
+      "source": "rewards_ledger",
+      "description": "Points expiring within the shortest window"
+    },
+    {
+      "key": "pointsExpiringShortValue",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Their QAR value"
+    },
+    {
+      "key": "midWindowDays",
+      "unit": "days",
+      "source": "rule_pack",
+      "description": "Middle look-ahead window"
+    },
+    {
+      "key": "pointsExpiringMid",
+      "unit": "points",
+      "source": "rewards_ledger",
+      "description": "Points expiring within the middle window"
+    },
+    {
+      "key": "pointsExpiringMidValue",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Their QAR value"
+    },
+    {
+      "key": "longWindowDays",
+      "unit": "days",
+      "source": "rule_pack",
+      "description": "Widest look-ahead window"
+    },
+    {
+      "key": "pointsExpiringLong",
+      "unit": "points",
+      "source": "rewards_ledger",
+      "description": "Points expiring within the widest window"
+    },
+    {
+      "key": "pointsExpiringLongValue",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Their QAR value"
+    },
+    {
+      "key": "nextExpiryDate",
+      "unit": "date",
+      "source": "rewards_ledger",
+      "description": "Next expiry date"
+    },
+    {
+      "key": "nextExpiryPoints",
+      "unit": "points",
+      "source": "rewards_ledger",
+      "description": "Points expiring on that date"
+    },
+    {
+      "key": "nextExpiryValue",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Their QAR value"
+    },
+    {
+      "key": "daysUntilNextExpiry",
+      "unit": "days",
+      "source": "computed",
+      "description": "Days until the next expiry"
+    }
+  ]
+}

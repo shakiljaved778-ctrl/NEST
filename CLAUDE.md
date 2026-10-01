@@ -32,7 +32,7 @@ Redis 7, decimal.js. Internal packages are consumed as TypeScript source (`@amil
 src/index.ts`); Next apps list them in `transpilePackages`, and the api is bundled with tsup.
 
 ```
-apps/api          Fastify API                          :4000
+apps/api          Fastify API :4000 + proactive worker (BullMQ, src/worker.ts)
 apps/demo-bank    Doha Demo Bank phone-framed app      :3000
 apps/console      Bank staff console                   :3001
 packages/db       Prisma schema, migrations, seed (+ pure seed-data builder)
@@ -60,6 +60,8 @@ pnpm db:migrate:dev --name <x>    # create a new migration (dev)
 pnpm db:reset                     # DEV ONLY: drop + re-migrate + seed (wipes the audit trail)
 pnpm audit:verify [bankId]        # verify the audit hash chain
 pnpm --filter @amil/demo-bank build && pnpm --filter @amil/demo-bank e2e   # Playwright (starts API + app)
+pnpm worker                       # proactive worker: BullMQ schedules from ProactiveJob rows
+pnpm proactive:run [pack] [--queue]   # run rewards.expiry / account.dormancy now
 pnpm --filter @amil/gateway gen:prompts   # after editing packages/gateway/prompts/*.md
 pnpm format                       # prettier --write
 ```
@@ -82,6 +84,15 @@ disposable database. They are skipped when it is unset.
   pack × variant × locale × severity has exactly one template, and that templates render without
   missing placeholders. Copy policy (banned terms, Sharia terminology, no `!`/emojis, option order)
   lives in `policy/copy-policy.json`.
+- Adding or changing a pack: register both variants in `PACKS` (`registry.ts`), resolve its input
+  from product rows in `resolvePackInput` (`@amil/db/pack-inputs`, with `PACK_REQUIRED_CONTEXT`),
+  add its option deep links in `apps/api/src/services/deeplinks.ts`, and add it to the persona
+  coverage (`packages/db/src/personas.phase5.test.ts`: every pack fires for ≥ 2 personas).
+  Recompute every worked example independently before writing the test (D-032).
+- Fact keys must not read like identity attributes (`account…`, `card…`, `…Id`, `…Name`): the
+  redactor drops them (D-041). Copy contains no literal digits: every number is a fact.
+- Continue-type options are named `continue_*` (plus the flagship `settle_now`); the widget gates
+  them on critical cards by that name. Proactive packs have no continue option.
 - Template syntax: `{fact}`, `[[fact: shown when non-zero]]`, `[[!fact: shown when zero]]` (D-013).
 - Use `AnyEvaluation` / `AnyFactSet` for code that handles evaluations without knowing the pack.
 - Figures become text only through `formatFact` (`@amil/gateway`), for templates, fact chips and the
@@ -91,7 +102,12 @@ disposable database. They are skipped when it is unset.
 - API: every route validates its input with the strict Zod schemas in `@amil/sdk/schemas`, and the
   OpenAPI document is generated from the same schemas. Errors carry generic codes only. "No insight"
   (consent, kill switch, template) is `200 { kind: "none" }`, never an error.
-- Audit: append through `appendInsightEvent` only; never write `insight_event` directly.
+- Audit: append through `appendInsightEvent` only (via `makeAudit` in the API); never write
+  `insight_event` directly. Checks, scheduled alerts and charge explanations all share
+  `deliverInsight` / `makeAudit` (`apps/api/src/services/checks.ts`).
+- Proactive alerts: only customers with a live `proactive_alerts` consent are read; one alert per
+  product and event date (dedupe key); each alert is worded and audited in every bank locale
+  (D-038).
 - Demo bank: the Next server is the "bank backend" (reads its own records via `@amil/db/client`,
   holds the AMIL HMAC key in `lib/amil.ts`); the browser gets only a session token. Bank deep links
   `ddb://x` map to routes `/x`. UI strings live in `apps/demo-bank/src/messages/{en,ar}.json` with

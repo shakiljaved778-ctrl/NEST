@@ -1,0 +1,111 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "finance.top_up",
+  "version": "1.0.0",
+  "variant": "conventional",
+  "productFamily": "finance",
+  "triggers": [
+    {
+      "type": "action",
+      "event": "finance.top_up"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Finance",
+      "fields": [
+        "type",
+        "ratePct",
+        "tenorMonths",
+        "startAt",
+        "schedule",
+        "settlementFeeRule",
+        "rebateRule",
+        "insuranceOrTakaful",
+        "salaryLinked"
+      ]
+    }
+  ],
+  "parameters": {
+    "processingFeePct": "1.00",
+    "processingFeeMin": "100.00",
+    "processingFeeMax": "1000.00",
+    "maxTenorMonths": 72,
+    "dayCountBasis": 365,
+    "roundingMode": "half_up"
+  },
+  "facts": [
+    {
+      "key": "topUpAmount",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Additional amount requested"
+    },
+    {
+      "key": "currentInstalment",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Next scheduled instalment today"
+    },
+    {
+      "key": "remainingMonths",
+      "unit": "months",
+      "source": "finance_schedule",
+      "description": "Unpaid instalments remaining"
+    },
+    {
+      "key": "remainingCost",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Sum of the unpaid instalments"
+    },
+    {
+      "key": "refinancedAmount",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Today's settlement amount of the existing finance (fees or rebate included)"
+    },
+    {
+      "key": "newFinancedAmount",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Refinanced amount plus the top-up"
+    },
+    {
+      "key": "newTenorMonths",
+      "unit": "months",
+      "source": "computed",
+      "description": "Requested new tenor, capped at the pack maximum"
+    },
+    {
+      "key": "newInstalment",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Monthly instalment on the new amount over the new tenor"
+    },
+    {
+      "key": "newTotalCost",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Total of the new instalments"
+    },
+    {
+      "key": "totalCostSameTenor",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Total if the new amount were repaid over the months that remain today"
+    },
+    {
+      "key": "extraCostOfExtension",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Extra cost of extending the tenor"
+    },
+    {
+      "key": "processingFee",
+      "unit": "QAR",
+      "source": "rule_pack",
+      "description": "Processing fee on the top-up amount"
+    }
+  ]
+}

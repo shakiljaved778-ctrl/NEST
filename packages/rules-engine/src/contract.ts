@@ -21,6 +21,7 @@ export type FactSourceName =
   | "deposit"
   | "account"
   | "standing_order"
+  | "transaction"
   | "fee_schedule"
   | "customer"
   | "rule_pack"
@@ -55,13 +56,61 @@ export interface AnyFactSet {
 export type FactSet<K extends string> = Record<K, Fact> & { _sources: FactSource[] };
 
 export type OptionKey =
+  // card.close
   | "redeem_points"
   | "view_instalments"
   | "continue_closure"
+  // finance.early_settlement
   | "settle_now"
   | "schedule_settlement"
   | "partial_prepayment"
+  // finance.top_up
+  | "choose_shorter_tenor"
+  | "continue_top_up"
+  // card.cash_withdrawal
+  | "use_debit_card"
+  | "continue_withdrawal"
+  // card.minimum_payment
+  | "pay_statement_balance"
+  | "pay_custom_amount"
+  | "continue_minimum_payment"
+  // card.epp_conversion
+  | "pay_in_full"
+  | "continue_epp"
+  // card.balance_transfer
+  | "adjust_transfer_amount"
+  | "continue_balance_transfer"
+  // deposit.break
+  | "keep_until_maturity"
+  | "continue_break"
+  // salary.transfer_change
+  | "view_linked_benefits"
+  | "continue_salary_change"
+  // account.close
+  | "review_standing_orders"
+  | "continue_account_close"
+  // account.dormancy (proactive)
+  | "make_a_transaction"
+  // every pack
   | "talk_to_someone";
+
+/**
+ * Options that continue the customer's original action. On critical cards they stay disabled
+ * until the customer acknowledges ("I understand"); they always come after the loss-avoiding
+ * options and before talk_to_someone.
+ */
+export const CONTINUE_OPTIONS: ReadonlySet<OptionKey> = new Set<OptionKey>([
+  "continue_closure",
+  "settle_now",
+  "continue_top_up",
+  "continue_withdrawal",
+  "continue_minimum_payment",
+  "continue_epp",
+  "continue_balance_transfer",
+  "continue_break",
+  "continue_salary_change",
+  "continue_account_close",
+]);
 
 export interface Evaluation<K extends string> {
   /** false => no insight is shown. */

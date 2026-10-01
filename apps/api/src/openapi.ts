@@ -1,5 +1,9 @@
 import { OpenAPIRegistry, OpenApiGeneratorV31 } from "@asteasolutions/zod-to-openapi";
 import {
+  Alert,
+  AlertList,
+  AlertListQuery,
+  ChargeExplanation,
   CheckRequest,
   CheckResponse,
   Consent,
@@ -7,6 +11,9 @@ import {
   ConsentPurpose,
   ConsentRequest,
   ErrorResponse,
+  EventAck,
+  EventRequest,
+  ExplainChargeRequest,
   InsightResponseAck,
   InsightResponseRequest,
   SessionRequest,
@@ -99,6 +106,48 @@ export function buildOpenApiDocument(): object {
       query: z.object({ purpose: ConsentPurpose }),
     },
     responses: { 200: json(ConsentList, "Consents after withdrawal"), ...errors },
+  });
+  registry.registerPath({
+    method: "get",
+    path: "/v1/alerts",
+    summary: "A customer's proactive alerts (rewards expiry, account dormancy), newest first",
+    description:
+      "Alerts are written by AMIL's scheduled runs for customers who consented to proactive alerts. Each carries the insight card exactly as computed and audited. Withdrawing that consent hides them.",
+    security,
+    request: { query: AlertListQuery },
+    responses: { 200: json(AlertList, "Alerts"), ...errors },
+  });
+  registry.registerPath({
+    method: "post",
+    path: "/v1/alerts/{id}/read",
+    summary: "Mark an alert as read",
+    security,
+    request: { params: z.object({ id: z.string() }) },
+    responses: { 200: json(Alert, "The alert"), ...errors },
+  });
+  registry.registerPath({
+    method: "post",
+    path: "/v1/explain-charge",
+    summary: "Explain a fee line on the customer's statement",
+    description:
+      "Computed from the bank's published fee schedule (the version in force when the fee posted) and the customer's own transactions. No model is used. Without consent, general information only.",
+    security,
+    request: { body: json(ExplainChargeRequest, "Customer and transaction") },
+    responses: { 200: json(ChargeExplanation, "Explanation"), ...errors },
+  });
+  registry.registerPath({
+    method: "post",
+    path: "/v1/events",
+    summary: "Push a product event (bank backend only, webhook-style)",
+    description:
+      "Idempotent on idempotencyKey: the first delivery returns 201, any retry 200 with duplicate: true.",
+    security: [{ [hmac.name]: [] }],
+    request: { body: json(EventRequest, "Event") },
+    responses: {
+      201: json(EventAck, "Recorded"),
+      200: json(EventAck, "Already recorded (retry)"),
+      ...errors,
+    },
   });
   registry.registerPath({
     method: "get",

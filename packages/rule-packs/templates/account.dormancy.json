@@ -1,0 +1,345 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons. Labels and explanations are shared by both variants, so they use variant-neutral terms.",
+  "templates": [
+    {
+      "key": "account.dormancy.conventional.info",
+      "rulePackKey": "account.dormancy",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "This account becomes dormant on {dormancyDate}, in {daysUntilDormancy} days",
+      "body": "Your last activity on this account was on {lastActivityDate}. Accounts with no activity for {dormancyPeriodDays} days become dormant and are restricted until reactivated. Any transaction you make, such as a transfer or a deposit, keeps it active. Your balance of {currentBalance} stays yours either way.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "Make a transaction"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.conventional.caution",
+      "rulePackKey": "account.dormancy",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "This account becomes dormant on {dormancyDate}, in {daysUntilDormancy} days",
+      "body": "Your last activity on this account was on {lastActivityDate}. Accounts with no activity for {dormancyPeriodDays} days become dormant and are restricted until reactivated. Any transaction you make, such as a transfer or a deposit, keeps it active. Your balance of {currentBalance} stays yours either way.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "Make a transaction"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.conventional.critical",
+      "rulePackKey": "account.dormancy",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "This account becomes dormant on {dormancyDate}, in {daysUntilDormancy} days",
+      "body": "Your last activity on this account was on {lastActivityDate}. Accounts with no activity for {dormancyPeriodDays} days become dormant and are restricted until reactivated. Any transaction you make, such as a transfer or a deposit, keeps it active. Your balance of {currentBalance} stays yours either way.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "Make a transaction"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.conventional.info",
+      "rulePackKey": "account.dormancy",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "يصبح هذا الحساب خاملاً في {dormancyDate}، بعد {daysUntilDormancy} يوماً",
+      "body": "آخر نشاط قمت به على هذا الحساب كان في {lastActivityDate}. الحسابات التي لا يُجرى عليها نشاط لمدة {dormancyPeriodDays} يوماً تصبح خاملة وتُقيَّد حتى إعادة تفعيلها. أي معاملة تجريها، مثل تحويل أو إيداع، تبقيه نشطاً. يبقى رصيدك البالغ {currentBalance} ملكك في جميع الأحوال.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "إجراء معاملة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.conventional.caution",
+      "rulePackKey": "account.dormancy",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "يصبح هذا الحساب خاملاً في {dormancyDate}، بعد {daysUntilDormancy} يوماً",
+      "body": "آخر نشاط قمت به على هذا الحساب كان في {lastActivityDate}. الحسابات التي لا يُجرى عليها نشاط لمدة {dormancyPeriodDays} يوماً تصبح خاملة وتُقيَّد حتى إعادة تفعيلها. أي معاملة تجريها، مثل تحويل أو إيداع، تبقيه نشطاً. يبقى رصيدك البالغ {currentBalance} ملكك في جميع الأحوال.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "إجراء معاملة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.conventional.critical",
+      "rulePackKey": "account.dormancy",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "يصبح هذا الحساب خاملاً في {dormancyDate}، بعد {daysUntilDormancy} يوماً",
+      "body": "آخر نشاط قمت به على هذا الحساب كان في {lastActivityDate}. الحسابات التي لا يُجرى عليها نشاط لمدة {dormancyPeriodDays} يوماً تصبح خاملة وتُقيَّد حتى إعادة تفعيلها. أي معاملة تجريها، مثل تحويل أو إيداع، تبقيه نشطاً. يبقى رصيدك البالغ {currentBalance} ملكك في جميع الأحوال.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "إجراء معاملة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "account.dormancy",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Keeping your accounts active",
+      "body": "Accounts with no activity for a long period become dormant and are restricted until reactivated. Any transaction you make keeps an account active. You can see your accounts in the app, or ask us.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "account.dormancy",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "إبقاء حساباتك نشطة",
+      "body": "الحسابات التي لا يُجرى عليها نشاط لفترة طويلة تصبح خاملة وتُقيَّد حتى إعادة تفعيلها. أي معاملة تجريها تبقي الحساب نشطاً. يمكنك الاطلاع على حساباتك في التطبيق أو سؤالنا.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.islamic.info",
+      "rulePackKey": "account.dormancy",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "This account becomes dormant on {dormancyDate}, in {daysUntilDormancy} days",
+      "body": "Your last activity on this account was on {lastActivityDate}. Accounts with no activity for {dormancyPeriodDays} days become dormant and are restricted until reactivated. Any transaction you make, such as a transfer or a deposit, keeps it active. Your balance of {currentBalance} stays yours either way.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "Make a transaction"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.islamic.caution",
+      "rulePackKey": "account.dormancy",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "This account becomes dormant on {dormancyDate}, in {daysUntilDormancy} days",
+      "body": "Your last activity on this account was on {lastActivityDate}. Accounts with no activity for {dormancyPeriodDays} days become dormant and are restricted until reactivated. Any transaction you make, such as a transfer or a deposit, keeps it active. Your balance of {currentBalance} stays yours either way.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "Make a transaction"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.islamic.critical",
+      "rulePackKey": "account.dormancy",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "This account becomes dormant on {dormancyDate}, in {daysUntilDormancy} days",
+      "body": "Your last activity on this account was on {lastActivityDate}. Accounts with no activity for {dormancyPeriodDays} days become dormant and are restricted until reactivated. Any transaction you make, such as a transfer or a deposit, keeps it active. Your balance of {currentBalance} stays yours either way.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "Make a transaction"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.islamic.info",
+      "rulePackKey": "account.dormancy",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "يصبح هذا الحساب خاملاً في {dormancyDate}، بعد {daysUntilDormancy} يوماً",
+      "body": "آخر نشاط قمت به على هذا الحساب كان في {lastActivityDate}. الحسابات التي لا يُجرى عليها نشاط لمدة {dormancyPeriodDays} يوماً تصبح خاملة وتُقيَّد حتى إعادة تفعيلها. أي معاملة تجريها، مثل تحويل أو إيداع، تبقيه نشطاً. يبقى رصيدك البالغ {currentBalance} ملكك في جميع الأحوال.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "إجراء معاملة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.islamic.caution",
+      "rulePackKey": "account.dormancy",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "يصبح هذا الحساب خاملاً في {dormancyDate}، بعد {daysUntilDormancy} يوماً",
+      "body": "آخر نشاط قمت به على هذا الحساب كان في {lastActivityDate}. الحسابات التي لا يُجرى عليها نشاط لمدة {dormancyPeriodDays} يوماً تصبح خاملة وتُقيَّد حتى إعادة تفعيلها. أي معاملة تجريها، مثل تحويل أو إيداع، تبقيه نشطاً. يبقى رصيدك البالغ {currentBalance} ملكك في جميع الأحوال.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "إجراء معاملة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.islamic.critical",
+      "rulePackKey": "account.dormancy",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "يصبح هذا الحساب خاملاً في {dormancyDate}، بعد {daysUntilDormancy} يوماً",
+      "body": "آخر نشاط قمت به على هذا الحساب كان في {lastActivityDate}. الحسابات التي لا يُجرى عليها نشاط لمدة {dormancyPeriodDays} يوماً تصبح خاملة وتُقيَّد حتى إعادة تفعيلها. أي معاملة تجريها، مثل تحويل أو إيداع، تبقيه نشطاً. يبقى رصيدك البالغ {currentBalance} ملكك في جميع الأحوال.",
+      "options": [
+        {
+          "key": "make_a_transaction",
+          "label": "إجراء معاملة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "account.dormancy",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Keeping your accounts active",
+      "body": "Accounts with no activity for a long period become dormant and are restricted until reactivated. Any transaction you make keeps an account active. You can see your accounts in the app, or ask us.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "account.dormancy.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "account.dormancy",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "إبقاء حساباتك نشطة",
+      "body": "الحسابات التي لا يُجرى عليها نشاط لفترة طويلة تصبح خاملة وتُقيَّد حتى إعادة تفعيلها. أي معاملة تجريها تبقي الحساب نشطاً. يمكنك الاطلاع على حساباتك في التطبيق أو سؤالنا.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "currentBalance": "Balance",
+      "lastActivityDate": "Last activity",
+      "daysSinceLastActivity": "Days since last activity",
+      "dormancyPeriodDays": "Dormancy period (days)",
+      "dormancyDate": "Becomes dormant on",
+      "daysUntilDormancy": "Days until dormant"
+    },
+    "ar": {
+      "currentBalance": "الرصيد",
+      "lastActivityDate": "آخر نشاط",
+      "daysSinceLastActivity": "أيام منذ آخر نشاط",
+      "dormancyPeriodDays": "فترة الخمول (بالأيام)",
+      "dormancyDate": "يصبح خاملاً في",
+      "daysUntilDormancy": "الأيام حتى الخمول"
+    }
+  },
+  "explanations": {
+    "en": {
+      "account_nearing_dormancy": "This account has had no activity from you for a long time and will soon reach the bank's dormancy period.",
+      "any_transaction_keeps_account_active": "Any transaction you make resets the dormancy period.",
+      "severity_critical": "The account turns dormant soon, so your bank shows an important notice.",
+      "severity_caution": "Your bank shows a notice for this situation."
+    },
+    "ar": {
+      "account_nearing_dormancy": "لم تُجرِ أي نشاط على هذا الحساب منذ مدة طويلة، وسيبلغ قريباً فترة الخمول لدى البنك.",
+      "any_transaction_keeps_account_active": "أي معاملة تجريها تعيد احتساب فترة الخمول.",
+      "severity_critical": "سيصبح الحساب خاملاً قريباً، لذا يُظهر البنك تنبيهاً مهماً.",
+      "severity_caution": "يُظهر البنك تنبيهاً في هذه الحالة."
+    }
+  }
+}

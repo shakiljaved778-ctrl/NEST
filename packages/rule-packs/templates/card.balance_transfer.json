@@ -1,0 +1,415 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons. Labels and explanations are shared by both variants, so they use variant-neutral terms.",
+  "templates": [
+    {
+      "key": "card.balance_transfer.conventional.info",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "The transfer fee is {transferFee}, and the rate changes after {promoMonths} months",
+      "body": "Transferring {transferAmount} has a fee of {transferFee} ({transferFeePct}). The rate is {promoRatePct} for {promoMonths} months, then {revertRatePct} a year. If you pay only the minimum, {remainingAfterPromo} is still owed when the introductory period ends, and the following year adds {chargeYearAfterPromo} in interest.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "Transfer a smaller amount"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "Continue with the transfer"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.conventional.caution",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "Paying the minimum, this transfer costs {costPromoAndYearAfter} in fee and charges",
+      "body": "Transferring {transferAmount} has a fee of {transferFee} ({transferFeePct}). The rate is {promoRatePct} for {promoMonths} months, then {revertRatePct} a year. If you pay only the minimum, {remainingAfterPromo} is still owed when the introductory period ends, and the following year adds {chargeYearAfterPromo} in interest.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "Transfer a smaller amount"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "Continue with the transfer"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.conventional.critical",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "Paying the minimum, this transfer costs {costPromoAndYearAfter} in fee and charges",
+      "body": "Transferring {transferAmount} has a fee of {transferFee} ({transferFeePct}). The rate is {promoRatePct} for {promoMonths} months, then {revertRatePct} a year. If you pay only the minimum, {remainingAfterPromo} is still owed when the introductory period ends, and the following year adds {chargeYearAfterPromo} in interest.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "Transfer a smaller amount"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "Continue with the transfer"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.conventional.info",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "رسوم التحويل {transferFee}، ويتغيّر المعدل بعد {promoMonths} أشهر",
+      "body": "تحويل {transferAmount} تترتب عليه رسوم {transferFee} ({transferFeePct}). المعدل {promoRatePct} لمدة {promoMonths} أشهر، ثم {revertRatePct} سنوياً. إذا سددت الحد الأدنى فقط، يبقى {remainingAfterPromo} مستحقاً عند انتهاء الفترة التمهيدية، وتضيف السنة التالية {chargeYearAfterPromo} فوائد.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "تحويل مبلغ أقل"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "متابعة التحويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.conventional.caution",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "بسداد الحد الأدنى، يكلّف هذا التحويل {costPromoAndYearAfter} رسوماً وتكاليف",
+      "body": "تحويل {transferAmount} تترتب عليه رسوم {transferFee} ({transferFeePct}). المعدل {promoRatePct} لمدة {promoMonths} أشهر، ثم {revertRatePct} سنوياً. إذا سددت الحد الأدنى فقط، يبقى {remainingAfterPromo} مستحقاً عند انتهاء الفترة التمهيدية، وتضيف السنة التالية {chargeYearAfterPromo} فوائد.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "تحويل مبلغ أقل"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "متابعة التحويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.conventional.critical",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "بسداد الحد الأدنى، يكلّف هذا التحويل {costPromoAndYearAfter} رسوماً وتكاليف",
+      "body": "تحويل {transferAmount} تترتب عليه رسوم {transferFee} ({transferFeePct}). المعدل {promoRatePct} لمدة {promoMonths} أشهر، ثم {revertRatePct} سنوياً. إذا سددت الحد الأدنى فقط، يبقى {remainingAfterPromo} مستحقاً عند انتهاء الفترة التمهيدية، وتضيف السنة التالية {chargeYearAfterPromo} فوائد.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "تحويل مبلغ أقل"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "متابعة التحويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you transfer a balance",
+      "body": "A balance transfer usually has a fee, and its introductory rate lasts for a set period. After that, the card's standard rate applies to whatever is still owed. You can see the terms in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_balance_transfer",
+          "label": "Continue with the transfer"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل تحويل الرصيد",
+      "body": "تحويل الرصيد تترتب عليه عادةً رسوم، ويسري معدله التمهيدي لفترة محددة. بعدها يُطبَّق المعدل المعتاد للبطاقة على ما يبقى مستحقاً. يمكنك الاطلاع على الشروط في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_balance_transfer",
+          "label": "متابعة التحويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.islamic.info",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "The transfer fee is {transferFee}, and the rate changes after {promoMonths} months",
+      "body": "Transferring {transferAmount} has a fee of {transferFee} ({transferFeePct}). The profit rate is {promoRatePct} for {promoMonths} months, then {revertRatePct} a year. If you pay only the minimum, {remainingAfterPromo} is still owed when the introductory period ends, and the following year adds {chargeYearAfterPromo} in profit charges.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "Transfer a smaller amount"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "Continue with the transfer"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.islamic.caution",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "Paying the minimum, this transfer costs {costPromoAndYearAfter} in fee and charges",
+      "body": "Transferring {transferAmount} has a fee of {transferFee} ({transferFeePct}). The profit rate is {promoRatePct} for {promoMonths} months, then {revertRatePct} a year. If you pay only the minimum, {remainingAfterPromo} is still owed when the introductory period ends, and the following year adds {chargeYearAfterPromo} in profit charges.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "Transfer a smaller amount"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "Continue with the transfer"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.islamic.critical",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "Paying the minimum, this transfer costs {costPromoAndYearAfter} in fee and charges",
+      "body": "Transferring {transferAmount} has a fee of {transferFee} ({transferFeePct}). The profit rate is {promoRatePct} for {promoMonths} months, then {revertRatePct} a year. If you pay only the minimum, {remainingAfterPromo} is still owed when the introductory period ends, and the following year adds {chargeYearAfterPromo} in profit charges.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "Transfer a smaller amount"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "Continue with the transfer"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.islamic.info",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "رسوم التحويل {transferFee}، ويتغيّر المعدل بعد {promoMonths} أشهر",
+      "body": "تحويل {transferAmount} تترتب عليه رسوم {transferFee} ({transferFeePct}). معدل الربح {promoRatePct} لمدة {promoMonths} أشهر، ثم {revertRatePct} سنوياً. إذا سددت الحد الأدنى فقط، يبقى {remainingAfterPromo} مستحقاً عند انتهاء الفترة التمهيدية، وتضيف السنة التالية {chargeYearAfterPromo} أرباحاً.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "تحويل مبلغ أقل"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "متابعة التحويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.islamic.caution",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "بسداد الحد الأدنى، يكلّف هذا التحويل {costPromoAndYearAfter} رسوماً وتكاليف",
+      "body": "تحويل {transferAmount} تترتب عليه رسوم {transferFee} ({transferFeePct}). معدل الربح {promoRatePct} لمدة {promoMonths} أشهر، ثم {revertRatePct} سنوياً. إذا سددت الحد الأدنى فقط، يبقى {remainingAfterPromo} مستحقاً عند انتهاء الفترة التمهيدية، وتضيف السنة التالية {chargeYearAfterPromo} أرباحاً.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "تحويل مبلغ أقل"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "متابعة التحويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.islamic.critical",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "بسداد الحد الأدنى، يكلّف هذا التحويل {costPromoAndYearAfter} رسوماً وتكاليف",
+      "body": "تحويل {transferAmount} تترتب عليه رسوم {transferFee} ({transferFeePct}). معدل الربح {promoRatePct} لمدة {promoMonths} أشهر، ثم {revertRatePct} سنوياً. إذا سددت الحد الأدنى فقط، يبقى {remainingAfterPromo} مستحقاً عند انتهاء الفترة التمهيدية، وتضيف السنة التالية {chargeYearAfterPromo} أرباحاً.",
+      "options": [
+        {
+          "key": "adjust_transfer_amount",
+          "label": "تحويل مبلغ أقل"
+        },
+        {
+          "key": "continue_balance_transfer",
+          "label": "متابعة التحويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you transfer a balance",
+      "body": "A balance transfer usually has a fee, and its introductory rate lasts for a set period. After that, the card's standard rate applies to whatever is still owed. You can see the terms in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_balance_transfer",
+          "label": "Continue with the transfer"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.balance_transfer.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "card.balance_transfer",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل تحويل الرصيد",
+      "body": "تحويل الرصيد تترتب عليه عادةً رسوم، ويسري معدله التمهيدي لفترة محددة. بعدها يُطبَّق المعدل المعتاد للبطاقة على ما يبقى مستحقاً. يمكنك الاطلاع على الشروط في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_balance_transfer",
+          "label": "متابعة التحويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "transferAmount": "Transfer amount",
+      "transferFee": "Transfer fee",
+      "transferFeePct": "Fee rate",
+      "promoMonths": "Introductory period (months)",
+      "promoRatePct": "Introductory rate",
+      "revertRatePct": "Rate afterwards",
+      "remainingAfterPromo": "Owed when the period ends",
+      "chargeYearAfterPromo": "Charges in the following year",
+      "costPromoAndYearAfter": "Fee and charges"
+    },
+    "ar": {
+      "transferAmount": "مبلغ التحويل",
+      "transferFee": "رسوم التحويل",
+      "transferFeePct": "نسبة الرسوم",
+      "promoMonths": "الفترة التمهيدية (بالأشهر)",
+      "promoRatePct": "المعدل التمهيدي",
+      "revertRatePct": "المعدل بعدها",
+      "remainingAfterPromo": "المستحق عند انتهاء الفترة",
+      "chargeYearAfterPromo": "تكاليف السنة التالية",
+      "costPromoAndYearAfter": "الرسوم والتكاليف"
+    }
+  },
+  "explanations": {
+    "en": {
+      "balance_transfer_fee_applies": "A balance transfer has a fee.",
+      "promo_rate_ends": "The introductory rate ends after a set period, and the standard rate then applies.",
+      "severity_critical": "The cost is above the level your bank has set for an important notice.",
+      "severity_caution": "Your bank shows a notice for this situation."
+    },
+    "ar": {
+      "balance_transfer_fee_applies": "تترتب على تحويل الرصيد رسوم.",
+      "promo_rate_ends": "ينتهي المعدل التمهيدي بعد فترة محددة، ثم يُطبَّق المعدل المعتاد.",
+      "severity_critical": "التكلفة أعلى من الحد الذي حدده البنك لإظهار تنبيه مهم.",
+      "severity_caution": "يُظهر البنك تنبيهاً في هذه الحالة."
+    }
+  }
+}

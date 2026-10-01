@@ -38,14 +38,14 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [~] `apps/console`: Next.js 15 (full console in Phase 7)
 - [x] `apps/api`: Fastify, OpenAPI 3.1 generated from Zod, Swagger UI at `/docs`
 - [x] `packages/rules-engine`: contract, facts, severity, money and date helpers
-- [~] `packages/rule-packs`: versioned JSON + calculators + approved copy; 2 of 12 packs (Phase 2), rest in Phase 5
+- [x] `packages/rule-packs`: versioned JSON + calculators + approved copy; all 12 packs × 2 variants (Phases 2, 5)
 - [~] `packages/widget`: Lit `<amil-insight>` (Phase 4) · [ ] `<amil-assistant>` (Phase 6)
 - [x] `packages/sdk`: Zod contract + typed server (HMAC) and widget (session) clients
 - [x] `packages/gateway`: providers (anthropic, in_country, mock), redactor, number validator, wording cache
 - [x] `packages/db`: Prisma schema, migrations, seed
 - [~] `packages/i18n`: en/ar number, date and currency formatting, Arabic-Indic digits, glossary (catalogs grow per phase)
 - [x] `packages/ui`: shared shadcn-style components (D-026)
-- [x] PostgreSQL 16, Redis 7 (docker-compose) · [ ] BullMQ (Phase 5)
+- [x] PostgreSQL 16, Redis 7 (docker-compose) · [x] BullMQ (Phase 5: proactive worker, schedules mirrored from ProactiveJob, D-039)
 - [ ] LangGraph.js assistant (Phase 6)
 - [~] pino structured logs (Phase 1) · [ ] OpenTelemetry (Phase 8)
 - [x] `docker-compose.yml`, `Dockerfile` per app · [ ] `infra/terraform` skeleton (Phase 8)
@@ -70,17 +70,17 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 - [x] 1. card.close (flagship): both variants
 - [x] 2. finance.early_settlement (flagship, cheapest date within 60 days): conventional, murabaha (ibra), ijara
-- [ ] 3. finance.top_up (Phase 5)
-- [ ] 4. card.cash_withdrawal (Phase 5)
-- [ ] 5. card.minimum_payment (Phase 5)
-- [ ] 6. card.epp_conversion (Phase 5)
-- [ ] 7. card.balance_transfer (Phase 5)
-- [ ] 8. deposit.break (Phase 5)
-- [ ] 9. salary.transfer_change (Phase 5)
-- [ ] 10. account.close (Phase 5)
-- [ ] 11. account.dormancy (proactive, Phase 5)
-- [ ] 12. rewards.expiry (proactive, Phase 5)
-- [~] Islamic variants use Sharia terminology (lint-enforced) and are seeded `sharia_approved` (flagships done; rest in Phase 5)
+- [x] 3. finance.top_up (Phase 5)
+- [x] 4. card.cash_withdrawal (Phase 5)
+- [x] 5. card.minimum_payment (Phase 5)
+- [x] 6. card.epp_conversion (Phase 5)
+- [x] 7. card.balance_transfer (Phase 5)
+- [x] 8. deposit.break (Phase 5)
+- [x] 9. salary.transfer_change (Phase 5)
+- [x] 10. account.close (Phase 5)
+- [x] 11. account.dormancy (proactive, Phase 5)
+- [x] 12. rewards.expiry (proactive, Phase 5)
+- [x] Islamic variants use Sharia terminology (lint-enforced) and are seeded `sharia_approved`
 
 ## Section 7: API (Phase 3+)
 
@@ -89,11 +89,11 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] `POST/GET/DELETE /v1/consents`
 - [x] `POST /v1/checks` (p95 51 ms measured with mock; model deadline 1.5 s → template, async cache warm)
 - [x] `POST /v1/insights/:id/responses`
-- [ ] `GET /v1/alerts` (Phase 5)
-- [ ] `POST /v1/explain-charge` (Phase 5)
+- [x] `GET /v1/alerts` + `POST /v1/alerts/:id/read` (Phase 5, D-038)
+- [x] `POST /v1/explain-charge` (Phase 5, D-040)
 - [ ] `POST /v1/compare` (Phase 6)
 - [ ] `POST /v1/assistant/messages` SSE (Phase 6)
-- [ ] `POST /v1/events` with idempotency key (Phase 5)
+- [x] `POST /v1/events` with idempotency key (Phase 5, recorded only in the MVP, D-043)
 - [ ] `/v1/admin/*` RBAC (Phase 7)
 - [x] `GET /healthz`, `GET /readyz`, `GET /docs`
 - [x] Errors never leak to the customer UI (generic error codes; no-insight is never an error)
@@ -115,7 +115,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 10: Demo bank app (Phase 4+)
 
-- [~] Phone-framed app, persona switcher, home, card detail + Close card flow, finance detail + Settle early flow, deep-link targets, settings (language, consent) (Phase 4) · [ ] deposit break, salary change, statement with charges, alerts, Ask AMIL (Phase 5–6)
+- [~] Phone-framed app, persona switcher, home, card/finance/deposit/account detail, one AMIL-checked flow for every action, deep-link targets, settings (Phases 4–5) · [x] deposit break, salary change, account close, statements with tappable charges, alerts inbox (Phase 5) · [ ] Ask AMIL (Phase 6)
 - [x] Critical severity requires "I understand" before "Continue" enables
 
 ## Section 11: Bank console (Phase 7)
@@ -127,9 +127,9 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] Doha Demo Bank, brand tokens, `ddb://` deep-link scheme
 - [x] 25 synthetic customers (en + ar display names), mixed conventional/Islamic
 - [x] Named personas: Khalid, Fatima, Ravi, Aisha, Omar with the specified holdings
-- [x] Holdings designed so every rule pack can fire for ≥ 2 personas (coverage map in `packages/db/src/seed/customers.ts`; verified in Phase 5)
+- [x] Holdings designed so every rule pack can fire for ≥ 2 personas (coverage map in `packages/db/src/seed/customers.ts`; verified in Phase 5 by `packages/db/src/personas.phase5.test.ts`)
 - [x] 6 months of transactions per customer incl. fee lines mapped to `FeeSchedule` codes
-- [~] Templates: 12 packs × 2 locales × severities, `approved` / `sharia_approved`: 24 flagship templates seeded (Phase 2); the rest in Phase 5
+- [x] Templates: 12 packs × 2 variants × 2 locales × 3 severities (144) + 48 generic, `approved` / `sharia_approved` (Phases 2, 5)
 
 ## Section 13: Security and quality
 
@@ -145,7 +145,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] **Phase 2: Rules engine + flagship packs.** ≥ 40 table-driven tests; Khalid and Fatima match expected facts exactly
 - [x] **Phase 3: Insight API + gateway.** Redaction property tests, validator (Arabic-Indic), audit chain verifies, p95 < 400 ms with mock
 - [x] **Phase 4: Demo bank app + widget.** Playwright: Khalid sees points insight in en + ar, deep-links to "Redeem points"
-- [ ] **Phase 5: Remaining packs + proactive + explain.** Every pack fires for ≥ 2 personas; alerts after scheduler; all fee lines explainable
+- [x] **Phase 5: Remaining packs + proactive + explain.** Every pack fires for ≥ 2 personas; alerts after scheduler; all fee lines explainable
 - [ ] **Phase 6: Ask AMIL + compare.** Khalid card-close answer with fact chips; refuses investment advice; compare matches engine
 - [ ] **Phase 7: Bank console.** Point-value change flows to next insight; kill switch immediate; complaints lookup shows Khalid
 - [ ] **Phase 8: Hardening + demo.** Headers, encryption, rate limits, CI, Terraform, DEMO_SCRIPT, INTEGRATION_GUIDE, SECURITY; fresh clone to running demo in ≤ 3 commands

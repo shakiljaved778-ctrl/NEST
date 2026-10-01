@@ -1,4 +1,6 @@
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@amil/ui";
+import Link from "next/link";
+import { actHref } from "@/lib/actions";
+import { Button, buttonVariants, Card, CardContent, CardHeader, CardTitle } from "@amil/ui";
 import { getTranslations } from "next-intl/server";
 import { setInsightsConsent, setLocale } from "@/app/actions";
 import { AppShell } from "@/components/app-shell";
@@ -64,6 +66,13 @@ export default async function Settings() {
           )}
         </CardContent>
       </Card>
+      <Link
+        href={actHref("salary.transfer_change")}
+        className={buttonVariants({ variant: "outline", block: true })}
+        data-testid="move-salary"
+      >
+        {t("actions.moveSalary")}
+      </Link>
     </AppShell>
   );
 }

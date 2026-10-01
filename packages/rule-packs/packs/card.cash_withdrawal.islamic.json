@@ -1,0 +1,100 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "card.cash_withdrawal",
+  "version": "1.0.0",
+  "variant": "islamic",
+  "productFamily": "cards",
+  "triggers": [
+    {
+      "type": "action",
+      "event": "card.cash_withdrawal"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Card",
+      "fields": [
+        "balance",
+        "creditLimit",
+        "profitOrInterestRateApr",
+        "cashAdvanceFeePct",
+        "cashAdvanceMinFee",
+        "type"
+      ]
+    }
+  ],
+  "parameters": {
+    "shortHorizonDays": 30,
+    "longHorizonDays": 60,
+    "dayCountBasis": 365,
+    "roundingMode": "half_up"
+  },
+  "facts": [
+    {
+      "key": "withdrawalAmount",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Amount the customer is about to withdraw"
+    },
+    {
+      "key": "cashFee",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Cash withdrawal fee (percentage with a minimum)"
+    },
+    {
+      "key": "cashFeePct",
+      "unit": "percent",
+      "source": "card",
+      "description": "Cash withdrawal fee percentage"
+    },
+    {
+      "key": "cashFeeMin",
+      "unit": "QAR",
+      "source": "card",
+      "description": "Minimum cash withdrawal fee"
+    },
+    {
+      "key": "aprPct",
+      "unit": "percent",
+      "source": "card",
+      "description": "Annual rate charged on cash from the day of withdrawal"
+    },
+    {
+      "key": "shortHorizonDays",
+      "unit": "days",
+      "source": "rule_pack",
+      "description": "Shorter repayment horizon shown"
+    },
+    {
+      "key": "costIfRepaidShort",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Fee plus charges if repaid after the shorter horizon"
+    },
+    {
+      "key": "longHorizonDays",
+      "unit": "days",
+      "source": "rule_pack",
+      "description": "Longer repayment horizon shown"
+    },
+    {
+      "key": "costIfRepaidLong",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Fee plus charges if repaid after the longer horizon"
+    },
+    {
+      "key": "availableCredit",
+      "unit": "QAR",
+      "source": "card",
+      "description": "Credit limit minus the current balance"
+    },
+    {
+      "key": "exceedsAvailableCredit",
+      "unit": "boolean",
+      "source": "computed",
+      "description": "Whether the withdrawal exceeds the available credit"
+    }
+  ]
+}

@@ -1,0 +1,421 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons. Labels and explanations are shared by both variants, so they use variant-neutral terms.",
+  "templates": [
+    {
+      "key": "finance.top_up.conventional.info",
+      "rulePackKey": "finance.top_up",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "A top-up of {topUpAmount} changes your instalment to {newInstalment}",
+      "body": "Your new loan would be {newFinancedAmount}: today's settlement amount of {refinancedAmount} plus the top-up of {topUpAmount}. Over {newTenorMonths} months the instalment is {newInstalment} instead of {currentInstalment}, and you repay {newTotalCost} in total. [[extraCostOfExtension: Repaying the same amount over the {remainingMonths} months left today would total {totalCostSameTenor}. ]][[processingFee: A processing fee of {processingFee} applies.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "Keep a shorter term"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "Continue with the top-up"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.conventional.caution",
+      "rulePackKey": "finance.top_up",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[extraCostOfExtension: A longer term adds {extraCostOfExtension} to what you repay]][[!extraCostOfExtension: This top-up changes your instalment to {newInstalment}]]",
+      "body": "Your new loan would be {newFinancedAmount}: today's settlement amount of {refinancedAmount} plus the top-up of {topUpAmount}. Over {newTenorMonths} months the instalment is {newInstalment} instead of {currentInstalment}, and you repay {newTotalCost} in total. [[extraCostOfExtension: Repaying the same amount over the {remainingMonths} months left today would total {totalCostSameTenor}. ]][[processingFee: A processing fee of {processingFee} applies.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "Keep a shorter term"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "Continue with the top-up"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.conventional.critical",
+      "rulePackKey": "finance.top_up",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[extraCostOfExtension: Extending to {newTenorMonths} months adds {extraCostOfExtension} to what you repay]][[!extraCostOfExtension: This top-up changes your instalment to {newInstalment}]]",
+      "body": "Your new loan would be {newFinancedAmount}: today's settlement amount of {refinancedAmount} plus the top-up of {topUpAmount}. Over {newTenorMonths} months the instalment is {newInstalment} instead of {currentInstalment}, and you repay {newTotalCost} in total. [[extraCostOfExtension: Repaying the same amount over the {remainingMonths} months left today would total {totalCostSameTenor}. ]][[processingFee: A processing fee of {processingFee} applies.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "Keep a shorter term"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "Continue with the top-up"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.conventional.info",
+      "rulePackKey": "finance.top_up",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "زيادة التمويل بمبلغ {topUpAmount} تغيّر قسطك إلى {newInstalment}",
+      "body": "سيصبح قرضك الجديد {newFinancedAmount}: مبلغ السداد اليوم {refinancedAmount} مضافاً إليه الزيادة {topUpAmount}. على مدى {newTenorMonths} شهراً يكون القسط {newInstalment} بدلاً من {currentInstalment}، وتسدد {newTotalCost} إجمالاً. [[extraCostOfExtension: لو سددت المبلغ نفسه خلال الأشهر المتبقية اليوم ({remainingMonths}) لبلغ الإجمالي {totalCostSameTenor}. ]][[processingFee: تُطبَّق رسوم معالجة بقيمة {processingFee}.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "الإبقاء على مدة أقصر"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "متابعة زيادة التمويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.conventional.caution",
+      "rulePackKey": "finance.top_up",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[extraCostOfExtension: المدة الأطول تضيف {extraCostOfExtension} إلى ما تسدده]][[!extraCostOfExtension: هذه الزيادة تغيّر قسطك إلى {newInstalment}]]",
+      "body": "سيصبح قرضك الجديد {newFinancedAmount}: مبلغ السداد اليوم {refinancedAmount} مضافاً إليه الزيادة {topUpAmount}. على مدى {newTenorMonths} شهراً يكون القسط {newInstalment} بدلاً من {currentInstalment}، وتسدد {newTotalCost} إجمالاً. [[extraCostOfExtension: لو سددت المبلغ نفسه خلال الأشهر المتبقية اليوم ({remainingMonths}) لبلغ الإجمالي {totalCostSameTenor}. ]][[processingFee: تُطبَّق رسوم معالجة بقيمة {processingFee}.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "الإبقاء على مدة أقصر"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "متابعة زيادة التمويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.conventional.critical",
+      "rulePackKey": "finance.top_up",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[extraCostOfExtension: التمديد إلى {newTenorMonths} شهراً يضيف {extraCostOfExtension} إلى ما تسدده]][[!extraCostOfExtension: هذه الزيادة تغيّر قسطك إلى {newInstalment}]]",
+      "body": "سيصبح قرضك الجديد {newFinancedAmount}: مبلغ السداد اليوم {refinancedAmount} مضافاً إليه الزيادة {topUpAmount}. على مدى {newTenorMonths} شهراً يكون القسط {newInstalment} بدلاً من {currentInstalment}، وتسدد {newTotalCost} إجمالاً. [[extraCostOfExtension: لو سددت المبلغ نفسه خلال الأشهر المتبقية اليوم ({remainingMonths}) لبلغ الإجمالي {totalCostSameTenor}. ]][[processingFee: تُطبَّق رسوم معالجة بقيمة {processingFee}.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "الإبقاء على مدة أقصر"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "متابعة زيادة التمويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "finance.top_up",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you top up your finance",
+      "body": "A top-up usually refinances what you owe today and can extend your term. A longer term lowers the instalment but raises the total you repay. You can compare terms in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_top_up",
+          "label": "Continue with the top-up"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "finance.top_up",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل زيادة تمويلك",
+      "body": "زيادة التمويل تعني عادةً إعادة تمويل المبلغ المستحق اليوم، وقد تمدّد المدة. المدة الأطول تخفّض القسط لكنها ترفع إجمالي ما تسدده. يمكنك مقارنة المدد في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_top_up",
+          "label": "متابعة زيادة التمويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.islamic.info",
+      "rulePackKey": "finance.top_up",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "A top-up of {topUpAmount} changes your instalment to {newInstalment}",
+      "body": "Your new finance would be {newFinancedAmount}: today's settlement amount of {refinancedAmount} plus the top-up of {topUpAmount}. Over {newTenorMonths} months the instalment is {newInstalment} instead of {currentInstalment}, and you repay {newTotalCost} in total, including profit. [[extraCostOfExtension: Repaying the same amount over the {remainingMonths} months left today would total {totalCostSameTenor}. ]][[processingFee: A processing fee of {processingFee} applies.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "Keep a shorter term"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "Continue with the top-up"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.islamic.caution",
+      "rulePackKey": "finance.top_up",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[extraCostOfExtension: A longer term adds {extraCostOfExtension} to what you repay]][[!extraCostOfExtension: This top-up changes your instalment to {newInstalment}]]",
+      "body": "Your new finance would be {newFinancedAmount}: today's settlement amount of {refinancedAmount} plus the top-up of {topUpAmount}. Over {newTenorMonths} months the instalment is {newInstalment} instead of {currentInstalment}, and you repay {newTotalCost} in total, including profit. [[extraCostOfExtension: Repaying the same amount over the {remainingMonths} months left today would total {totalCostSameTenor}. ]][[processingFee: A processing fee of {processingFee} applies.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "Keep a shorter term"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "Continue with the top-up"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.islamic.critical",
+      "rulePackKey": "finance.top_up",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[extraCostOfExtension: Extending to {newTenorMonths} months adds {extraCostOfExtension} to what you repay]][[!extraCostOfExtension: This top-up changes your instalment to {newInstalment}]]",
+      "body": "Your new finance would be {newFinancedAmount}: today's settlement amount of {refinancedAmount} plus the top-up of {topUpAmount}. Over {newTenorMonths} months the instalment is {newInstalment} instead of {currentInstalment}, and you repay {newTotalCost} in total, including profit. [[extraCostOfExtension: Repaying the same amount over the {remainingMonths} months left today would total {totalCostSameTenor}. ]][[processingFee: A processing fee of {processingFee} applies.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "Keep a shorter term"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "Continue with the top-up"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.islamic.info",
+      "rulePackKey": "finance.top_up",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "زيادة التمويل بمبلغ {topUpAmount} تغيّر قسطك إلى {newInstalment}",
+      "body": "سيصبح تمويلك الجديد {newFinancedAmount}: مبلغ السداد اليوم {refinancedAmount} مضافاً إليه الزيادة {topUpAmount}. على مدى {newTenorMonths} شهراً يكون القسط {newInstalment} بدلاً من {currentInstalment}، وتسدد {newTotalCost} إجمالاً شاملاً الربح. [[extraCostOfExtension: لو سددت المبلغ نفسه خلال الأشهر المتبقية اليوم ({remainingMonths}) لبلغ الإجمالي {totalCostSameTenor}. ]][[processingFee: تُطبَّق رسوم معالجة بقيمة {processingFee}.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "الإبقاء على مدة أقصر"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "متابعة زيادة التمويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.islamic.caution",
+      "rulePackKey": "finance.top_up",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[extraCostOfExtension: المدة الأطول تضيف {extraCostOfExtension} إلى ما تسدده]][[!extraCostOfExtension: هذه الزيادة تغيّر قسطك إلى {newInstalment}]]",
+      "body": "سيصبح تمويلك الجديد {newFinancedAmount}: مبلغ السداد اليوم {refinancedAmount} مضافاً إليه الزيادة {topUpAmount}. على مدى {newTenorMonths} شهراً يكون القسط {newInstalment} بدلاً من {currentInstalment}، وتسدد {newTotalCost} إجمالاً شاملاً الربح. [[extraCostOfExtension: لو سددت المبلغ نفسه خلال الأشهر المتبقية اليوم ({remainingMonths}) لبلغ الإجمالي {totalCostSameTenor}. ]][[processingFee: تُطبَّق رسوم معالجة بقيمة {processingFee}.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "الإبقاء على مدة أقصر"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "متابعة زيادة التمويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.islamic.critical",
+      "rulePackKey": "finance.top_up",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[extraCostOfExtension: التمديد إلى {newTenorMonths} شهراً يضيف {extraCostOfExtension} إلى ما تسدده]][[!extraCostOfExtension: هذه الزيادة تغيّر قسطك إلى {newInstalment}]]",
+      "body": "سيصبح تمويلك الجديد {newFinancedAmount}: مبلغ السداد اليوم {refinancedAmount} مضافاً إليه الزيادة {topUpAmount}. على مدى {newTenorMonths} شهراً يكون القسط {newInstalment} بدلاً من {currentInstalment}، وتسدد {newTotalCost} إجمالاً شاملاً الربح. [[extraCostOfExtension: لو سددت المبلغ نفسه خلال الأشهر المتبقية اليوم ({remainingMonths}) لبلغ الإجمالي {totalCostSameTenor}. ]][[processingFee: تُطبَّق رسوم معالجة بقيمة {processingFee}.]]",
+      "options": [
+        {
+          "key": "choose_shorter_tenor",
+          "label": "الإبقاء على مدة أقصر"
+        },
+        {
+          "key": "continue_top_up",
+          "label": "متابعة زيادة التمويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "finance.top_up",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you top up your finance",
+      "body": "A top-up usually refinances what you owe today and can extend your term. A longer term lowers the instalment but raises the total you repay. You can compare terms in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_top_up",
+          "label": "Continue with the top-up"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.top_up.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "finance.top_up",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل زيادة تمويلك",
+      "body": "زيادة التمويل تعني عادةً إعادة تمويل المبلغ المستحق اليوم، وقد تمدّد المدة. المدة الأطول تخفّض القسط لكنها ترفع إجمالي ما تسدده. يمكنك مقارنة المدد في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_top_up",
+          "label": "متابعة زيادة التمويل"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "topUpAmount": "Top-up amount",
+      "currentInstalment": "Current instalment",
+      "remainingMonths": "Months remaining",
+      "remainingCost": "Remaining instalments",
+      "refinancedAmount": "Settled today",
+      "newFinancedAmount": "New amount",
+      "newTenorMonths": "New term (months)",
+      "newInstalment": "New instalment",
+      "newTotalCost": "Total to repay",
+      "totalCostSameTenor": "Total over the current term",
+      "extraCostOfExtension": "Cost of the longer term",
+      "processingFee": "Processing fee"
+    },
+    "ar": {
+      "topUpAmount": "مبلغ الزيادة",
+      "currentInstalment": "القسط الحالي",
+      "remainingMonths": "الأشهر المتبقية",
+      "remainingCost": "الأقساط المتبقية",
+      "refinancedAmount": "مبلغ السداد اليوم",
+      "newFinancedAmount": "المبلغ الجديد",
+      "newTenorMonths": "المدة الجديدة (بالأشهر)",
+      "newInstalment": "القسط الجديد",
+      "newTotalCost": "إجمالي السداد",
+      "totalCostSameTenor": "الإجمالي على المدة الحالية",
+      "extraCostOfExtension": "تكلفة المدة الأطول",
+      "processingFee": "رسوم المعالجة"
+    }
+  },
+  "explanations": {
+    "en": {
+      "top_up_extends_tenor": "The new term is longer than the months left on your finance, so you pay for longer.",
+      "top_up_has_processing_fee": "A top-up has a processing fee under the bank's terms.",
+      "severity_critical": "The extra cost is above the level your bank has set for an important notice.",
+      "severity_caution": "Your bank shows a notice for this situation."
+    },
+    "ar": {
+      "top_up_extends_tenor": "المدة الجديدة أطول من الأشهر المتبقية في تمويلك، لذا تسدد لفترة أطول.",
+      "top_up_has_processing_fee": "تترتب على زيادة التمويل رسوم معالجة وفق شروط البنك.",
+      "severity_critical": "التكلفة الإضافية أعلى من الحد الذي حدده البنك لإظهار تنبيه مهم.",
+      "severity_caution": "يُظهر البنك تنبيهاً في هذه الحالة."
+    }
+  }
+}

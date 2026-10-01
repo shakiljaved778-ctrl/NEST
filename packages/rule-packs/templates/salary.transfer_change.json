@@ -1,0 +1,421 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons. Labels and explanations are shared by both variants, so they use variant-neutral terms.",
+  "templates": [
+    {
+      "key": "salary.transfer_change.conventional.info",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "[[instalmentIncrease: Moving your salary raises your instalments by {instalmentIncrease} a month]][[!instalmentIncrease: Moving your salary ends fee waivers worth {waiversLostAnnual} a year]]",
+      "body": "[[instalmentIncrease: Your loan pricing depends on your salary being paid here. The rate would move from {currentRatePct} to {newRatePct}, taking your monthly instalments from {currentInstalmentTotal} to {newInstalmentTotal}, or {extraCostRemainingTerm} more over the remaining term. ]][[clearanceRequired: The bank requires salary-linked finance of {outstandingSalaryLinked} to be cleared before the salary moves. ]][[waiversLostAnnual: Fee waivers tied to your salary would end, worth {waiversLostAnnual} a year.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "View what is linked to my salary"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "Continue with the change"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.conventional.caution",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[instalmentIncrease: Moving your salary raises your instalments by {instalmentIncrease} a month]][[!instalmentIncrease: Moving your salary ends fee waivers worth {waiversLostAnnual} a year]]",
+      "body": "[[instalmentIncrease: Your loan pricing depends on your salary being paid here. The rate would move from {currentRatePct} to {newRatePct}, taking your monthly instalments from {currentInstalmentTotal} to {newInstalmentTotal}, or {extraCostRemainingTerm} more over the remaining term. ]][[clearanceRequired: The bank requires salary-linked finance of {outstandingSalaryLinked} to be cleared before the salary moves. ]][[waiversLostAnnual: Fee waivers tied to your salary would end, worth {waiversLostAnnual} a year.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "View what is linked to my salary"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "Continue with the change"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.conventional.critical",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[instalmentIncrease: Moving your salary raises your instalments by {instalmentIncrease} a month]][[!instalmentIncrease: Moving your salary ends fee waivers worth {waiversLostAnnual} a year]]",
+      "body": "[[instalmentIncrease: Your loan pricing depends on your salary being paid here. The rate would move from {currentRatePct} to {newRatePct}, taking your monthly instalments from {currentInstalmentTotal} to {newInstalmentTotal}, or {extraCostRemainingTerm} more over the remaining term. ]][[clearanceRequired: The bank requires salary-linked finance of {outstandingSalaryLinked} to be cleared before the salary moves. ]][[waiversLostAnnual: Fee waivers tied to your salary would end, worth {waiversLostAnnual} a year.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "View what is linked to my salary"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "Continue with the change"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.conventional.info",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "[[instalmentIncrease: نقل راتبك يرفع أقساطك بمقدار {instalmentIncrease} شهرياً]][[!instalmentIncrease: نقل راتبك ينهي إعفاءات من رسوم قيمتها {waiversLostAnnual} سنوياً]]",
+      "body": "[[instalmentIncrease: تسعير قرضك مرتبط بتحويل راتبك إلى هنا. سيتغيّر المعدل من {currentRatePct} إلى {newRatePct}، فترتفع أقساطك الشهرية من {currentInstalmentTotal} إلى {newInstalmentTotal}، أي {extraCostRemainingTerm} إضافية على المدة المتبقية. ]][[clearanceRequired: يشترط البنك سداد التمويل المرتبط بالراتب البالغ {outstandingSalaryLinked} قبل نقل الراتب. ]][[waiversLostAnnual: ستنتهي الإعفاءات من الرسوم المرتبطة براتبك، وقيمتها {waiversLostAnnual} سنوياً.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "عرض ما يرتبط براتبي"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "متابعة التغيير"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.conventional.caution",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[instalmentIncrease: نقل راتبك يرفع أقساطك بمقدار {instalmentIncrease} شهرياً]][[!instalmentIncrease: نقل راتبك ينهي إعفاءات من رسوم قيمتها {waiversLostAnnual} سنوياً]]",
+      "body": "[[instalmentIncrease: تسعير قرضك مرتبط بتحويل راتبك إلى هنا. سيتغيّر المعدل من {currentRatePct} إلى {newRatePct}، فترتفع أقساطك الشهرية من {currentInstalmentTotal} إلى {newInstalmentTotal}، أي {extraCostRemainingTerm} إضافية على المدة المتبقية. ]][[clearanceRequired: يشترط البنك سداد التمويل المرتبط بالراتب البالغ {outstandingSalaryLinked} قبل نقل الراتب. ]][[waiversLostAnnual: ستنتهي الإعفاءات من الرسوم المرتبطة براتبك، وقيمتها {waiversLostAnnual} سنوياً.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "عرض ما يرتبط براتبي"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "متابعة التغيير"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.conventional.critical",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[instalmentIncrease: نقل راتبك يرفع أقساطك بمقدار {instalmentIncrease} شهرياً]][[!instalmentIncrease: نقل راتبك ينهي إعفاءات من رسوم قيمتها {waiversLostAnnual} سنوياً]]",
+      "body": "[[instalmentIncrease: تسعير قرضك مرتبط بتحويل راتبك إلى هنا. سيتغيّر المعدل من {currentRatePct} إلى {newRatePct}، فترتفع أقساطك الشهرية من {currentInstalmentTotal} إلى {newInstalmentTotal}، أي {extraCostRemainingTerm} إضافية على المدة المتبقية. ]][[clearanceRequired: يشترط البنك سداد التمويل المرتبط بالراتب البالغ {outstandingSalaryLinked} قبل نقل الراتب. ]][[waiversLostAnnual: ستنتهي الإعفاءات من الرسوم المرتبطة براتبك، وقيمتها {waiversLostAnnual} سنوياً.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "عرض ما يرتبط براتبي"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "متابعة التغيير"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you move your salary",
+      "body": "Some pricing and fee waivers depend on your salary being paid into this bank. Moving it can change instalments on salary-linked finance and end those waivers. You can see what is linked to your salary in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_salary_change",
+          "label": "Continue with the change"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل نقل راتبك",
+      "body": "بعض الأسعار والإعفاءات من الرسوم مرتبطة بتحويل راتبك إلى هذا البنك. نقله قد يغيّر أقساط التمويل المرتبط بالراتب وينهي تلك الإعفاءات. يمكنك الاطلاع على ما يرتبط براتبك في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_salary_change",
+          "label": "متابعة التغيير"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.islamic.info",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "[[instalmentIncrease: Moving your salary raises your instalments by {instalmentIncrease} a month]][[!instalmentIncrease: Moving your salary ends fee waivers worth {waiversLostAnnual} a year]]",
+      "body": "[[instalmentIncrease: Your ijara pricing depends on your salary being paid here. The profit rate would move from {currentRatePct} to {newRatePct}, taking your monthly instalments from {currentInstalmentTotal} to {newInstalmentTotal}, or {extraCostRemainingTerm} more over the remaining term. ]][[clearanceRequired: The bank requires salary-linked finance of {outstandingSalaryLinked} to be cleared before the salary moves. ]][[waiversLostAnnual: Fee waivers tied to your salary would end, worth {waiversLostAnnual} a year.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "View what is linked to my salary"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "Continue with the change"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.islamic.caution",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[instalmentIncrease: Moving your salary raises your instalments by {instalmentIncrease} a month]][[!instalmentIncrease: Moving your salary ends fee waivers worth {waiversLostAnnual} a year]]",
+      "body": "[[instalmentIncrease: Your ijara pricing depends on your salary being paid here. The profit rate would move from {currentRatePct} to {newRatePct}, taking your monthly instalments from {currentInstalmentTotal} to {newInstalmentTotal}, or {extraCostRemainingTerm} more over the remaining term. ]][[clearanceRequired: The bank requires salary-linked finance of {outstandingSalaryLinked} to be cleared before the salary moves. ]][[waiversLostAnnual: Fee waivers tied to your salary would end, worth {waiversLostAnnual} a year.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "View what is linked to my salary"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "Continue with the change"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.islamic.critical",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[instalmentIncrease: Moving your salary raises your instalments by {instalmentIncrease} a month]][[!instalmentIncrease: Moving your salary ends fee waivers worth {waiversLostAnnual} a year]]",
+      "body": "[[instalmentIncrease: Your ijara pricing depends on your salary being paid here. The profit rate would move from {currentRatePct} to {newRatePct}, taking your monthly instalments from {currentInstalmentTotal} to {newInstalmentTotal}, or {extraCostRemainingTerm} more over the remaining term. ]][[clearanceRequired: The bank requires salary-linked finance of {outstandingSalaryLinked} to be cleared before the salary moves. ]][[waiversLostAnnual: Fee waivers tied to your salary would end, worth {waiversLostAnnual} a year.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "View what is linked to my salary"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "Continue with the change"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.islamic.info",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "[[instalmentIncrease: نقل راتبك يرفع أقساطك بمقدار {instalmentIncrease} شهرياً]][[!instalmentIncrease: نقل راتبك ينهي إعفاءات من رسوم قيمتها {waiversLostAnnual} سنوياً]]",
+      "body": "[[instalmentIncrease: تسعير الإجارة مرتبط بتحويل راتبك إلى هنا. سيتغيّر معدل الربح من {currentRatePct} إلى {newRatePct}، فترتفع أقساطك الشهرية من {currentInstalmentTotal} إلى {newInstalmentTotal}، أي {extraCostRemainingTerm} إضافية على المدة المتبقية. ]][[clearanceRequired: يشترط البنك سداد التمويل المرتبط بالراتب البالغ {outstandingSalaryLinked} قبل نقل الراتب. ]][[waiversLostAnnual: ستنتهي الإعفاءات من الرسوم المرتبطة براتبك، وقيمتها {waiversLostAnnual} سنوياً.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "عرض ما يرتبط براتبي"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "متابعة التغيير"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.islamic.caution",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "[[instalmentIncrease: نقل راتبك يرفع أقساطك بمقدار {instalmentIncrease} شهرياً]][[!instalmentIncrease: نقل راتبك ينهي إعفاءات من رسوم قيمتها {waiversLostAnnual} سنوياً]]",
+      "body": "[[instalmentIncrease: تسعير الإجارة مرتبط بتحويل راتبك إلى هنا. سيتغيّر معدل الربح من {currentRatePct} إلى {newRatePct}، فترتفع أقساطك الشهرية من {currentInstalmentTotal} إلى {newInstalmentTotal}، أي {extraCostRemainingTerm} إضافية على المدة المتبقية. ]][[clearanceRequired: يشترط البنك سداد التمويل المرتبط بالراتب البالغ {outstandingSalaryLinked} قبل نقل الراتب. ]][[waiversLostAnnual: ستنتهي الإعفاءات من الرسوم المرتبطة براتبك، وقيمتها {waiversLostAnnual} سنوياً.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "عرض ما يرتبط براتبي"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "متابعة التغيير"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.islamic.critical",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[instalmentIncrease: نقل راتبك يرفع أقساطك بمقدار {instalmentIncrease} شهرياً]][[!instalmentIncrease: نقل راتبك ينهي إعفاءات من رسوم قيمتها {waiversLostAnnual} سنوياً]]",
+      "body": "[[instalmentIncrease: تسعير الإجارة مرتبط بتحويل راتبك إلى هنا. سيتغيّر معدل الربح من {currentRatePct} إلى {newRatePct}، فترتفع أقساطك الشهرية من {currentInstalmentTotal} إلى {newInstalmentTotal}، أي {extraCostRemainingTerm} إضافية على المدة المتبقية. ]][[clearanceRequired: يشترط البنك سداد التمويل المرتبط بالراتب البالغ {outstandingSalaryLinked} قبل نقل الراتب. ]][[waiversLostAnnual: ستنتهي الإعفاءات من الرسوم المرتبطة براتبك، وقيمتها {waiversLostAnnual} سنوياً.]]",
+      "options": [
+        {
+          "key": "view_linked_benefits",
+          "label": "عرض ما يرتبط براتبي"
+        },
+        {
+          "key": "continue_salary_change",
+          "label": "متابعة التغيير"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you move your salary",
+      "body": "Some pricing and fee waivers depend on your salary being paid into this bank. Moving it can change instalments on salary-linked finance and end those waivers. You can see what is linked to your salary in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_salary_change",
+          "label": "Continue with the change"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "salary.transfer_change.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "salary.transfer_change",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل نقل راتبك",
+      "body": "بعض الأسعار والإعفاءات من الرسوم مرتبطة بتحويل راتبك إلى هذا البنك. نقله قد يغيّر أقساط التمويل المرتبط بالراتب وينهي تلك الإعفاءات. يمكنك الاطلاع على ما يرتبط براتبك في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_salary_change",
+          "label": "متابعة التغيير"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "salaryLinkedFinances": "Salary-linked finances",
+      "currentRatePct": "Current rate",
+      "newRatePct": "Rate after the move",
+      "currentInstalmentTotal": "Current monthly instalments",
+      "newInstalmentTotal": "New monthly instalments",
+      "instalmentIncrease": "Monthly increase",
+      "extraCostRemainingTerm": "Extra over the remaining term",
+      "outstandingSalaryLinked": "Outstanding salary-linked finance",
+      "clearanceRequired": "Must be cleared first",
+      "maintenanceFeeWaivedMonthly": "Account fees waived (monthly)",
+      "annualFeesWaived": "Card fees waived (yearly)",
+      "waiversLostAnnual": "Waivers that end (yearly)"
+    },
+    "ar": {
+      "salaryLinkedFinances": "التمويلات المرتبطة بالراتب",
+      "currentRatePct": "المعدل الحالي",
+      "newRatePct": "المعدل بعد النقل",
+      "currentInstalmentTotal": "الأقساط الشهرية الحالية",
+      "newInstalmentTotal": "الأقساط الشهرية الجديدة",
+      "instalmentIncrease": "الزيادة الشهرية",
+      "extraCostRemainingTerm": "الزيادة على المدة المتبقية",
+      "outstandingSalaryLinked": "التمويل المرتبط بالراتب القائم",
+      "clearanceRequired": "يجب سداده أولاً",
+      "maintenanceFeeWaivedMonthly": "رسوم الحساب المعفاة (شهرياً)",
+      "annualFeesWaived": "رسوم البطاقات المعفاة (سنوياً)",
+      "waiversLostAnnual": "الإعفاءات المنتهية (سنوياً)"
+    }
+  },
+  "explanations": {
+    "en": {
+      "salary_linked_pricing_changes": "Pricing on some of your finance depends on your salary being paid here.",
+      "salary_linked_waivers_end": "Some fees are waived because your salary is paid here.",
+      "severity_critical": "The extra cost is above the level your bank has set for an important notice.",
+      "severity_caution": "Your bank shows a notice for this situation."
+    },
+    "ar": {
+      "salary_linked_pricing_changes": "تسعير بعض تمويلاتك مرتبط بتحويل راتبك إلى هنا.",
+      "salary_linked_waivers_end": "بعض الرسوم معفاة لأن راتبك يُحوَّل إلى هنا.",
+      "severity_critical": "التكلفة الإضافية أعلى من الحد الذي حدده البنك لإظهار تنبيه مهم.",
+      "severity_caution": "يُظهر البنك تنبيهاً في هذه الحالة."
+    }
+  }
+}

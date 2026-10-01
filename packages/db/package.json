@@ -10,7 +10,8 @@
     ".": "./src/index.ts",
     "./seed-data": "./src/seed/build.ts",
     "./adapters": "./src/adapters.ts",
-    "./client": "./src/client.ts"
+    "./client": "./src/client.ts",
+    "./pack-inputs": "./src/pack-inputs.ts"
   },
   "scripts": {
     "lint": "eslint .",
@@ -34,6 +35,7 @@
     "zod": "^4.1.0"
   },
   "devDependencies": {
+    "@amil/gateway": "workspace:*",
     "dotenv-cli": "^8.0.0",
     "prisma": "~6.19.0",
     "tsx": "^4.20.0"

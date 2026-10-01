@@ -1,0 +1,88 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "card.epp_conversion",
+  "version": "1.0.0",
+  "variant": "conventional",
+  "productFamily": "cards",
+  "triggers": [
+    {
+      "type": "action",
+      "event": "card.epp_conversion"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Card",
+      "fields": ["profitOrInterestRateApr", "type"]
+    },
+    {
+      "entity": "Transaction",
+      "fields": ["amount", "type", "postedAt"]
+    }
+  ],
+  "parameters": {
+    "minAmount": "1000.00",
+    "allowedMonths": [3, 6, 12],
+    "processingFeePct": "1.50",
+    "processingFeeMin": "50.00",
+    "planRatePct": "0.00",
+    "earlyClosureFeePct": "2.00",
+    "roundingMode": "half_up"
+  },
+  "facts": [
+    {
+      "key": "purchaseAmount",
+      "unit": "QAR",
+      "source": "transaction",
+      "description": "Purchase being converted"
+    },
+    {
+      "key": "planMonths",
+      "unit": "months",
+      "source": "computed",
+      "description": "Plan length chosen"
+    },
+    {
+      "key": "planMonthlyInstalment",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Monthly instalment on the plan"
+    },
+    {
+      "key": "planProcessingFee",
+      "unit": "QAR",
+      "source": "rule_pack",
+      "description": "One-off processing fee"
+    },
+    {
+      "key": "planCharge",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Interest or profit charged by the plan"
+    },
+    {
+      "key": "planTotalCost",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Purchase plus fee plus plan charge"
+    },
+    {
+      "key": "extraCostVsPayInFull",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Extra paid compared with paying in full by the due date"
+    },
+    {
+      "key": "chargeIfRevolved",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Charges if the purchase revolved at the card rate with the same monthly payment"
+    },
+    {
+      "key": "planEarlyClosureFeePct",
+      "unit": "percent",
+      "source": "rule_pack",
+      "description": "Fee for closing the plan early, as a percentage of the remaining amount"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import { messages } from "@amil/i18n";
 import {
   AmilWidgetClient,
   type CheckAction,
+  type CheckContext,
   type CheckResponse,
   type InsightCard,
 } from "@amil/sdk";
@@ -11,7 +12,12 @@ type Locale = "en" | "ar";
 type Status = "idle" | "loading" | "ready" | "unavailable";
 
 /** Options that continue the customer's original action: gated by "I understand" on critical cards. */
-const CONTINUE_OPTIONS = new Set(["continue_closure", "settle_now"]);
+/**
+ * Options that continue the customer's original action (gated on critical cards until "I
+ * understand"). Mirrors CONTINUE_OPTIONS in @amil/rules-engine, whose test enforces the naming:
+ * every continue option is `continue_*`, except the flagship `settle_now`.
+ */
+const isContinueOption = (key: string) => key.startsWith("continue_") || key === "settle_now";
 
 export interface AmilReadyDetail {
   kind: CheckResponse["kind"];
@@ -52,6 +58,7 @@ export class AmilInsight extends LitElement {
     customerRef: { type: String, attribute: "customer-ref" },
     cardId: { type: String, attribute: "card-id" },
     financeId: { type: String, attribute: "finance-id" },
+    context: { type: Object },
     locale: { type: String, reflect: true },
     result: { attribute: false },
     status: { state: true },
@@ -64,6 +71,8 @@ export class AmilInsight extends LitElement {
   declare customerRef: string;
   declare cardId: string | undefined;
   declare financeId: string | undefined;
+  /** Full check context as JSON (depositId, accountId, amount, …); card-id / finance-id add to it. */
+  declare context: CheckContext | undefined;
   declare locale: Locale;
   declare result: CheckResponse | null;
   declare status: Status;
@@ -221,6 +230,7 @@ export class AmilInsight extends LitElement {
       "customerRef",
       "cardId",
       "financeId",
+      "context",
       "locale",
     ] as const;
     if (inputs.some((k) => changed.has(k)) && this.token && this.action && this.customerRef) {
@@ -251,11 +261,15 @@ export class AmilInsight extends LitElement {
     const seq = ++this.requestSeq;
     this.status = "loading";
     try {
-      const context = this.cardId
-        ? { cardId: this.cardId }
-        : this.financeId
-          ? { financeId: this.financeId }
-          : {};
+      // From markup the context arrives as a JSON attribute; hosts may also set the object.
+      const given: unknown = this.context;
+      const base = (typeof given === "string" ? JSON.parse(given) : given) as
+        CheckContext | undefined;
+      const context: CheckContext = {
+        ...base,
+        ...(this.cardId ? { cardId: this.cardId } : {}),
+        ...(this.financeId ? { financeId: this.financeId } : {}),
+      };
       const result = await this.client().check({
         action: this.action as CheckAction,
         customerRef: this.customerRef,
@@ -294,7 +308,7 @@ export class AmilInsight extends LitElement {
   private onOption(card: InsightCard, key: string): void {
     const option = card.options.find((o) => o.key === key);
     if (!option || !this.result) return;
-    const continues = CONTINUE_OPTIONS.has(key);
+    const continues = isContinueOption(key);
     void this.respond(
       continues ? "continued" : key === "talk_to_someone" ? "talk_to_someone" : "chose_option",
       continues || key === "talk_to_someone" ? undefined : key,
@@ -376,9 +390,9 @@ export class AmilInsight extends LitElement {
         }
         <div class="options">
           ${card.options.map((o, i) => {
-            const gated = needsAck && CONTINUE_OPTIONS.has(o.key) && !this.acknowledged;
+            const gated = needsAck && isContinueOption(o.key) && !this.acknowledged;
             return html`<button
-              class="option ${i === 0 && !CONTINUE_OPTIONS.has(o.key) && o.key !== "talk_to_someone" ? "primary" : ""}"
+              class="option ${i === 0 && !isContinueOption(o.key) && o.key !== "talk_to_someone" ? "primary" : ""}"
               data-option=${o.key}
               ?disabled=${gated}
               @click=${() => this.onOption(card, o.key)}

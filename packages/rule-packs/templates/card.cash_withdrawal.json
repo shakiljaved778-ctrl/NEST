@@ -1,0 +1,421 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons. Labels and explanations are shared by both variants, so they use variant-neutral terms.",
+  "templates": [
+    {
+      "key": "card.cash_withdrawal.conventional.info",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "A cash withdrawal of {withdrawalAmount} has a fee of {cashFee}",
+      "body": "The cash withdrawal fee is {cashFeePct} of the amount, with a minimum of {cashFeeMin}. Cash has no interest-free period: at {aprPct} a year, repaying after {shortHorizonDays} days costs {costIfRepaidShort} in fee and interest, and after {longHorizonDays} days {costIfRepaidLong}. [[exceedsAvailableCredit: This is more than your available credit of {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "Use my debit card instead"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "Continue with the withdrawal"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.conventional.caution",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "A cash withdrawal of {withdrawalAmount} has a fee of {cashFee}",
+      "body": "The cash withdrawal fee is {cashFeePct} of the amount, with a minimum of {cashFeeMin}. Cash has no interest-free period: at {aprPct} a year, repaying after {shortHorizonDays} days costs {costIfRepaidShort} in fee and interest, and after {longHorizonDays} days {costIfRepaidLong}. [[exceedsAvailableCredit: This is more than your available credit of {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "Use my debit card instead"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "Continue with the withdrawal"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.conventional.critical",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "Withdrawing {withdrawalAmount} costs {cashFee} now, plus interest from today",
+      "body": "The cash withdrawal fee is {cashFeePct} of the amount, with a minimum of {cashFeeMin}. Cash has no interest-free period: at {aprPct} a year, repaying after {shortHorizonDays} days costs {costIfRepaidShort} in fee and interest, and after {longHorizonDays} days {costIfRepaidLong}. [[exceedsAvailableCredit: This is more than your available credit of {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "Use my debit card instead"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "Continue with the withdrawal"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.conventional.info",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "السحب النقدي بمبلغ {withdrawalAmount} تترتب عليه رسوم {cashFee}",
+      "body": "رسوم السحب النقدي {cashFeePct} من المبلغ، بحد أدنى {cashFeeMin}. لا توجد فترة سماح على السحب النقدي: بمعدل {aprPct} سنوياً، السداد بعد {shortHorizonDays} يوماً يكلّف {costIfRepaidShort} رسوماً وفوائد، وبعد {longHorizonDays} يوماً {costIfRepaidLong}. [[exceedsAvailableCredit: هذا المبلغ أعلى من الرصيد المتاح لك البالغ {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "استخدام بطاقة الخصم بدلاً منها"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "متابعة السحب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.conventional.caution",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "السحب النقدي بمبلغ {withdrawalAmount} تترتب عليه رسوم {cashFee}",
+      "body": "رسوم السحب النقدي {cashFeePct} من المبلغ، بحد أدنى {cashFeeMin}. لا توجد فترة سماح على السحب النقدي: بمعدل {aprPct} سنوياً، السداد بعد {shortHorizonDays} يوماً يكلّف {costIfRepaidShort} رسوماً وفوائد، وبعد {longHorizonDays} يوماً {costIfRepaidLong}. [[exceedsAvailableCredit: هذا المبلغ أعلى من الرصيد المتاح لك البالغ {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "استخدام بطاقة الخصم بدلاً منها"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "متابعة السحب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.conventional.critical",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "سحب {withdrawalAmount} نقداً يكلّف {cashFee} الآن، إضافة إلى فوائد من اليوم",
+      "body": "رسوم السحب النقدي {cashFeePct} من المبلغ، بحد أدنى {cashFeeMin}. لا توجد فترة سماح على السحب النقدي: بمعدل {aprPct} سنوياً، السداد بعد {shortHorizonDays} يوماً يكلّف {costIfRepaidShort} رسوماً وفوائد، وبعد {longHorizonDays} يوماً {costIfRepaidLong}. [[exceedsAvailableCredit: هذا المبلغ أعلى من الرصيد المتاح لك البالغ {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "استخدام بطاقة الخصم بدلاً منها"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "متابعة السحب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you withdraw cash on your card",
+      "body": "Cash withdrawals on a credit card have a fee, and charges apply from the day of withdrawal. A debit card withdrawal from your account has no such charges. You can see the card's fees in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_withdrawal",
+          "label": "Continue with the withdrawal"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل السحب النقدي ببطاقتك",
+      "body": "السحب النقدي ببطاقة الائتمان تترتب عليه رسوم، وتُحتسب الرسوم من يوم السحب. السحب ببطاقة الخصم من حسابك لا تترتب عليه هذه الرسوم. يمكنك الاطلاع على رسوم البطاقة في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_withdrawal",
+          "label": "متابعة السحب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.islamic.info",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "A cash withdrawal of {withdrawalAmount} has a fee of {cashFee}",
+      "body": "The cash withdrawal fee is {cashFeePct} of the amount, with a minimum of {cashFeeMin}. Cash has no grace period: at a profit rate of {aprPct} a year, repaying after {shortHorizonDays} days costs {costIfRepaidShort} in fee and profit, and after {longHorizonDays} days {costIfRepaidLong}. [[exceedsAvailableCredit: This is more than your available limit of {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "Use my debit card instead"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "Continue with the withdrawal"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.islamic.caution",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "A cash withdrawal of {withdrawalAmount} has a fee of {cashFee}",
+      "body": "The cash withdrawal fee is {cashFeePct} of the amount, with a minimum of {cashFeeMin}. Cash has no grace period: at a profit rate of {aprPct} a year, repaying after {shortHorizonDays} days costs {costIfRepaidShort} in fee and profit, and after {longHorizonDays} days {costIfRepaidLong}. [[exceedsAvailableCredit: This is more than your available limit of {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "Use my debit card instead"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "Continue with the withdrawal"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.islamic.critical",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "Withdrawing {withdrawalAmount} costs {cashFee} now, plus profit charges from today",
+      "body": "The cash withdrawal fee is {cashFeePct} of the amount, with a minimum of {cashFeeMin}. Cash has no grace period: at a profit rate of {aprPct} a year, repaying after {shortHorizonDays} days costs {costIfRepaidShort} in fee and profit, and after {longHorizonDays} days {costIfRepaidLong}. [[exceedsAvailableCredit: This is more than your available limit of {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "Use my debit card instead"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "Continue with the withdrawal"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.islamic.info",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "السحب النقدي بمبلغ {withdrawalAmount} تترتب عليه رسوم {cashFee}",
+      "body": "رسوم السحب النقدي {cashFeePct} من المبلغ، بحد أدنى {cashFeeMin}. لا توجد فترة سماح على السحب النقدي: بمعدل ربح {aprPct} سنوياً، السداد بعد {shortHorizonDays} يوماً يكلّف {costIfRepaidShort} رسوماً وأرباحاً، وبعد {longHorizonDays} يوماً {costIfRepaidLong}. [[exceedsAvailableCredit: هذا المبلغ أعلى من الحد المتاح لك البالغ {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "استخدام بطاقة الخصم بدلاً منها"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "متابعة السحب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.islamic.caution",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "السحب النقدي بمبلغ {withdrawalAmount} تترتب عليه رسوم {cashFee}",
+      "body": "رسوم السحب النقدي {cashFeePct} من المبلغ، بحد أدنى {cashFeeMin}. لا توجد فترة سماح على السحب النقدي: بمعدل ربح {aprPct} سنوياً، السداد بعد {shortHorizonDays} يوماً يكلّف {costIfRepaidShort} رسوماً وأرباحاً، وبعد {longHorizonDays} يوماً {costIfRepaidLong}. [[exceedsAvailableCredit: هذا المبلغ أعلى من الحد المتاح لك البالغ {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "استخدام بطاقة الخصم بدلاً منها"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "متابعة السحب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.islamic.critical",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "سحب {withdrawalAmount} نقداً يكلّف {cashFee} الآن، إضافة إلى أرباح تُحتسب من اليوم",
+      "body": "رسوم السحب النقدي {cashFeePct} من المبلغ، بحد أدنى {cashFeeMin}. لا توجد فترة سماح على السحب النقدي: بمعدل ربح {aprPct} سنوياً، السداد بعد {shortHorizonDays} يوماً يكلّف {costIfRepaidShort} رسوماً وأرباحاً، وبعد {longHorizonDays} يوماً {costIfRepaidLong}. [[exceedsAvailableCredit: هذا المبلغ أعلى من الحد المتاح لك البالغ {availableCredit}.]]",
+      "options": [
+        {
+          "key": "use_debit_card",
+          "label": "استخدام بطاقة الخصم بدلاً منها"
+        },
+        {
+          "key": "continue_withdrawal",
+          "label": "متابعة السحب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you withdraw cash on your card",
+      "body": "Cash withdrawals on a credit card have a fee, and charges apply from the day of withdrawal. A debit card withdrawal from your account has no such charges. You can see the card's fees in the app, or ask us, before you continue.",
+      "options": [
+        {
+          "key": "continue_withdrawal",
+          "label": "Continue with the withdrawal"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.cash_withdrawal.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "card.cash_withdrawal",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل السحب النقدي ببطاقتك",
+      "body": "السحب النقدي ببطاقة الائتمان تترتب عليه رسوم، وتُحتسب الرسوم من يوم السحب. السحب ببطاقة الخصم من حسابك لا تترتب عليه هذه الرسوم. يمكنك الاطلاع على رسوم البطاقة في التطبيق أو سؤالنا قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_withdrawal",
+          "label": "متابعة السحب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "withdrawalAmount": "Withdrawal",
+      "cashFee": "Cash withdrawal fee",
+      "cashFeePct": "Fee rate",
+      "cashFeeMin": "Minimum fee",
+      "aprPct": "Annual rate",
+      "shortHorizonDays": "Shorter period (days)",
+      "costIfRepaidShort": "Cost if repaid sooner",
+      "longHorizonDays": "Longer period (days)",
+      "costIfRepaidLong": "Cost if repaid later",
+      "availableCredit": "Available limit",
+      "exceedsAvailableCredit": "Above available limit"
+    },
+    "ar": {
+      "withdrawalAmount": "مبلغ السحب",
+      "cashFee": "رسوم السحب النقدي",
+      "cashFeePct": "نسبة الرسوم",
+      "cashFeeMin": "الحد الأدنى للرسوم",
+      "aprPct": "المعدل السنوي",
+      "shortHorizonDays": "الفترة الأقصر (بالأيام)",
+      "costIfRepaidShort": "التكلفة عند السداد أبكر",
+      "longHorizonDays": "الفترة الأطول (بالأيام)",
+      "costIfRepaidLong": "التكلفة عند السداد لاحقاً",
+      "availableCredit": "الحد المتاح",
+      "exceedsAvailableCredit": "أعلى من الحد المتاح"
+    }
+  },
+  "explanations": {
+    "en": {
+      "cash_withdrawal_fee_applies": "Cash withdrawals on this card have a fee.",
+      "charges_accrue_from_withdrawal_day": "Charges on cash start on the day you withdraw it, with no grace period.",
+      "withdrawal_exceeds_available_credit": "The amount is more than the limit available on your card.",
+      "severity_critical": "The cost is above the level your bank has set for an important notice.",
+      "severity_caution": "Your bank shows a notice for this situation."
+    },
+    "ar": {
+      "cash_withdrawal_fee_applies": "تترتب على السحب النقدي بهذه البطاقة رسوم.",
+      "charges_accrue_from_withdrawal_day": "تُحتسب الرسوم على النقد من يوم السحب دون فترة سماح.",
+      "withdrawal_exceeds_available_credit": "المبلغ أعلى من الحد المتاح في بطاقتك.",
+      "severity_critical": "التكلفة أعلى من الحد الذي حدده البنك لإظهار تنبيه مهم.",
+      "severity_caution": "يُظهر البنك تنبيهاً في هذه الحالة."
+    }
+  }
+}

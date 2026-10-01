@@ -135,9 +135,11 @@ export function validateNumbers(text: string, facts: AnyFactSet): ValidationResu
     return " ";
   });
 
-  // 3. Numbers spelled out.
+  // 3. Numbers spelled out. Combining marks (Arabic short vowels, shadda) are dropped first, so
+  // "ستّة" (six) is still caught while "ستُعاد" (will be returned) stays one word.
   for (const token of rest
     .toLowerCase()
+    .replace(/\p{M}/gu, "")
     .split(/[^\p{L}]+/u)
     .filter(Boolean)) {
     if (EN_NUMBER_WORDS.has(token)) {

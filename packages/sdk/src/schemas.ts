@@ -6,12 +6,34 @@ import { z } from "zod";
 
 export const Locale = z.enum(["en", "ar"]).meta({ id: "Locale" });
 export const Severity = z.enum(["info", "caution", "critical"]).meta({ id: "Severity" });
-export const CheckAction = z.enum(["card.close", "finance.early_settlement"]).meta({
-  id: "CheckAction",
-  description: "The customer action about to be confirmed. More actions arrive with Phase 5 packs.",
-});
+export const CheckAction = z
+  .enum([
+    "card.close",
+    "finance.early_settlement",
+    "finance.top_up",
+    "card.cash_withdrawal",
+    "card.minimum_payment",
+    "card.epp_conversion",
+    "card.balance_transfer",
+    "deposit.break",
+    "salary.transfer_change",
+    "account.close",
+  ])
+  .meta({
+    id: "CheckAction",
+    description:
+      "The customer action about to be confirmed. Proactive packs (account.dormancy, rewards.expiry) run on AMIL's schedule and reach the customer as alerts.",
+  });
+export const AlertPack = z.enum(["account.dormancy", "rewards.expiry"]).meta({ id: "AlertPack" });
 export const Scope = z
-  .enum(["checks:write", "insights:respond", "consents:read", "consents:write"])
+  .enum([
+    "checks:write",
+    "insights:respond",
+    "consents:read",
+    "consents:write",
+    "alerts:read",
+    "charges:explain",
+  ])
   .meta({ id: "Scope" });
 export const ConsentPurpose = z
   .enum(["pre_decision_insights", "proactive_alerts", "assistant"])
@@ -81,14 +103,43 @@ export const ConsentList = z
   .meta({ id: "ConsentList" });
 
 // ── Checks ────────────────────────────────────────────────────────────────────────────────────
+const Amount = z
+  .string()
+  .regex(/^\d{1,9}(\.\d{1,2})?$/)
+  .meta({
+    description: "QAR amount as a decimal string (never a JSON number)",
+    example: "1000.00",
+  });
+
+export const CheckContext = z
+  .object({
+    cardId: ProductId.optional(),
+    financeId: ProductId.optional(),
+    depositId: ProductId.optional(),
+    accountId: ProductId.optional(),
+    transactionId: ProductId.optional(),
+    amount: Amount.optional(),
+    paymentAmount: Amount.optional(),
+    months: z.number().int().min(1).max(360).optional(),
+  })
+  .strict()
+  .meta({
+    id: "CheckContext",
+    description: [
+      "What the action is about. Required per action:",
+      "card.close, card.minimum_payment: cardId (minimum_payment: optional paymentAmount to compare);",
+      "card.cash_withdrawal, card.balance_transfer: cardId + amount;",
+      "card.epp_conversion: cardId + transactionId (+ months, default 6);",
+      "finance.early_settlement: financeId; finance.top_up: financeId + amount (+ months, default 60);",
+      "deposit.break: depositId; account.close: accountId; salary.transfer_change: none.",
+    ].join(" "),
+  });
+
 export const CheckRequest = z
   .object({
     action: CheckAction,
     customerRef: CustomerRef,
-    context: z
-      .object({ cardId: ProductId.optional(), financeId: ProductId.optional() })
-      .strict()
-      .meta({ description: "cardId for card actions, financeId for finance actions" }),
+    context: CheckContext,
     locale: Locale.optional(),
   })
   .strict()
@@ -145,6 +196,99 @@ export const CheckResponse = z
   })
   .meta({ id: "CheckResponse" });
 
+// ── Alerts ────────────────────────────────────────────────────────────────────────────────────
+export const Alert = z
+  .object({
+    id: z.string(),
+    rulePackKey: AlertPack,
+    severity: Severity,
+    createdAt: z.string().meta({ format: "date-time" }),
+    readAt: z.string().meta({ format: "date-time" }).nullable(),
+    insight: CheckResponse.meta({
+      description: "The card as computed by the scheduled run; render it with <amil-insight>.",
+    }),
+  })
+  .meta({ id: "Alert" });
+export const AlertList = z
+  .object({ customerRef: z.string(), unread: z.number().int(), alerts: z.array(Alert) })
+  .meta({ id: "AlertList" });
+export const AlertListQuery = z
+  .object({ customerRef: CustomerRef, locale: Locale.optional() })
+  .strict()
+  .meta({ id: "AlertListQuery" });
+
+// ── Explain my charge ─────────────────────────────────────────────────────────────────────────
+export const ExplainChargeRequest = z
+  .object({ customerRef: CustomerRef, transactionId: ProductId, locale: Locale.optional() })
+  .strict()
+  .meta({ id: "ExplainChargeRequest" });
+export const ChargeCalculation = z
+  .object({
+    kind: z.enum(["fixed", "percentage", "rate_on_balance", "per_product"]),
+    lines: z.array(z.object({ label: z.string(), display: z.string() })),
+    matches: z.boolean().nullable().meta({
+      description:
+        "Whether the charge equals what the published fee rule gives (null when it cannot be recomputed from the statement alone)",
+    }),
+  })
+  .meta({ id: "ChargeCalculation" });
+export const ChargeExplanation = z
+  .object({
+    explanationId: z.string(),
+    kind: z.enum(["charge", "generic", "none"]).meta({
+      description:
+        "charge: explained from the fee schedule and the customer's transactions; generic: no consent, the fee schedule entry only; none: not a fee line",
+    }),
+    feeCode: z.string().nullable(),
+    name: z.string().nullable(),
+    description: z.string().nullable(),
+    amount: FactChip.nullable(),
+    postedAt: z.string().nullable(),
+    calculation: ChargeCalculation.nullable(),
+    avoidTip: z.string().nullable(),
+    disclosure: z.string(),
+  })
+  .meta({ id: "ChargeExplanation" });
+
+// ── Inbound product events (bank -> AMIL) ─────────────────────────────────────────────────────
+export const EventType = z
+  .enum([
+    "transaction.posted",
+    "account.updated",
+    "card.updated",
+    "finance.updated",
+    "deposit.updated",
+    "customer.updated",
+  ])
+  .meta({ id: "EventType" });
+export const EventRequest = z
+  .object({
+    idempotencyKey: z
+      .string()
+      .min(8)
+      .max(128)
+      .regex(/^[A-Za-z0-9._:-]+$/)
+      .meta({
+        description: "Unique per event; a retry with the same key is acknowledged, not re-recorded",
+      }),
+    type: EventType,
+    occurredAt: z.string().datetime().meta({ format: "date-time" }),
+    customerRef: CustomerRef.optional(),
+    payload: z.record(z.string(), z.unknown()).meta({
+      description: "Event body (decimal strings for money). Kept in-country with the bank's data.",
+    }),
+  })
+  .strict()
+  .meta({ id: "EventRequest" });
+export const EventAck = z
+  .object({
+    eventId: z.string(),
+    idempotencyKey: z.string(),
+    receivedAt: z.string().meta({ format: "date-time" }),
+    duplicate: z.boolean().meta({ description: "true when this key was already recorded" }),
+  })
+  .meta({ id: "EventAck" });
+
 // ── Responses ─────────────────────────────────────────────────────────────────────────────────
 export const InsightResponseRequest = z
   .object({ action: ResponseAction, optionKey: z.string().max(64).optional() })
@@ -168,12 +312,24 @@ export type InsightCard = z.infer<typeof InsightCard>;
 export type FactChip = z.infer<typeof FactChip>;
 export type InsightResponseRequest = z.infer<typeof InsightResponseRequest>;
 export type InsightResponseAck = z.infer<typeof InsightResponseAck>;
+export type CheckContext = z.infer<typeof CheckContext>;
+export type EventRequest = z.infer<typeof EventRequest>;
+export type EventAck = z.infer<typeof EventAck>;
+export type AlertPack = z.infer<typeof AlertPack>;
+export type Alert = z.infer<typeof Alert>;
+export type AlertList = z.infer<typeof AlertList>;
+export type AlertListQuery = z.infer<typeof AlertListQuery>;
+export type ExplainChargeRequest = z.infer<typeof ExplainChargeRequest>;
+export type ChargeCalculation = z.infer<typeof ChargeCalculation>;
+export type ChargeExplanation = z.infer<typeof ChargeExplanation>;
 
 export const DEFAULT_SESSION_SCOPES: Scope[] = [
   "checks:write",
   "insights:respond",
   "consents:read",
   "consents:write",
+  "alerts:read",
+  "charges:explain",
 ];
 
 /** HTTP headers for bank-to-AMIL calls. */

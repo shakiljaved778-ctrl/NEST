@@ -109,5 +109,94 @@
   "soon": {
     "title": "Coming soon",
     "body": "This part of the demo arrives in a later phase."
+  },
+  "act": {
+    "step": "Before you confirm",
+    "unavailable": "AMIL has nothing to add here. You can continue with the bank's own confirmation.",
+    "continue": "Continue",
+    "titles": {
+      "card_close": "Close card",
+      "finance_early_settlement": "Settle early",
+      "finance_top_up": "Top up finance",
+      "card_cash_withdrawal": "Withdraw cash",
+      "card_minimum_payment": "Pay your card",
+      "card_epp_conversion": "Convert to instalments",
+      "card_balance_transfer": "Balance transfer",
+      "deposit_break": "Break deposit",
+      "salary_transfer_change": "Move my salary",
+      "account_close": "Close account"
+    },
+    "intros": {
+      "card_close": "Here is what changes if you close this card.",
+      "finance_early_settlement": "Here is what settling early costs.",
+      "finance_top_up": "Topping up by {amount} over {months} months.",
+      "card_cash_withdrawal": "Withdrawing {amount} in cash on this card.",
+      "card_minimum_payment": "Choose how much to pay this month.",
+      "card_epp_conversion": "Converting this purchase into {months} monthly instalments.",
+      "card_balance_transfer": "Transferring {amount} to this card.",
+      "deposit_break": "Here is what breaking this deposit today means.",
+      "salary_transfer_change": "Here is what is linked to your salary at Doha Demo Bank.",
+      "account_close": "Here is what still uses this account."
+    }
+  },
+  "actions": {
+    "title": "What would you like to do?",
+    "withdraw": "Withdraw cash",
+    "pay": "Pay card",
+    "convert": "Convert a purchase to instalments",
+    "transfer": "Balance transfer",
+    "statement": "Statement",
+    "topUp": "Top up",
+    "breakDeposit": "Break deposit",
+    "closeAccount": "Close account",
+    "moveSalary": "Move my salary to another bank"
+  },
+  "deposit": {
+    "principal": "Amount placed",
+    "rate": "Rate",
+    "started": "Started",
+    "matures": "Matures",
+    "autoRenew": "Renews automatically",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "account": {
+    "balance": "Balance",
+    "standingOrders": "Standing orders",
+    "next": "Next {date}",
+    "none": "None",
+    "cheques": "Cheques not yet presented",
+    "salary": "Salary account",
+    "lastActivity": "Last activity"
+  },
+  "statement": {
+    "title": "Statement",
+    "recent": "Recent transactions",
+    "feeHint": "Tap a fee to see how it was worked out",
+    "fee": "Fee",
+    "credit": "Credit"
+  },
+  "charge": {
+    "title": "About this charge",
+    "calculation": "How it was worked out",
+    "matches": "This matches the published fee.",
+    "noMatch": "This does not match the published fee. Talk to us and we will look into it.",
+    "notRecomputable": "This charge depends on your balance over the month, so it cannot be recomputed from this statement alone.",
+    "avoid": "How to avoid it",
+    "unavailable": "An explanation is not available right now.",
+    "talk": "Talk to someone about this charge"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "empty": "No alerts. AMIL lets you know when points are about to expire or an account is about to become dormant.",
+    "new": "New",
+    "consentOff": "Proactive alerts are off. You can turn them on in Settings.",
+    "unavailable": "Alerts are not available right now."
+  },
+  "screen": {
+    "title": "Doha Demo Bank",
+    "body": "This is the bank's own screen. AMIL only linked you here; it never moves money or changes your products.",
+    "done": "Back to home",
+    "details": "Details"
   }
 }

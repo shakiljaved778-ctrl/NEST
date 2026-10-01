@@ -179,15 +179,15 @@ model Bank {
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
 
-  customers      Customer[]
-  feeSchedules   FeeSchedule[]
-  rulePacks      RulePack[]
-  templates      Template[]
-  insightEvents  InsightEvent[]
-  proactiveJobs  ProactiveJob[]
-  consoleUsers   ConsoleUser[]
-  approvalLogs   ApprovalLog[]
-  inboundEvents  InboundEvent[]
+  customers     Customer[]
+  feeSchedules  FeeSchedule[]
+  rulePacks     RulePack[]
+  templates     Template[]
+  insightEvents InsightEvent[]
+  proactiveJobs ProactiveJob[]
+  consoleUsers  ConsoleUser[]
+  approvalLogs  ApprovalLog[]
+  inboundEvents InboundEvent[]
 
   @@map("bank")
 }
@@ -217,13 +217,13 @@ model Customer {
   personaKey      String?
   createdAt       DateTime @default(now())
 
-  bank           Bank            @relation(fields: [bankId], references: [id], onDelete: Cascade)
-  consents       Consent[]
-  accounts       Account[]
-  cards          Card[]
-  finances       Finance[]
-  deposits       Deposit[]
-  alerts         Alert[]
+  bank     Bank      @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  consents Consent[]
+  accounts Account[]
+  cards    Card[]
+  finances Finance[]
+  deposits Deposit[]
+  alerts   Alert[]
 
   @@unique([bankId, externalRef])
   @@unique([bankId, personaKey])
@@ -252,28 +252,28 @@ model Consent {
 // ---------------------------------------------------------------------------------------------
 
 model Account {
-  id                 String        @id
-  customerId         String
-  kind               AccountKind
-  variant            Variant       @default(conventional)
-  productName        String
+  id                   String        @id
+  customerId           String
+  kind                 AccountKind
+  variant              Variant       @default(conventional)
+  productName          String
   /// PII (synthetic)
-  number             String
+  number               String
   /// PII (synthetic)
-  iban               String
-  currency           String        @default("QAR")
-  balance            Decimal       @db.Decimal(18, 2)
-  status             AccountStatus @default(active)
-  isSalaryAccount    Boolean       @default(false)
-  openedAt           DateTime
-  lastActivityAt     DateTime
+  iban                 String
+  currency             String        @default("QAR")
+  balance              Decimal       @db.Decimal(18, 2)
+  status               AccountStatus @default(active)
+  isSalaryAccount      Boolean       @default(false)
+  openedAt             DateTime
+  lastActivityAt       DateTime
   /// Days of customer-initiated inactivity after which this account becomes dormant.
-  dormancyDays       Int           @default(365)
-  closureFee         Decimal       @db.Decimal(18, 2)
-  chequesOutstanding Int           @default(0)
+  dormancyDays         Int           @default(365)
+  closureFee           Decimal       @db.Decimal(18, 2)
+  chequesOutstanding   Int           @default(0)
   /// Monthly maintenance fee when not waived (synthetic).
-  maintenanceFee     Decimal       @default(0) @db.Decimal(18, 2)
-  maintenanceFeeWaived Boolean     @default(false)
+  maintenanceFee       Decimal       @default(0) @db.Decimal(18, 2)
+  maintenanceFeeWaived Boolean       @default(false)
 
   customer       Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
   standingOrders StandingOrder[]
@@ -285,14 +285,14 @@ model Account {
 }
 
 model StandingOrder {
-  id         String   @id
-  accountId  String
-  payee      String
-  amount     Decimal  @db.Decimal(18, 2)
+  id        String   @id
+  accountId String
+  payee     String
+  amount    Decimal  @db.Decimal(18, 2)
   /// "monthly" | "quarterly"
-  frequency  String
-  nextRunAt  DateTime
-  active     Boolean  @default(true)
+  frequency String
+  nextRunAt DateTime
+  active    Boolean  @default(true)
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
@@ -328,8 +328,8 @@ model Card {
   supplementaryCount      Int        @default(0)
   openedAt                DateTime
 
-  customer          Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  settlementAccount Account?          @relation("CardSettlementAccount", fields: [settlementAccountId], references: [id])
+  customer          Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  settlementAccount Account?         @relation("CardSettlementAccount", fields: [settlementAccountId], references: [id])
   rewards           RewardsLedger?
   instalmentPlans   InstalmentPlan[]
   transactions      Transaction[]
@@ -594,6 +594,9 @@ model Alert {
   insightEventId String?
   rulePackKey    String
   severity       Severity
+  /// The same alert worded in each language the bank supports: {"en": "<insightEventId>", "ar": …}.
+  /// insightEventId is the customer's preferred-language event.
+  localeEventIds Json      @default("{}")
   /// Prevents duplicate alerts, e.g. "rewards.expiry:card_x:2026-11-14"
   dedupeKey      String
   createdAt      DateTime  @default(now())

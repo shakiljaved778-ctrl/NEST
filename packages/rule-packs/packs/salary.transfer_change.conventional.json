@@ -1,0 +1,110 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "salary.transfer_change",
+  "version": "1.0.0",
+  "variant": "conventional",
+  "productFamily": "accounts",
+  "triggers": [
+    {
+      "type": "action",
+      "event": "salary.transfer_change"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Customer",
+      "fields": ["salaryTransfer"]
+    },
+    {
+      "entity": "Account",
+      "fields": ["maintenanceFee", "maintenanceFeeWaived"]
+    },
+    {
+      "entity": "Card",
+      "fields": ["annualFee", "annualFeeWaived"]
+    },
+    {
+      "entity": "Finance",
+      "fields": ["type", "ratePct", "salaryLinked", "schedule"]
+    }
+  ],
+  "parameters": {
+    "rateUpliftPct": "1.50",
+    "clearanceRequired": false,
+    "roundingMode": "half_up"
+  },
+  "facts": [
+    {
+      "key": "salaryLinkedFinances",
+      "unit": "count",
+      "source": "finance",
+      "description": "Finances priced on salary transfer"
+    },
+    {
+      "key": "currentRatePct",
+      "unit": "percent",
+      "source": "finance",
+      "description": "Current rate of the first salary-linked finance"
+    },
+    {
+      "key": "newRatePct",
+      "unit": "percent",
+      "source": "rule_pack",
+      "description": "Rate after the salary moves"
+    },
+    {
+      "key": "currentInstalmentTotal",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Current monthly instalments on salary-linked finance"
+    },
+    {
+      "key": "newInstalmentTotal",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Monthly instalments after repricing"
+    },
+    {
+      "key": "instalmentIncrease",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Increase in the monthly instalments"
+    },
+    {
+      "key": "extraCostRemainingTerm",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Extra cost over the remaining term"
+    },
+    {
+      "key": "outstandingSalaryLinked",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Outstanding principal on salary-linked finance"
+    },
+    {
+      "key": "clearanceRequired",
+      "unit": "boolean",
+      "source": "rule_pack",
+      "description": "Whether the bank requires salary-linked finance to be cleared first"
+    },
+    {
+      "key": "maintenanceFeeWaivedMonthly",
+      "unit": "QAR",
+      "source": "account",
+      "description": "Monthly account fees currently waived"
+    },
+    {
+      "key": "annualFeesWaived",
+      "unit": "QAR",
+      "source": "card",
+      "description": "Card annual fees currently waived"
+    },
+    {
+      "key": "waiversLostAnnual",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Yearly value of the waivers that end"
+    }
+  ]
+}

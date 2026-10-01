@@ -66,6 +66,23 @@ services:
       timeout: 5s
       retries: 10
 
+  # Proactive packs (rewards.expiry, account.dormancy) on BullMQ schedules from ProactiveJob rows.
+  worker:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    command: ["node", "dist/worker.js"]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://amil:amil@postgres:5432/amil?schema=public
+      REDIS_URL: redis://redis:6379
+      # Demo-only secrets (same as .env.example). Replace for any real deployment.
+      AMIL_API_KEYS: ddb-demo-key:demo-only-secret-change-me-0123456789abcdef:bank_ddb
+      SESSION_SECRET: demo-only-session-secret-change-me-0123456789
+      AUDIT_HASH_SECRET: demo-only-audit-hash-secret-change-me-0123456
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+
   demo-bank:
     build: { context: ., dockerfile: apps/demo-bank/Dockerfile }
     environment:

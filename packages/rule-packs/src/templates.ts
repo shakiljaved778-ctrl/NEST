@@ -1,7 +1,17 @@
 import type { Severity, Variant } from "@amil/rules-engine";
 import { z } from "zod";
-import cardCloseTemplates from "../templates/card.close.json" with { type: "json" };
-import financeSettlementTemplates from "../templates/finance.early_settlement.json" with { type: "json" };
+import accountCloseCopy from "../templates/account.close.json" with { type: "json" };
+import accountDormancyCopy from "../templates/account.dormancy.json" with { type: "json" };
+import cardBalanceTransferCopy from "../templates/card.balance_transfer.json" with { type: "json" };
+import cardCashWithdrawalCopy from "../templates/card.cash_withdrawal.json" with { type: "json" };
+import cardCloseCopy from "../templates/card.close.json" with { type: "json" };
+import cardEppConversionCopy from "../templates/card.epp_conversion.json" with { type: "json" };
+import cardMinimumPaymentCopy from "../templates/card.minimum_payment.json" with { type: "json" };
+import depositBreakCopy from "../templates/deposit.break.json" with { type: "json" };
+import financeEarlySettlementCopy from "../templates/finance.early_settlement.json" with { type: "json" };
+import financeTopUpCopy from "../templates/finance.top_up.json" with { type: "json" };
+import rewardsExpiryCopy from "../templates/rewards.expiry.json" with { type: "json" };
+import salaryTransferChangeCopy from "../templates/salary.transfer_change.json" with { type: "json" };
 import copyPolicyJson from "../policy/copy-policy.json" with { type: "json" };
 
 const OptionSchema = z.object({ key: z.string(), label: z.string().min(1) });
@@ -45,8 +55,18 @@ export type CopyPolicy = z.infer<typeof CopyPolicySchema>;
 export const copyPolicy: CopyPolicy = CopyPolicySchema.parse(copyPolicyJson);
 
 const FILES = {
-  "card.close": TemplateFileSchema.parse(cardCloseTemplates),
-  "finance.early_settlement": TemplateFileSchema.parse(financeSettlementTemplates),
+  "account.close": TemplateFileSchema.parse(accountCloseCopy),
+  "account.dormancy": TemplateFileSchema.parse(accountDormancyCopy),
+  "card.balance_transfer": TemplateFileSchema.parse(cardBalanceTransferCopy),
+  "card.cash_withdrawal": TemplateFileSchema.parse(cardCashWithdrawalCopy),
+  "card.close": TemplateFileSchema.parse(cardCloseCopy),
+  "card.epp_conversion": TemplateFileSchema.parse(cardEppConversionCopy),
+  "card.minimum_payment": TemplateFileSchema.parse(cardMinimumPaymentCopy),
+  "deposit.break": TemplateFileSchema.parse(depositBreakCopy),
+  "finance.early_settlement": TemplateFileSchema.parse(financeEarlySettlementCopy),
+  "finance.top_up": TemplateFileSchema.parse(financeTopUpCopy),
+  "rewards.expiry": TemplateFileSchema.parse(rewardsExpiryCopy),
+  "salary.transfer_change": TemplateFileSchema.parse(salaryTransferChangeCopy),
 } as const;
 type PackWithCopy = keyof typeof FILES;
 

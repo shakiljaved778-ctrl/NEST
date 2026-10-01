@@ -5,10 +5,12 @@ import {
   canonicalJson,
   hashCustomerRef,
   type PrismaClient,
+  loadCustomerBundle,
+  PACK_REQUIRED_CONTEXT,
+  type PackContext,
+  resolvePackInput,
   sha256,
   thresholdsFor,
-  toCardCloseInput,
-  toFinanceSettlementInput,
 } from "@amil/db";
 import {
   type ModelGateway,
@@ -18,21 +20,18 @@ import {
 } from "@amil/gateway";
 import { formatDate, messages } from "@amil/i18n";
 import {
-  CardCloseParamsSchema,
-  cardClosePacks,
   explain,
   factLabel,
-  FinanceSettlementParamsSchema,
-  financeEarlySettlementPacks,
+  getPack,
   isTruthyFact,
+  type PackKey,
   renderedFactKeys,
-  variantForFinanceType,
 } from "@amil/rule-packs";
-import type { AnyEvaluation, SeverityThresholds, Variant } from "@amil/rules-engine";
+import type { AnyEvaluation, Variant } from "@amil/rules-engine";
 import type { CheckRequest, CheckResponse, FactChip, InsightCard } from "@amil/sdk";
 import type { FastifyBaseLogger } from "fastify";
 import { z } from "zod";
-import { notFound } from "../errors";
+import { badRequest, notFound } from "../errors";
 import { deepLink, isOptionKey } from "./deeplinks";
 
 export interface CheckDeps {
@@ -43,19 +42,70 @@ export interface CheckDeps {
   log: FastifyBaseLogger;
 }
 
-type Locale = "en" | "ar";
-type Bank = NonNullable<Awaited<ReturnType<PrismaClient["bank"]["findUnique"]>>>;
+export type Locale = "en" | "ar";
+export type Bank = NonNullable<Awaited<ReturnType<PrismaClient["bank"]["findUnique"]>>>;
 
-interface Prepared {
+/** What an insight is about, independent of how it was triggered (a check or a schedule). */
+export interface InsightSubject {
+  packKey: PackKey;
   variant: Variant;
-  defaultParameters: object;
-  schema: z.ZodType;
-  /** Pure evaluation of the adapted input; also returns the hash of the input snapshot. */
-  evaluate: (
-    params: unknown,
-    thresholds: SeverityThresholds,
-    now: Date,
-  ) => { evaluation: AnyEvaluation; inputHash: string };
+  input: unknown;
+  /** The bank's context, used to build deep links (cardId, amount, …). */
+  context: PackContext;
+}
+
+export type Audit = (
+  fields: Omit<AuditEventContent, AuditBaseKey | "latencyMs">,
+) => ReturnType<typeof appendInsightEvent>;
+type AuditBaseKey =
+  | "id"
+  | "bankId"
+  | "occurredAt"
+  | "trigger"
+  | "customerRefHash"
+  | "rulePackKey"
+  | "locale"
+  | "retentionUntil";
+
+/**
+ * An audit writer for one event (non-negotiable 7). Retention runs from the event date for the
+ * bank's configured number of years; latency is measured from the writer's creation.
+ */
+export function makeAudit(
+  deps: Pick<CheckDeps, "prisma">,
+  bank: Bank,
+  e: {
+    id: string;
+    trigger: string;
+    customerRefHash: string;
+    rulePackKey: string;
+    locale: Locale;
+    now: Date;
+  },
+): Audit {
+  const started = performance.now();
+  const base = {
+    id: e.id,
+    bankId: bank.id,
+    occurredAt: e.now,
+    trigger: e.trigger,
+    customerRefHash: e.customerRefHash,
+    rulePackKey: e.rulePackKey,
+    locale: e.locale,
+    retentionUntil: new Date(
+      Date.UTC(
+        e.now.getUTCFullYear() + bank.auditRetentionYears,
+        e.now.getUTCMonth(),
+        e.now.getUTCDate(),
+      ),
+    ),
+  };
+  return (fields) =>
+    appendInsightEvent(deps.prisma, {
+      ...base,
+      ...fields,
+      latencyMs: Math.round(performance.now() - started),
+    });
 }
 
 const OptionsSchema = z.array(z.object({ key: z.string(), label: z.string() }));
@@ -72,7 +122,6 @@ export async function runCheck(
   req: CheckRequest,
   sessionLocale?: Locale,
 ): Promise<CheckResponse> {
-  const started = performance.now();
   const now = deps.clock();
   const bank = await deps.prisma.bank.findUnique({ where: { id: bankId } });
   if (!bank) throw notFound();
@@ -85,28 +134,14 @@ export async function runCheck(
   const locale: Locale = req.locale ?? sessionLocale ?? customer.preferredLocale;
   const customerRefHash = hashCustomerRef(deps.auditHashSecret, bankId, req.customerRef);
   const insightId = randomUUID();
-  const base = {
+  const audit = makeAudit(deps, bank, {
     id: insightId,
-    bankId,
-    occurredAt: now,
     trigger: `action:${req.action}`,
     customerRefHash,
     rulePackKey: req.action,
     locale,
-    retentionUntil: new Date(
-      Date.UTC(
-        now.getUTCFullYear() + bank.auditRetentionYears,
-        now.getUTCMonth(),
-        now.getUTCDate(),
-      ),
-    ),
-  };
-  const audit = async (fields: Omit<AuditEventContent, keyof typeof base | "latencyMs">) =>
-    appendInsightEvent(deps.prisma, {
-      ...base,
-      ...fields,
-      latencyMs: Math.round(performance.now() - started),
-    });
+    now,
+  });
 
   // ── Consent first: without it, read no customer data and show generic information only ──
   const consent = await deps.prisma.consent.findFirst({
@@ -115,24 +150,73 @@ export async function runCheck(
   });
   if (!consent) return genericResponse(deps, bank, req, locale, insightId, audit);
 
-  const prepared = await prepare(deps, customer.id, req);
+  const context: PackContext = req.context;
+  for (const key of PACK_REQUIRED_CONTEXT[req.action])
+    if (context[key] === undefined) throw badRequest("missing_context");
+  const bundle = await loadCustomerBundle(deps.prisma, customer.id, context.transactionId);
+  const resolved = bundle ? resolvePackInput(req.action, bundle, context, now) : null;
+  if (!resolved) throw notFound();
+
+  const result = await deliverInsight(deps, bank, now, locale, insightId, audit, {
+    packKey: req.action,
+    variant: resolved.variant,
+    input: resolved.input,
+    context,
+  });
+  return result.response;
+}
+
+export interface Delivered {
+  response: CheckResponse;
+  /** Set when an insight card was shown (and audited). */
+  evaluation: AnyEvaluation | null;
+  auditEventId: string | null;
+}
+
+/**
+ * The shared pipeline for checks and scheduled alerts:
+ *   rule-pack kill switch (9) -> evaluation (1) -> approved, enabled template (8, 9) ->
+ *   gateway wording (2, 6) -> card -> audit (7).
+ * Any gate that closes yields "no insight", never an error.
+ */
+export async function deliverInsight(
+  deps: CheckDeps,
+  bank: Bank,
+  now: Date,
+  locale: Locale,
+  insightId: string,
+  audit: Audit,
+  subject: InsightSubject,
+  /**
+   * Scheduled runs only: called after the pure evaluation. Returning false stops here without an
+   * audit event (not applicable, or the customer was already alerted about this event).
+   */
+  precheck?: (evaluation: AnyEvaluation) => Promise<boolean>,
+): Promise<Delivered> {
+  const { packKey, variant } = subject;
+  const pack = getPack(packKey, variant);
+  const nothing = (): Delivered => ({
+    response: none(insightId),
+    evaluation: null,
+    auditEventId: null,
+  });
 
   // ── Kill switch and parameters (latest active version effective now) ──
   const packRow = await deps.prisma.rulePack.findFirst({
     where: {
-      bankId,
-      key: req.action,
-      variant: prepared.variant,
+      bankId: bank.id,
+      key: packKey,
+      variant,
       status: "active",
       effectiveFrom: { lte: now },
     },
     orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }],
   });
   const suppressed = async (reason: string, extra: Partial<AuditEventContent> = {}) => {
-    deps.log.info({ action: req.action, reason }, "insight_suppressed");
+    deps.log.info({ action: packKey, reason }, "insight_suppressed");
     await audit({
       rulePackVersion: packRow?.version ?? "n/a",
-      variant: prepared.variant,
+      variant,
       inputSnapshotHash: "",
       applicable: false,
       severity: null,
@@ -145,32 +229,31 @@ export async function runCheck(
       shown: { suppressed: reason },
       ...extra,
     });
-    return none(insightId);
+    return nothing();
   };
   if (!packRow || !packRow.enabled) return suppressed("rule_pack_disabled");
 
-  const params = prepared.schema.safeParse({
-    ...prepared.defaultParameters,
+  const params = pack.parametersSchema.safeParse({
+    ...(pack.defaultParameters as object),
     ...(packRow.parameters as object),
   });
   if (!params.success) {
-    deps.log.error(
-      { action: req.action, version: packRow.version },
-      "rule_pack_parameters_invalid",
-    );
+    deps.log.error({ action: packKey, version: packRow.version }, "rule_pack_parameters_invalid");
     return suppressed("rule_pack_parameters_invalid");
   }
 
   // ── Evaluate (pure) ──
-  const { evaluation, inputHash } = prepared.evaluate(
+  const evaluation: AnyEvaluation = pack.evaluate(
+    subject.input as never,
     params.data,
-    thresholdsFor(bank.severityThresholds, req.action),
+    thresholdsFor(bank.severityThresholds, packKey),
     now,
   );
+  if (precheck && !(await precheck(evaluation))) return nothing();
   const evaluated = {
     rulePackVersion: packRow.version,
-    variant: prepared.variant,
-    inputSnapshotHash: inputHash,
+    variant,
+    inputSnapshotHash: sha256(canonicalJson(subject.input)),
     facts: stripSources(evaluation),
   };
   if (!evaluation.applicable) {
@@ -185,12 +268,12 @@ export async function runCheck(
       validatorResult: "not_used",
       shown: { suppressed: "not_applicable" },
     });
-    return none(insightId);
+    return nothing();
   }
 
   // ── Approved, enabled template ──
-  const templateKey = `${req.action}.${prepared.variant}.${evaluation.severity}`;
-  const template = await findTemplate(deps, bankId, templateKey, locale, prepared.variant);
+  const templateKey = `${packKey}.${variant}.${evaluation.severity}`;
+  const template = await findTemplate(deps, bank.id, templateKey, locale, variant);
   if (!template)
     return suppressed("template_unavailable", { ...evaluated, severity: evaluation.severity });
 
@@ -198,8 +281,8 @@ export async function runCheck(
   let wording: WordingResult;
   try {
     wording = await deps.gateway.word({
-      action: req.action,
-      variant: prepared.variant,
+      action: packKey,
+      variant,
       locale,
       evaluation,
       template: {
@@ -217,9 +300,9 @@ export async function runCheck(
     throw error;
   }
 
-  const card = buildCard(bank, req, locale, evaluation, template, wording);
+  const card = buildCard(bank, packKey, subject.context, locale, evaluation, template, wording);
   const aiUsed = wording.source !== "template" && wording.provider !== "mock";
-  await audit({
+  const row = await audit({
     ...evaluated,
     applicable: true,
     severity: evaluation.severity,
@@ -238,12 +321,16 @@ export async function runCheck(
   });
 
   return {
-    insightId,
-    applicable: true,
-    kind: "insight",
-    severity: evaluation.severity,
-    card,
-    requiresAcknowledgement: evaluation.severity === "critical",
+    response: {
+      insightId,
+      applicable: true,
+      kind: "insight",
+      severity: evaluation.severity,
+      card,
+      requiresAcknowledgement: evaluation.severity === "critical",
+    },
+    evaluation,
+    auditEventId: row.id,
   };
 }
 
@@ -261,54 +348,6 @@ function none(insightId: string): CheckResponse {
 /** Facts as audited, including `_sources` (where each figure came from). */
 function stripSources(evaluation: AnyEvaluation): Record<string, unknown> {
   return { ...evaluation.facts };
-}
-
-async function prepare(deps: CheckDeps, customerId: string, req: CheckRequest): Promise<Prepared> {
-  if (req.action === "card.close") {
-    if (!req.context.cardId) throw notFound();
-    const card = await deps.prisma.card.findFirst({
-      where: { id: req.context.cardId, customerId, status: "active" },
-      include: { rewards: true, instalmentPlans: true },
-    });
-    if (!card) throw notFound();
-    const pack = cardClosePacks[card.type];
-    return {
-      variant: card.type,
-      defaultParameters: pack.defaultParameters,
-      schema: CardCloseParamsSchema,
-      evaluate: (params, thresholds, now) => {
-        const input = toCardCloseInput(card, card.rewards, card.instalmentPlans, now);
-        return {
-          evaluation: pack.evaluate(
-            input,
-            params as typeof pack.defaultParameters,
-            thresholds,
-            now,
-          ),
-          inputHash: sha256(canonicalJson(input)),
-        };
-      },
-    };
-  }
-  if (!req.context.financeId) throw notFound();
-  const finance = await deps.prisma.finance.findFirst({
-    where: { id: req.context.financeId, customerId, status: "active" },
-  });
-  if (!finance) throw notFound();
-  const variant = variantForFinanceType(finance.type);
-  const pack = financeEarlySettlementPacks[variant];
-  return {
-    variant,
-    defaultParameters: pack.defaultParameters,
-    schema: FinanceSettlementParamsSchema,
-    evaluate: (params, thresholds, now) => {
-      const input = toFinanceSettlementInput(finance, now);
-      return {
-        evaluation: pack.evaluate(input, params as typeof pack.defaultParameters, thresholds, now),
-        inputHash: sha256(canonicalJson(input)),
-      };
-    },
-  };
 }
 
 /** Approved (Islamic: Sharia-approved), enabled template, latest version (non-negotiables 8, 9). */
@@ -344,7 +383,8 @@ function latestAsOf(evaluation: AnyEvaluation): string {
 
 function buildCard(
   bank: Bank,
-  req: CheckRequest,
+  packKey: PackKey,
+  context: PackContext,
   locale: Locale,
   evaluation: AnyEvaluation,
   template: TemplateRow,
@@ -363,7 +403,7 @@ function buildCard(
     if (!isTruthyFact(fact) || fact.unit === "boolean") continue;
     facts.push({
       key,
-      label: factLabel(req.action, locale, key),
+      label: factLabel(packKey, locale, key),
       value: fact.value,
       display: formatFact(fact, display),
       unit: fact.unit,
@@ -381,7 +421,7 @@ function buildCard(
       deepLink: deepLink(
         bank.deepLinkScheme,
         o.key as Parameters<typeof deepLink>[1],
-        { action: req.action, ...req.context },
+        { action: packKey, ...context },
         evaluation.facts,
       ),
     }));
@@ -399,7 +439,7 @@ function buildCard(
     body: wording.body,
     facts,
     options,
-    why: explain(req.action, locale, evaluation.explanation),
+    why: explain(packKey, locale, evaluation.explanation),
     aiDisclosure: aiUsed ? `${figures} ${m.footerAi}` : figures,
   };
 }
@@ -414,20 +454,7 @@ async function genericResponse(
   req: CheckRequest,
   locale: Locale,
   insightId: string,
-  audit: (
-    fields: Omit<
-      AuditEventContent,
-      | "id"
-      | "bankId"
-      | "occurredAt"
-      | "trigger"
-      | "customerRefHash"
-      | "rulePackKey"
-      | "locale"
-      | "retentionUntil"
-      | "latencyMs"
-    >,
-  ) => Promise<unknown>,
+  audit: Audit,
 ): Promise<CheckResponse> {
   const template = await findTemplate(
     deps,

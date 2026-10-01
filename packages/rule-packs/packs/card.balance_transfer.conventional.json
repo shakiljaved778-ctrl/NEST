@@ -1,0 +1,85 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "card.balance_transfer",
+  "version": "1.0.0",
+  "variant": "conventional",
+  "productFamily": "cards",
+  "triggers": [
+    {
+      "type": "action",
+      "event": "card.balance_transfer"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Card",
+      "fields": ["profitOrInterestRateApr", "type"]
+    }
+  ],
+  "parameters": {
+    "feePct": "2.00",
+    "feeMin": "50.00",
+    "promoRatePct": "0.00",
+    "promoMonths": 6,
+    "revertRatePct": "30.00",
+    "minDuePct": "5.00",
+    "minDueFloor": "100.00",
+    "roundingMode": "half_up"
+  },
+  "facts": [
+    {
+      "key": "transferAmount",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Amount to transfer"
+    },
+    {
+      "key": "transferFee",
+      "unit": "QAR",
+      "source": "rule_pack",
+      "description": "Balance transfer fee"
+    },
+    {
+      "key": "transferFeePct",
+      "unit": "percent",
+      "source": "rule_pack",
+      "description": "Balance transfer fee percentage"
+    },
+    {
+      "key": "promoMonths",
+      "unit": "months",
+      "source": "rule_pack",
+      "description": "Length of the promotional period"
+    },
+    {
+      "key": "promoRatePct",
+      "unit": "percent",
+      "source": "rule_pack",
+      "description": "Promotional rate"
+    },
+    {
+      "key": "revertRatePct",
+      "unit": "percent",
+      "source": "rule_pack",
+      "description": "Rate once the promotional period ends"
+    },
+    {
+      "key": "remainingAfterPromo",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Balance left when the promo ends, paying the minimum"
+    },
+    {
+      "key": "chargeYearAfterPromo",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Charges in the 12 months after the promo, paying the minimum"
+    },
+    {
+      "key": "costPromoAndYearAfter",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Fee plus charges over the promo and the following 12 months"
+    }
+  ]
+}

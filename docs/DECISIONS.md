@@ -235,3 +235,140 @@ environment. CI installs the matching browser with `playwright install --with-de
 There is no answer yet on the wording model or mTLS. The defaults stay: `claude-opus-5-5`
 (switchable with `AMIL_ANTHROPIC_MODEL`), and the mTLS decision deferred to Phase 8. Neither
 affects Phase 4, which runs on the offline mock provider.
+
+## D-030: One pack registry; every calculator has the same signature (Phase 5)
+
+`PACKS` in `packages/rule-packs/src/registry.ts` maps each of the 12 pack keys to its two
+variants, each loaded from its versioned JSON with its Zod parameter schema (`parametersSchema`,
+used by the API to validate bank overrides before computing with them). Calculators that need
+neither thresholds nor `now` are adapted to the uniform `(input, params, thresholds, now)`, so the
+API and the scheduler handle every pack the same way (`getPack(key, variant)`). The flagship
+`cardClosePacks` / `financeEarlySettlementPacks` exports remain.
+
+## D-031: Product rows → pack input lives in one shared resolver (Phase 5)
+
+`resolvePackInput(packKey, bundle, context, dataAsOf)` in `@amil/db` turns a customer's rows into
+any pack's input. The API loads the bundle with Prisma (`loadCustomerBundle`); the persona tests
+build it from the seed (`bundleFromSeed`). What is tested is what is served. A check missing a
+required context value (`PACK_REQUIRED_CONTEXT`) is a 400 `missing_context`; an unknown, inactive
+or other customer's product is a 404. Amounts in the context are decimal strings; a JSON number is
+rejected (non-negotiable 10).
+
+## D-032: Phase 5 worked examples are verified independently (Phase 5)
+
+Every worked example in a calculator comment and test was recomputed outside TypeScript (Python
+`Decimal`, half-up). Three first drafts were wrong and were corrected before the tests were
+written: minimum payment (12 months / 102.16, not 11 / 111.47), EPP revolving comparison (328.58,
+not 300.00) and the top-up same-tenor total (3,082.26, not 3,067.32).
+
+## D-033: Revolving balances: the payment is taken first, then the month's charge (Phase 5)
+
+`amortiseRevolving` (minimum payment, EPP comparison, balance transfer) takes the month's payment
+from the balance, then charges APR/12 on what remains, rounding each month's charge. The minimum-due
+formula (bank parameters, matching the seed: max(5%, QAR 100), never above the balance) is
+re-applied to the falling balance each month. A horizon (`maxMonths`) stops plans that never clear;
+the card then says so (`minimumClearsBalance: false`).
+
+## D-034: Top-up refinances at today's settlement amount (Phase 5)
+
+`finance.top_up` refinances the existing finance at today's early-settlement amount, quoted by the
+`finance.early_settlement` calculator (fee, ibra or future rental profit included), adds the
+top-up, and prices the new amount over the new tenor: annuity for conventional and ijara, flat
+(fixed at inception) for murabaha. The cost of the extension is compared with pricing the same new
+amount over the months that remain today. "Keep a shorter term" is offered only when the tenor
+actually extends.
+
+## D-035: Salary transfer change: repricing and waivers (Phase 5)
+
+Moving the salary reprices salary-linked conventional and ijara finance by the bank's uplift
+(`rateUpliftPct`, demo 1.50 points) over the remaining term. Murabaha is not repriced: its sale
+price was fixed at inception. Fee waivers tied to the salary (account maintenance, card annual
+fees) end. The rates shown are those of the first finance that is actually repriced. The variant
+follows the salary account.
+
+## D-036: Account closure severity comes from what breaks, not only from money (Phase 5)
+
+Outstanding cheques and salary-linked finance on the salary account are critical; standing orders,
+cards paid from the account and the salary account itself are caution; the closure fee sets a floor
+through the bank's thresholds. "Review standing orders" is offered only when there are some.
+
+## D-037: Proactive packs: dormancy by time, rewards by value (Phase 5)
+
+`account.dormancy` is time-based (critical within 30 days, caution within 60; bank parameters):
+no money is lost, but a dormant account is restricted. `rewards.expiry` reports cumulative 30 / 60
+/ 90-day windows and the next expiry date, with severity from the value expiring within the widest
+window. Proactive packs have no "continue" option: there is no action in progress. The option-order
+lint now requires `talk_to_someone` last and, for action packs only, exactly one continue option
+just before it.
+
+## D-038: How a scheduled run becomes alerts (Phase 5)
+
+`runProactive(deps, bankId, pack)` reads only customers with a live `proactive_alerts` consent
+(non-negotiable 5) and evaluates each product through the same pipeline as a check: kill switch,
+stored parameters, approved template, gateway, audit (`trigger: schedule:<pack>`). Then:
+
+- A non-applicable product is not audited: nothing was shown to anyone.
+- The alert's dedupe key is product + event date (`rewards.expiry:card_x:2026-11-14`), so re-running
+  the job, the same day or the next, never alerts a customer twice about the same expiry or
+  dormancy date. A duplicate is not audited again.
+- The alert is worded and audited in every language the bank supports, preferred language first.
+  `Alert.localeEventIds` (new migration) maps locale → audit event, and `GET /v1/alerts?locale=`
+  serves the card in the language the customer is reading. Found by the Phase 5 e2e test: a
+  customer switching the app to Arabic saw English alerts.
+- Withdrawing proactive-alert consent hides existing alerts immediately.
+
+## D-039: BullMQ schedules mirror the ProactiveJob rows (Phase 5)
+
+The worker (`apps/api/src/worker.ts`, `pnpm worker`) upserts one BullMQ job scheduler per enabled
+`ProactiveJob` row (cron in `Asia/Qatar`) and removes schedulers whose row is disabled or gone. It
+re-syncs every 5 minutes, so console changes (Phase 7) take effect without a restart. Jobs run one
+at a time with 3 attempts and exponential backoff. `pnpm proactive:run [pack] [--queue]` runs a pack
+now (demo, operations), in-process or through the queue. docker-compose gains a `worker` service.
+
+## D-040: Explain my charge is computed from the fee schedule, never generated (Phase 5)
+
+`POST /v1/explain-charge` takes the fee schedule version in force when the fee posted, and words
+the explanation with the bank's own approved name, description and how-to-avoid text (en/ar). No
+model is involved. The calculation is recomputed from the customer's transactions:
+
+- fixed fees: compared with the published amount;
+- percentage fees: matched to the same-day transaction the fee applies to, restricted by type
+  (cash withdrawal fee → the cash withdrawal; FX fee → a purchase). The screenshot review found
+  that without the type restriction a minimum fee "matched" an unrelated small purchase;
+- annual fees: compared with the card's fee;
+- interest/profit charges: shows the rate, with `matches: null` (the month's balances are needed).
+
+Without consent only general information is returned and no transaction is read. Every
+explanation is audited (`rulePackKey: explain.charge`, version `fee_schedule@N`).
+
+## D-041: Fact keys must pass the redactor's identity filter (Phase 5)
+
+The gateway drops any fact whose key reads like an identity attribute (`account…`, `card…`). Three
+new keys did (`accountBalance`, `cardFeesWaivedAnnual`, `isSalaryAccount`), so they were renamed
+(`currentBalance`, `annualFeesWaived`, `receivesSalary`). The existing gateway test that checks
+every declared fact key caught this.
+
+## D-042: The number validator ignores Arabic short vowels when looking for spelled numbers (Phase 5)
+
+The validator split words on anything that is not a letter, and Arabic diacritics are combining
+marks, so "ستُعاد" (will be returned) was split into "ست" (six) + "عاد", and the approved
+account-closure copy was rejected. Combining marks are now removed before tokenising. "ستّة" (six,
+with shadda) is still rejected; both cases are tested.
+
+## D-043: Inbound events are recorded, not processed, in the MVP (Phase 5)
+
+`POST /v1/events` (bank backend only) records product events idempotently: the first delivery
+returns 201, a retry with the same `idempotencyKey` returns 200 with `duplicate: true`, and a
+concurrent retry is resolved by the unique `(bankId, idempotencyKey)`. While AMIL reads the bank's
+synthetic records directly (D-024), events trigger no processing. In a pilot they feed AMIL's own
+store.
+
+## D-044: Copy choices for the new packs (Phase 5)
+
+- "promo" and "promotion" are banned selling terms, so balance-transfer copy says "introductory
+  rate" (Arabic "المعدل التمهيدي").
+- Fact labels and "why" sentences are shared by both variants, so they are variant-neutral
+  ("charges", "annual rate"); a test runs them through the Islamic copy lint.
+- Literal digits never appear in copy: every number comes from a fact, so the validator accepts the
+  approved wording.
+- Per-pack severity thresholds were added to the demo bank (synthetic, D-002).
