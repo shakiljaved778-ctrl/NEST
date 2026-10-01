@@ -1,2 +1,5 @@
-/** Typed API client. Implemented in Phase 3 alongside the OpenAPI spec. */
-export const SDK_VERSION = "0.1.0";
+export * from "./schemas";
+export * from "./http";
+export * from "./widget";
+
+export const SDK_VERSION = "0.3.0";

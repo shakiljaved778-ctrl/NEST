@@ -17,12 +17,15 @@ Requires Node 22, pnpm 10, and PostgreSQL 16 + Redis 7 (via Docker or installed 
 cp .env.example .env
 docker compose up -d postgres redis
 pnpm install && pnpm db:migrate && pnpm db:seed
-pnpm dev        # api http://localhost:4000 · demo bank http://localhost:3000 · console http://localhost:3001
+pnpm dev        # api http://localhost:4000 (Swagger UI at /docs) · demo bank :3000 · console :3001
 ```
 
 To run the full stack in containers instead: `docker compose up --build`.
 
-Checks: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`.
+Checks: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Audit chain: `pnpm audit:verify`.
+
+Without `ANTHROPIC_API_KEY` the model gateway uses an offline mock that serves the bank-approved
+wording, so everything works with no network.
 
 ## Layout
 

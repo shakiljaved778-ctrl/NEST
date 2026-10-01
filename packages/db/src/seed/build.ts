@@ -20,7 +20,7 @@ import {
   toMoneyString,
   type Dec,
 } from "@amil/rules-engine";
-import { ALL_PACK_DEFINITIONS, TEMPLATES } from "@amil/rule-packs";
+import { ALL_PACK_DEFINITIONS, ALL_TEMPLATES } from "@amil/rule-packs";
 import { bank, BANK_ID, consoleUsers, proactiveJobs } from "./bank";
 import { customers, type CardSpec, type CustomerSpec, type FinanceSpec } from "./customers";
 import { FEE_AMOUNTS, FEE_CODES, feeSchedule } from "./fees";
@@ -247,7 +247,7 @@ export function buildSeedData(now: Date): SeedData {
       createdBy: "cu_product",
     })),
     // Bank-approved demo copy (non-negotiable 8): Islamic packs carry sharia_approved.
-    templates: TEMPLATES.map((t) => {
+    templates: ALL_TEMPLATES.map((t) => {
       const islamic = t.variant === "islamic";
       return {
         id: `tpl_${t.key}_${t.locale}_v${t.version}`,

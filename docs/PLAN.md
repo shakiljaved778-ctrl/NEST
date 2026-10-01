@@ -19,15 +19,15 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 2: Non-negotiables (enforced in code, tests and CLAUDE.md)
 
-- [~] 1. Facts are computed by the deterministic rules engine; the LLM only writes wording around a fact set (engine + facts with sources in Phase 2; gateway in Phase 3)
-- [ ] 2. Number validator rejects any LLM number, amount, percentage or date absent from the fact set (incl. Arabic-Indic digits ٠-٩); falls back to the approved static template; adversarial tests (Phase 3)
-- [ ] 3. Inform, never execute: options are `bank://` deep links configured per bank (Phase 3–4)
-- [~] 4. No selling: banned-term lint test over all templates (configurable list, en + ar): `policy/copy-policy.json` + tests in Phase 2; console checker in Phase 7
-- [ ] 5. Consent first: no customer data read for insights without a consent record; otherwise generic info only (Phase 3)
-- [ ] 6. Data stays in-country: gateway modes `redacted` (default) and `in_country`; redaction test suite (Phase 3)
-- [~] 7. Everything audited: immutable `InsightEvent` with hash chain; retention default 10 years (schema and append-only DB trigger in Phase 1; writer in Phase 3)
-- [~] 8. Bank approves all copy: templates seeded `approved` / `sharia_approved` (Phase 2); serving rule enforced in Phase 3
-- [ ] 9. Kill switches per rule pack and per template; disabled → no insight, never an error (Phase 3, 7)
+- [x] 1. Facts are computed by the deterministic rules engine; the LLM only rewords the approved copy from a redacted fact template
+- [x] 2. Number validator rejects any LLM number, amount, percentage or date absent from the fact set (Arabic-Indic, extended and full-width digits, zero-width tricks, spelled-out numbers); falls back to the approved template; adversarial tests
+- [x] 3. Inform, never execute: options are deep links on the bank's scheme (`ddb://…`)
+- [~] 4. No selling: banned-term lint over all templates and over model output (configurable, en + ar); console checker in Phase 7
+- [x] 5. Consent first: no product data read without an active consent; generic, data-free copy otherwise (D-019)
+- [x] 6. Data stays in-country: gateway modes `redacted` (default), `in_country`, `off`; fail-closed redactor with property tests
+- [x] 7. Everything audited: immutable, hash-chained `InsightEvent` per evaluation (including suppressed ones), customer responses, retention 10 years; `pnpm audit:verify`
+- [x] 8. Bank approves all copy: only `approved` templates served, Islamic only `sharia_approved`
+- [x] 9. Kill switches per rule pack and per template; disabled → `kind: none`, never an error (console UI in Phase 7)
 - [x] 10. Money is decimal (`decimal.js`), QAR 2 dp, rounding mode is a rule-pack parameter (`roundingMode` in every pack)
 
 ## Section 3: Stack
@@ -36,12 +36,12 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [ ] Playwright (Phase 4)
 - [~] `apps/demo-bank`: Next.js 15, Tailwind; shadcn/ui, next-intl and RTL arrive in Phase 4
 - [~] `apps/console`: Next.js 15 (full console in Phase 7)
-- [~] `apps/api`: Fastify with health endpoints (OpenAPI 3.1 + Swagger in Phase 3)
+- [x] `apps/api`: Fastify, OpenAPI 3.1 generated from Zod, Swagger UI at `/docs`
 - [x] `packages/rules-engine`: contract, facts, severity, money and date helpers
 - [~] `packages/rule-packs`: versioned JSON + calculators + approved copy; 2 of 12 packs (Phase 2), rest in Phase 5
 - [ ] `packages/widget`: Lit `<amil-insight>`, `<amil-assistant>` (Phase 4, 6)
-- [ ] `packages/sdk`: typed API client (Phase 3)
-- [ ] `packages/gateway`: providers (anthropic, in_country, mock), redactor, number validator (Phase 3)
+- [x] `packages/sdk`: Zod contract + typed server (HMAC) and widget (session) clients
+- [x] `packages/gateway`: providers (anthropic, in_country, mock), redactor, number validator, wording cache
 - [x] `packages/db`: Prisma schema, migrations, seed
 - [~] `packages/i18n`: en/ar number, date and currency formatting, Arabic-Indic digits, glossary (catalogs grow per phase)
 - [ ] `packages/ui`: shared components (Phase 4)
@@ -84,28 +84,28 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 7: API (Phase 3+)
 
-- [ ] HMAC-signed server calls (`X-AMIL-Key`, `X-AMIL-Signature`, 5-minute replay window), mTLS-ready
-- [ ] `POST /v1/sessions` (15-minute widget token)
-- [ ] `POST/GET/DELETE /v1/consents`
-- [ ] `POST /v1/checks` (p95 < 400 ms with mock; model timeout 1.5 s → template fallback)
-- [ ] `POST /v1/insights/:id/responses`
+- [x] HMAC-signed server calls (`X-AMIL-Key`, `X-AMIL-Timestamp`, `X-AMIL-Signature`, 5-minute window, single-use signatures), mTLS-ready (D-015)
+- [x] `POST /v1/sessions` (15-minute widget token)
+- [x] `POST/GET/DELETE /v1/consents`
+- [x] `POST /v1/checks` (p95 51 ms measured with mock; model deadline 1.5 s → template, async cache warm)
+- [x] `POST /v1/insights/:id/responses`
 - [ ] `GET /v1/alerts` (Phase 5)
 - [ ] `POST /v1/explain-charge` (Phase 5)
 - [ ] `POST /v1/compare` (Phase 6)
 - [ ] `POST /v1/assistant/messages` SSE (Phase 6)
 - [ ] `POST /v1/events` with idempotency key (Phase 5)
 - [ ] `/v1/admin/*` RBAC (Phase 7)
-- [x] `GET /healthz`, `GET /readyz` · [ ] `GET /docs` (Phase 3)
-- [ ] Errors never leak to the customer UI
+- [x] `GET /healthz`, `GET /readyz`, `GET /docs`
+- [x] Errors never leak to the customer UI (generic error codes; no-insight is never an error)
 
 ## Section 8: Model gateway (Phase 3)
 
-- [ ] Provider interface; anthropic, in_country (OpenAI-compatible stub), mock
-- [ ] Redactor with property-based tests (fast-check)
-- [ ] Versioned prompt `packages/gateway/prompts/insight.v1.md`; Zod-validated JSON output (headline ≤ 90, body ≤ 280)
-- [ ] Number validator + static-template fallback + `validator_rejected` log
-- [~] Arabic MSA glossary `packages/i18n/glossary.ar.json` (seeded in Phase 1) · [ ] injected into prompt + term tests (Phase 3)
-- [ ] Redis wording cache (24 h)
+- [x] Provider interface; anthropic, in_country (OpenAI-compatible stub), mock
+- [x] Redactor with property-based tests (fast-check)
+- [x] Versioned prompt `packages/gateway/prompts/insight.v1.md`; Zod-validated JSON output (headline ≤ 90, body ≤ 280)
+- [x] Number validator + static-template fallback + `validator_rejected` log
+- [x] Arabic MSA glossary `packages/i18n/glossary.ar.json`, injected into the Arabic fact template; key-term tests
+- [x] Redis wording cache (24 h)
 
 ## Section 9: Ask AMIL (Phase 6)
 
@@ -133,17 +133,17 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 13: Security and quality
 
-- [ ] Zod validation everywhere, rate limiting, helmet, CSP for widget (Phase 3, 8)
+- [~] Zod validation on every request (strict schemas), CORS allow-list for widget origins · [ ] rate limiting, helmet, CSP (Phase 8)
 - [ ] AES-256-GCM application-level PII encryption with KMS interface (Phase 8)
 - [ ] RBAC on console; console actions audited (Phase 7)
-- [ ] Integration tests (testcontainers), e2e (Playwright)
+- [~] Integration tests against real PostgreSQL via TEST_DATABASE_URL (D-023) · [ ] e2e (Playwright, Phase 4)
 - [x] CI: GitHub Actions lint, typecheck, test, build (`.github/workflows/ci.yml`) · [ ] Playwright on PR (Phase 4), dependency audit (Phase 8)
 
 ## Section 14: Phases
 
 - [x] **Phase 1: Foundation.** Monorepo, tooling, docker-compose, Prisma schema, migrations, seed. ✅ `pnpm dev` runs all apps; `pnpm db:seed` works; `docs/data-model.md`
 - [x] **Phase 2: Rules engine + flagship packs.** ≥ 40 table-driven tests; Khalid and Fatima match expected facts exactly
-- [ ] **Phase 3: Insight API + gateway.** Redaction property tests, validator (Arabic-Indic), audit chain verifies, p95 < 400 ms with mock
+- [x] **Phase 3: Insight API + gateway.** Redaction property tests, validator (Arabic-Indic), audit chain verifies, p95 < 400 ms with mock
 - [ ] **Phase 4: Demo bank app + widget.** Playwright: Khalid sees points insight in en + ar, deep-links to "Redeem points"
 - [ ] **Phase 5: Remaining packs + proactive + explain.** Every pack fires for ≥ 2 personas; alerts after scheduler; all fee lines explainable
 - [ ] **Phase 6: Ask AMIL + compare.** Khalid card-close answer with fact chips; refuses investment advice; compare matches engine
@@ -154,5 +154,5 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 - [x] Calm, factual, second person; no alarmism, emojis or exclamation marks (enforced by template lint test)
 - [x] Lead with consequence and value; avoid-the-loss option first, then Continue, then Talk to someone (option order lint-enforced)
-- [~] Arabic written natively against the glossary (flagship copy); glossary injection into the prompt in Phase 3
+- [x] Arabic written natively against the glossary; glossary injected into Arabic model requests
 - [ ] Footer: "Figures from Doha Demo Bank records as of {asOf}. Wording assisted by AI." (+ Arabic)

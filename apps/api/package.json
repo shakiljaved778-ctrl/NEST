@@ -10,13 +10,23 @@
     "start": "node dist/server.js",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "dotenv -e ../../.env -- vitest run"
   },
   "dependencies": {
     "@amil/db": "workspace:*",
+    "@amil/gateway": "workspace:*",
+    "@amil/i18n": "workspace:*",
+    "@amil/rule-packs": "workspace:*",
+    "@amil/rules-engine": "workspace:*",
+    "@amil/sdk": "workspace:*",
+    "@asteasolutions/zod-to-openapi": "^9.1.0",
+    "@fastify/cors": "^11.3.0",
+    "@fastify/swagger": "^9.9.1",
+    "@fastify/swagger-ui": "^6.1.1",
     "@prisma/client": "~6.19.0",
     "fastify": "^5.6.0",
     "ioredis": "^5.8.0",
+    "jose": "^6.2.12",
     "pino": "^10.0.0",
     "zod": "^4.1.0"
   },

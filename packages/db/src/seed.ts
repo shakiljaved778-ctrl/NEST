@@ -8,8 +8,8 @@
  * Dates are relative to SEED_NOW (ISO) or the current time (D-002).
  */
 import { PrismaClient } from "@prisma/client";
-import { BANK_ID } from "./seed/bank";
 import { buildSeedData } from "./seed/build";
+import { writeSeedData } from "./seed/write";
 
 async function main(): Promise<void> {
   const now = process.env.SEED_NOW ? new Date(process.env.SEED_NOW) : new Date();
@@ -18,39 +18,7 @@ async function main(): Promise<void> {
   const prisma = new PrismaClient();
 
   try {
-    await prisma.$transaction(
-      async (tx) => {
-        const { id: _id, ...bankUpdate } = data.bank;
-        await tx.bank.upsert({ where: { id: BANK_ID }, create: data.bank, update: bankUpdate });
-
-        // Product data is replaced wholesale; audit tables are untouched.
-        await tx.customer.deleteMany({ where: { bankId: BANK_ID } });
-        await tx.feeSchedule.deleteMany({ where: { bankId: BANK_ID } });
-        await tx.proactiveJob.deleteMany({ where: { bankId: BANK_ID } });
-        await tx.rulePack.deleteMany({ where: { bankId: BANK_ID } });
-        await tx.template.deleteMany({ where: { bankId: BANK_ID } });
-
-        for (const u of data.consoleUsers) {
-          const { id, ...rest } = u;
-          await tx.consoleUser.upsert({ where: { id }, create: u, update: rest });
-        }
-        await tx.proactiveJob.createMany({ data: data.proactiveJobs });
-        await tx.feeSchedule.createMany({ data: data.feeSchedule });
-        await tx.customer.createMany({ data: data.customers });
-        await tx.consent.createMany({ data: data.consents });
-        await tx.account.createMany({ data: data.accounts });
-        await tx.standingOrder.createMany({ data: data.standingOrders });
-        await tx.card.createMany({ data: data.cards });
-        await tx.rewardsLedger.createMany({ data: data.rewardsLedgers });
-        await tx.instalmentPlan.createMany({ data: data.instalmentPlans });
-        await tx.finance.createMany({ data: data.finances });
-        await tx.deposit.createMany({ data: data.deposits });
-        await tx.transaction.createMany({ data: data.transactions });
-        await tx.rulePack.createMany({ data: data.rulePacks });
-        await tx.template.createMany({ data: data.templates });
-      },
-      { timeout: 60_000 },
-    );
+    await writeSeedData(prisma, data);
 
     console.log(
       [

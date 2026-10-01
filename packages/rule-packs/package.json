@@ -9,7 +9,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./packs/*": "./packs/*",
-    "./templates/*": "./templates/*"
+    "./templates/*": "./templates/*",
+    "./fixtures": "./src/fixtures.ts"
   },
   "scripts": {
     "lint": "eslint .",

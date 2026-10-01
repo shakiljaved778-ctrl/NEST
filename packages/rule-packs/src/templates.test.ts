@@ -19,7 +19,15 @@ import {
   variantForFinanceType,
 } from "./registry";
 import { renderTemplate, stripTemplateSyntax, templateFactKeys } from "./template";
-import { copyPolicy, copyViolations, TEMPLATES } from "./templates";
+import {
+  copyPolicy,
+  copyViolations,
+  explain,
+  explanationKey,
+  factLabel,
+  GENERIC_TEMPLATES,
+  TEMPLATES,
+} from "./templates";
 
 const SEVERITIES: Severity[] = ["info", "caution", "critical"];
 const LOCALES: Locale[] = ["en", "ar"];
@@ -299,5 +307,105 @@ describe("copy policy (adversarial)", () => {
     ["عرض خطط التقسيط", "ar"], // 'view instalment plans': عرض alone is allowed
   ] as const)("does not flag %j", (text, locale) => {
     expect(copyViolations(text, locale, "conventional")).toEqual([]);
+  });
+});
+
+describe("generic (no-consent) templates", () => {
+  it.each(ALL_PACK_DEFINITIONS.flatMap((d) => LOCALES.map((l) => [d.key, d.variant, l] as const)))(
+    "%s / %s / %s exists, has no placeholders and follows policy",
+    (key, variant, locale) => {
+      const matches = GENERIC_TEMPLATES.filter(
+        (t) => t.rulePackKey === key && t.variant === variant && t.locale === locale,
+      );
+      expect(matches).toHaveLength(1);
+      const t = matches[0];
+      if (!t) return;
+      for (const text of [t.headline, t.body]) {
+        expect(templateFactKeys(text)).toEqual({ sections: [], placeholders: [] });
+        expect(copyViolations(text, locale, variant)).toEqual([]);
+      }
+      expect(t.options.at(-1)?.key).toBe("talk_to_someone");
+    },
+  );
+});
+
+describe("fact labels and explanations", () => {
+  it.each(
+    ALL_PACK_DEFINITIONS.flatMap((d) => LOCALES.map((l) => [d.key, d.variant, l, d] as const)),
+  )("%s / %s: every declared fact has a %s label", (key, _v, locale, def) => {
+    for (const f of def.facts) expect(factLabel(key, locale, f.key), f.key).not.toBe(f.key);
+  });
+
+  it("every explanation code the calculators emit has approved copy in both locales", () => {
+    const evaluations = [
+      [
+        "card.close",
+        cardClosePacks.conventional.evaluate(
+          khalidCard(),
+          cardClosePacks.conventional.defaultParameters,
+          thresholds,
+          NOW,
+        ),
+      ],
+      [
+        "card.close",
+        cardClosePacks.conventional.evaluate(
+          {
+            ...emptyCard(),
+            rewards: {
+              balance: 0,
+              pointValueQar: "0.01",
+              expiryBuckets: [],
+              pendingCashback: "60.00",
+              asOf: NOW,
+            },
+          },
+          cardClosePacks.conventional.defaultParameters,
+          thresholds,
+          NOW,
+        ),
+      ],
+      [
+        "finance.early_settlement",
+        financeEarlySettlementPacks.islamic.evaluate(
+          fatimaFinance({ salaryLinked: true }),
+          financeEarlySettlementPacks.islamic.defaultParameters,
+          financeThresholds,
+          NOW,
+        ),
+      ],
+      [
+        "finance.early_settlement",
+        financeEarlySettlementPacks.conventional.evaluate(
+          smallLoan(),
+          financeEarlySettlementPacks.conventional.defaultParameters,
+          { cautionAtQar: "0.00", criticalAtQar: "999999" },
+          new Date("2026-02-25T10:00:00Z"),
+        ),
+      ],
+    ] as const;
+    for (const [pack, ev] of evaluations) {
+      const codes = ev.explanation
+        .map(explanationKey)
+        .filter((k): k is string => k !== null && k !== "severity_info");
+      for (const locale of LOCALES)
+        expect(explain(pack, locale, ev.explanation), `${pack}/${locale}`).toHaveLength(
+          codes.length,
+        );
+    }
+  });
+
+  it("normalises explanation codes", () => {
+    expect(explanationKey("points_expiring_within_90_days")).toBe("points_expiring_within_N_days");
+    expect(explanationKey("severity:critical")).toBe("severity_critical");
+    expect(explanationKey("severity_basis_qar:492.00")).toBeNull();
+  });
+
+  it("explanations and labels follow the copy policy", () => {
+    for (const pack of ["card.close", "finance.early_settlement"])
+      for (const locale of LOCALES) {
+        const all = [...explain(pack, locale, ["severity:critical", "severity:caution"])];
+        for (const s of all) expect(copyViolations(s, locale, "conventional")).toEqual([]);
+      }
   });
 });

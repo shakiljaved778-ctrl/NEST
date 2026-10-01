@@ -1,5 +1,5 @@
 {
-  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional.",
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional. 'generic' entries carry no customer data and are served when no consent is on record (non-negotiable 5). 'factLabels' label the fact chips; 'explanations' word the 'Why am I seeing this?' reasons.",
   "templates": [
     {
       "key": "card.close.conventional.critical",
@@ -336,6 +336,166 @@
           "label": "التحدث إلى موظف"
         }
       ]
+    },
+    {
+      "key": "card.close.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "card.close",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you close your card",
+      "body": "Closing a credit card ends its reward points and can make instalment plans payable in full. You can check your rewards and instalment plans in the app before you continue.",
+      "options": [
+        {
+          "key": "continue_closure",
+          "label": "Continue closing the card"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.close.conventional.generic",
+      "kind": "generic",
+      "rulePackKey": "card.close",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل إغلاق بطاقتك",
+      "body": "إغلاق بطاقة الائتمان يُنهي نقاط المكافآت، وقد يجعل خطط التقسيط مستحقة بالكامل. يمكنك مراجعة نقاطك وخطط التقسيط في التطبيق قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_closure",
+          "label": "متابعة إغلاق البطاقة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.close.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "card.close",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Before you close your card",
+      "body": "Closing a credit card ends its reward points and can make instalment plans payable in full. You can check your rewards and instalment plans in the app before you continue.",
+      "options": [
+        {
+          "key": "continue_closure",
+          "label": "Continue closing the card"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.close.islamic.generic",
+      "kind": "generic",
+      "rulePackKey": "card.close",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "قبل إغلاق بطاقتك",
+      "body": "إغلاق بطاقة الائتمان يُنهي نقاط المكافآت، وقد يجعل خطط التقسيط مستحقة بالكامل. يمكنك مراجعة نقاطك وخطط التقسيط في التطبيق قبل المتابعة.",
+      "options": [
+        {
+          "key": "continue_closure",
+          "label": "متابعة إغلاق البطاقة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
     }
-  ]
+  ],
+  "factLabels": {
+    "en": {
+      "pointsBalance": "Reward points",
+      "pointValueQar": "Value per point",
+      "pointsValue": "Value of points",
+      "pointsExpiringSoon": "Points expiring soon",
+      "pointsExpiringSoonValue": "Value expiring soon",
+      "nextPointsExpiryDate": "Next points expiry",
+      "pointsExpiryWindowDays": "Expiry window (days)",
+      "pendingCashback": "Pending cashback",
+      "pendingCashbackForfeited": "Cashback that ends",
+      "forfeitedValue": "Value that ends",
+      "activeInstalmentPlans": "Active instalment plans",
+      "instalmentsRemainingPrincipal": "Instalments remaining",
+      "instalmentEarlyClosureFees": "Early-closure fees",
+      "instalmentsPayableOnClosure": "Payable on closure",
+      "annualFee": "Annual fee",
+      "annualFeeRefundEligible": "Annual fee refund due",
+      "annualFeeMonthsUsed": "Months used",
+      "annualFeeRefund": "Annual fee refund",
+      "supplementaryCards": "Supplementary cards",
+      "outstandingBalance": "Balance to clear",
+      "netAmountToClear": "Net amount to clear",
+      "avoidableLoss": "Value at stake"
+    },
+    "ar": {
+      "pointsBalance": "نقاط المكافآت",
+      "pointValueQar": "قيمة النقطة",
+      "pointsValue": "قيمة النقاط",
+      "pointsExpiringSoon": "نقاط تنتهي قريباً",
+      "pointsExpiringSoonValue": "قيمة النقاط التي تنتهي قريباً",
+      "nextPointsExpiryDate": "أقرب تاريخ لانتهاء النقاط",
+      "pointsExpiryWindowDays": "فترة الانتهاء (بالأيام)",
+      "pendingCashback": "الاسترداد النقدي المعلّق",
+      "pendingCashbackForfeited": "الاسترداد النقدي الذي ينتهي",
+      "forfeitedValue": "القيمة التي تنتهي",
+      "activeInstalmentPlans": "خطط التقسيط القائمة",
+      "instalmentsRemainingPrincipal": "المتبقي من الأقساط",
+      "instalmentEarlyClosureFees": "رسوم الإغلاق المبكر",
+      "instalmentsPayableOnClosure": "المستحق عند الإغلاق",
+      "annualFee": "الرسوم السنوية",
+      "annualFeeRefundEligible": "استرداد من الرسوم السنوية",
+      "annualFeeMonthsUsed": "الأشهر المستخدمة",
+      "annualFeeRefund": "المسترد من الرسوم السنوية",
+      "supplementaryCards": "البطاقات الإضافية",
+      "outstandingBalance": "الرصيد المستحق",
+      "netAmountToClear": "صافي المبلغ المستحق",
+      "avoidableLoss": "القيمة المعرّضة للفقد"
+    }
+  },
+  "explanations": {
+    "en": {
+      "points_forfeited_on_closure": "Your card has reward points, and points end when a card is closed.",
+      "points_expiring_within_N_days": "Some of your points were due to expire soon.",
+      "pending_cashback_forfeited": "Your card has cashback that has not been credited yet.",
+      "active_instalment_plans_become_payable": "Your card has an instalment plan that becomes payable in full when the card closes.",
+      "instalment_early_closure_fees_apply": "Closing an instalment plan early has a fee under its terms.",
+      "annual_fee_pro_rata_refund_due": "Part of this year's annual fee is refundable.",
+      "supplementary_cards_close_too": "Supplementary cards close with the main card.",
+      "outstanding_balance_to_clear": "The card has a balance that needs to be cleared.",
+      "severity_critical": "The value at stake is above the level your bank has set for an important notice.",
+      "severity_caution": "The value at stake is above the level your bank has set for a notice."
+    },
+    "ar": {
+      "points_forfeited_on_closure": "لديك نقاط مكافآت على البطاقة، وتنتهي النقاط عند إغلاق البطاقة.",
+      "points_expiring_within_N_days": "بعض نقاطك كان موعد انتهائها قريباً.",
+      "pending_cashback_forfeited": "لديك استرداد نقدي على البطاقة لم يُضف بعد.",
+      "active_instalment_plans_become_payable": "لديك خطة تقسيط على البطاقة تصبح مستحقة بالكامل عند إغلاقها.",
+      "instalment_early_closure_fees_apply": "إغلاق خطة التقسيط مبكراً تترتب عليه رسوم بحسب شروطها.",
+      "annual_fee_pro_rata_refund_due": "جزء من الرسوم السنوية لهذا العام قابل للاسترداد.",
+      "supplementary_cards_close_too": "تُغلق البطاقات الإضافية مع البطاقة الأساسية.",
+      "outstanding_balance_to_clear": "على البطاقة رصيد مستحق يلزم سداده.",
+      "severity_critical": "القيمة المعرّضة للفقد أعلى من الحد الذي حدده البنك لإظهار تنبيه مهم.",
+      "severity_caution": "القيمة المعرّضة للفقد أعلى من الحد الذي حدده البنك لإظهار تنبيه."
+    }
+  }
 }

@@ -198,8 +198,9 @@ diffs).
     waived because his salary is transferred.
 - Around 2,700 transactions over 6 months. Every fee line carries a `feeCode`.
 - Rule packs: `card.close` and `finance.early_settlement`, both variants, `active` and enabled,
-  with their versioned default parameters (Phase 2). There are 24 templates (2 packs × 2 variants
-  × en/ar × 3 severities): conventional ones `approved`, Islamic ones `sharia_approved`. Template
+  with their versioned default parameters (Phase 2). There are 32 templates: 24 insight templates
+  (2 packs × 2 variants × en/ar × 3 severities) and 8 generic no-consent templates. Conventional
+  ones are `approved`, Islamic ones `sharia_approved`. Template
   and rule-pack IDs are deterministic (`tpl_card.close.conventional.critical_en_v1`).
 - Dates are relative to `SEED_NOW` or the current time (D-002). Reseeding keeps audit tables intact
   (D-003).

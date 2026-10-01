@@ -58,6 +58,8 @@ pnpm lint && pnpm typecheck && pnpm test
 pnpm build
 pnpm db:migrate:dev --name <x>    # create a new migration (dev)
 pnpm db:reset                     # DEV ONLY: drop + re-migrate + seed (wipes the audit trail)
+pnpm audit:verify [bankId]        # verify the audit hash chain
+pnpm --filter @amil/gateway gen:prompts   # after editing packages/gateway/prompts/*.md
 pnpm format                       # prettier --write
 ```
 
@@ -81,6 +83,14 @@ disposable database. They are skipped when it is unset.
   lives in `policy/copy-policy.json`.
 - Template syntax: `{fact}`, `[[fact: shown when non-zero]]`, `[[!fact: shown when zero]]` (D-013).
 - Use `AnyEvaluation` / `AnyFactSet` for code that handles evaluations without knowing the pack.
+- Figures become text only through `formatFact` (`@amil/gateway`), for templates, fact chips and the
+  model's fact template alike, so the number validator sees exactly what the customer sees.
+- The model never sees customer records: `buildFactTemplate` (redactor) is the only payload builder,
+  and it fails closed. Model output goes through `checkModelOutput` (schema, numbers, copy policy).
+- API: every route validates its input with the strict Zod schemas in `@amil/sdk/schemas`, and the
+  OpenAPI document is generated from the same schemas. Errors carry generic codes only. "No insight"
+  (consent, kill switch, template) is `200 { kind: "none" }`, never an error.
+- Audit: append through `appendInsightEvent` only; never write `insight_event` directly.
 - Product rules on DB rows reach the engine only through `@amil/db/adapters`, which Zod-validate
   them. Malformed rules throw and are never defaulted.
 - Commits: `phase-N: <summary>` at phase ends; otherwise conventional short messages.

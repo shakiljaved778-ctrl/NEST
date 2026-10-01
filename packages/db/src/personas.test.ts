@@ -168,8 +168,9 @@ describe("seeded rule packs and templates", () => {
     expect(data.rulePacks.every((p) => p.enabled && p.status === "active")).toBe(true);
   });
 
-  it("seeds 24 templates; Islamic ones are sharia_approved (non-negotiable 8)", () => {
-    expect(data.templates).toHaveLength(24);
+  it("seeds 24 insight + 8 generic templates; Islamic ones are sharia_approved (non-negotiable 8)", () => {
+    expect(data.templates).toHaveLength(32);
+    expect(data.templates.filter((t) => t.key.endsWith(".generic"))).toHaveLength(8);
     for (const t of data.templates) {
       expect(t.status).toBe(t.variant === "islamic" ? "sharia_approved" : "approved");
       expect(t.approvedBy).toBeTruthy();

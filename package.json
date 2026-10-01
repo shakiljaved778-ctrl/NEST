@@ -19,7 +19,8 @@
     "db:migrate": "pnpm --filter @amil/db db:migrate",
     "db:migrate:dev": "pnpm --filter @amil/db db:migrate:dev",
     "db:seed": "pnpm --filter @amil/db db:seed",
-    "db:reset": "pnpm --filter @amil/db db:reset"
+    "db:reset": "pnpm --filter @amil/db db:reset",
+    "audit:verify": "pnpm --filter @amil/db audit:verify"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

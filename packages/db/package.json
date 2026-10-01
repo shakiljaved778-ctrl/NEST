@@ -20,7 +20,8 @@
     "db:migrate": "dotenv -e ../../.env -- prisma migrate deploy",
     "db:migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
     "db:seed": "dotenv -e ../../.env -- tsx src/seed.ts",
-    "db:reset": "dotenv -e ../../.env -- prisma migrate reset --force"
+    "db:reset": "dotenv -e ../../.env -- prisma migrate reset --force",
+    "audit:verify": "dotenv -e ../../.env -- tsx src/scripts/verify-audit.ts"
   },
   "prisma": {
     "seed": "tsx src/seed.ts"

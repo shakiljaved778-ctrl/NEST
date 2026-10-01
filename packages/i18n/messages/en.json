@@ -3,11 +3,13 @@
     "footer": "Demo data — Doha Demo Bank is fictional"
   },
   "insight": {
-    "footer": "Figures from Doha Demo Bank records as of {asOf}. Wording assisted by AI.",
     "acknowledge": "I understand",
     "continue": "Continue",
     "talkToSomeone": "Talk to someone",
     "why": "Why am I seeing this?",
-    "unavailable": "Information unavailable"
+    "unavailable": "Information unavailable",
+    "footerFigures": "Figures from {bankName} records as of {asOf}.",
+    "footerAi": "Wording assisted by AI.",
+    "genericFooter": "General information. No account data was used."
   }
 }

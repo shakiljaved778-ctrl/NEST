@@ -12,6 +12,17 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "gen:prompts": "node scripts/gen-prompts.mjs"
+  },
+  "dependencies": {
+    "@amil/i18n": "workspace:*",
+    "@amil/rule-packs": "workspace:*",
+    "@amil/rules-engine": "workspace:*",
+    "@anthropic-ai/sdk": "^0.131.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "fast-check": "^4.10.2"
   }
 }

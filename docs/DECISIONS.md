@@ -112,3 +112,77 @@ judges the visible text with the markup stripped (`stripTemplateSyntax`).
   dates. Conventional and ijara accrue actual/365 (a pack parameter). For ijara, future rental profit
   is not charged and is shown as `futureProfitNotCharged`.
 - The cheapest date is the **earliest** day with the minimum outflow.
+
+## D-015: HMAC covers timestamp, method, path and body; each signature is single-use (Phase 3)
+
+The prompt asks for a signature "over body + timestamp". AMIL signs
+`${timestamp}.${METHOD}.${path-with-query}.${raw-body}` with HMAC-SHA256. Binding the method and
+path stops a valid signature for one endpoint from being replayed against another. Timestamps must
+be within ±5 minutes. Every accepted signature is also recorded (Redis `SET NX`, 10-minute TTL),
+so an identical request is rejected even inside the window. Signatures are compared in constant
+time, and the raw body is captured before JSON parsing.
+
+## D-016: API credentials come from the environment for the MVP (Phase 3)
+
+`AMIL_API_KEYS=keyId:secret:bankId[,…]` configures bank-to-AMIL credentials. This keeps the MVP
+simple and keeps secrets out of the database until application-level encryption lands. Phase 8
+moves them to an encrypted, rotatable credential store, with mTLS termination in front of the API
+(the design is mTLS-ready: auth sits behind a single `authenticate()` seam).
+
+## D-017: Anthropic provider settings, and why no refusal fallback model (Phase 3)
+
+- The model is `claude-opus-5-5` by default, configurable with `AMIL_ANTHROPIC_MODEL`. Output is
+  structured (`messages.parse` + Zod), effort is `low` (short, fact-bound wording), there are no SDK
+  retries, and the request timeout comes from the gateway.
+- The wording deadline is 1.5 s (`MODEL_TIMEOUT_MS`). Past it, the approved template is served
+  immediately and generation finishes in the background to warm the 24-hour wording cache, as
+  section 7 describes. Thinking is always on for this model, so on a cold cache the template will
+  often be what the customer sees first. A bank can choose a faster model per deployment.
+- **No server-side fallback model.** A refusal, timeout or invalid output all end in the same safe
+  place: the bank-approved static template, which needs no model at all. A second model would add
+  latency and another data flow without improving correctness.
+
+## D-018: The AI disclosure is shown only when a model actually wrote the wording (Phase 3)
+
+Every card shows "Figures from {bank} records as of {date}." The sentence "Wording assisted by AI."
+is added only when the wording came from a model, either directly or from the wording cache. It is
+omitted for the approved static template and for the offline mock provider, which echoes approved
+copy. Claiming AI assistance that did not happen would mislead the customer. The audit event
+records `aiAssisted` and `wordingSource` either way.
+
+## D-019: Without consent, no product data is read (Phase 3)
+
+When there is no active `pre_decision_insights` consent, `/v1/checks` does not load the card or
+finance at all, not even to find its variant. It serves the bank's **generic** template for the
+action: product information with no figures, and no customer data. Because the variant is unknown,
+generic copy must be variant-neutral, and a lint test checks every generic template against the
+Islamic terminology rules as well. The audit event records `consent: "absent"`.
+
+## D-020: Suppressed insights are audited too (Phase 3)
+
+When an insight is not shown, an audit event is still written with `applicable: false` and
+`shown.suppressed` set to the reason: a disabled rule pack, invalid stored parameters, no approved
+or enabled template, a template that fails to render, or nothing to show. A complaints lookup
+(Phase 7) can then explain why a customer saw nothing as well as what they saw.
+
+## D-021: Model output must pass the full copy policy, not only the number validator (Phase 3)
+
+Besides non-negotiable 2 (no figures absent from the fact set), model wording is checked against
+the same policy as the bank's templates: banned selling terms, Sharia terminology for Islamic packs,
+no exclamation marks or emojis, headline ≤ 90 and body ≤ 280 characters. Any failure serves the
+approved template and is audited as `validator_rejected`, with reasons.
+
+## D-022: The redactor fails closed (Phase 3)
+
+The outbound payload is built from facts only. Identity-like keys are dropped, and each value must
+match its unit's strict shape: money and points have at most 9 integer digits, so a 12-digit account
+number cannot pass as an amount. The serialized payload is then scanned for emails, IBANs, long
+digit runs and phone numbers. Any finding aborts the model call and the template is used. Property
+tests (fast-check) generate synthetic PII and assert that it never reaches the payload.
+
+## D-023: Integration tests use a real PostgreSQL via TEST_DATABASE_URL (Phase 3)
+
+The prompt suggests testcontainers. The build environment has no Docker daemon, so integration tests
+run against a disposable database named by `TEST_DATABASE_URL` (the CI workflow provides a Postgres
+service). Tests are skipped when it is unset. The assertions are the same as with testcontainers;
+switching later only changes where the database comes from.
