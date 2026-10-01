@@ -1,11 +1,15 @@
 import { OpenAPIRegistry, OpenApiGeneratorV31 } from "@asteasolutions/zod-to-openapi";
 import {
   Alert,
+  AssistantAnswer,
+  AssistantMessageRequest,
   AlertList,
   AlertListQuery,
   ChargeExplanation,
   CheckRequest,
   CheckResponse,
+  CompareRequest,
+  CompareResponse,
   Consent,
   ConsentList,
   ConsentPurpose,
@@ -134,6 +138,32 @@ export function buildOpenApiDocument(): object {
     security,
     request: { body: json(ExplainChargeRequest, "Customer and transaction") },
     responses: { 200: json(ChargeExplanation, "Explanation"), ...errors },
+  });
+  registry.registerPath({
+    method: "post",
+    path: "/v1/compare",
+    summary: "Compare the customer's own options side by side",
+    description:
+      "settlement_timing, min_vs_custom_payment, deposit_break_vs_wait. Every figure is computed by the same engine as the pre-action checks; the summary copy is bank-approved. Without consent: kind generic.",
+    security,
+    request: { body: json(CompareRequest, "Scenario and product") },
+    responses: { 200: json(CompareResponse, "Options"), ...errors },
+  });
+  registry.registerPath({
+    method: "post",
+    path: "/v1/assistant/messages",
+    summary: "Ask AMIL: a question about the customer's own products (server-sent events)",
+    description:
+      "Responds with text/event-stream: `status` events as each step completes (classify_intent, fetch_customer_context, compute, draft_answer, validate_numbers, guard, respond), `delta` events with the validated answer text, one `answer` event (schema below), then `done`. On failure: `error` with a generic code, then `done`. The question is classified locally and never sent to a model.",
+    security,
+    request: { body: json(AssistantMessageRequest, "Question") },
+    responses: {
+      200: {
+        description: "Event stream; the `answer` event carries this object",
+        content: { "text/event-stream": { schema: AssistantAnswer } },
+      },
+      ...errors,
+    },
   });
   registry.registerPath({
     method: "post",

@@ -41,3 +41,5 @@ export const PROACTIVE_RULE_PACK_KEYS: readonly RulePackKey[] = [
   "account.dormancy",
   "rewards.expiry",
 ];
+export * from "./knowledge";
+export * from "./compare/compare";

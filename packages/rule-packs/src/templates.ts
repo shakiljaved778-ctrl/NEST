@@ -1,6 +1,8 @@
 import type { Severity, Variant } from "@amil/rules-engine";
 import { z } from "zod";
 import accountCloseCopy from "../templates/account.close.json" with { type: "json" };
+import assistantCopy from "../templates/assistant.json" with { type: "json" };
+import compareCopy from "../templates/compare.json" with { type: "json" };
 import accountDormancyCopy from "../templates/account.dormancy.json" with { type: "json" };
 import cardBalanceTransferCopy from "../templates/card.balance_transfer.json" with { type: "json" };
 import cardCashWithdrawalCopy from "../templates/card.cash_withdrawal.json" with { type: "json" };
@@ -19,7 +21,8 @@ const OptionSchema = z.object({ key: z.string(), label: z.string().min(1) });
 export const TemplateSchema = z.object({
   key: z.string(),
   /** insight: computed card; generic: no-consent product information without customer data */
-  kind: z.enum(["insight", "generic"]).default("insight"),
+  /** compare: summary of a compare view; assistant: an Ask AMIL phrase (no rule pack). */
+  kind: z.enum(["insight", "generic", "compare", "assistant"]).default("insight"),
   rulePackKey: z.string(),
   variant: z.enum(["conventional", "islamic"]),
   locale: z.enum(["en", "ar"]),
@@ -40,6 +43,10 @@ const TemplateFileSchema = z.object({
   templates: z.array(TemplateSchema),
   factLabels: LocaleMap,
   explanations: LocaleMap,
+  /** Compare views: titles of the options (today, cheapest_date, …). */
+  optionTitles: LocaleMap.optional(),
+  /** Ask AMIL: suggested questions offered as chips. */
+  suggestions: LocaleMap.optional(),
 });
 
 export const CopyPolicySchema = z.object({
@@ -67,6 +74,8 @@ const FILES = {
   "finance.top_up": TemplateFileSchema.parse(financeTopUpCopy),
   "rewards.expiry": TemplateFileSchema.parse(rewardsExpiryCopy),
   "salary.transfer_change": TemplateFileSchema.parse(salaryTransferChangeCopy),
+  compare: TemplateFileSchema.parse(compareCopy),
+  assistant: TemplateFileSchema.parse(assistantCopy),
 } as const;
 type PackWithCopy = keyof typeof FILES;
 
@@ -78,7 +87,29 @@ export const TEMPLATES: TemplateDef[] = ALL_TEMPLATES.filter((t) => t.kind === "
 export const GENERIC_TEMPLATES: TemplateDef[] = ALL_TEMPLATES.filter((t) => t.kind === "generic");
 
 function copyFor(packKey: string): (typeof FILES)[PackWithCopy] | undefined {
-  return (FILES as Record<string, (typeof FILES)[PackWithCopy]>)[packKey];
+  const file = packKey.startsWith("compare.")
+    ? "compare"
+    : packKey.startsWith("assistant")
+      ? "assistant"
+      : packKey;
+  return (FILES as Record<string, (typeof FILES)[PackWithCopy]>)[file];
+}
+
+/** Compare views: approved summary copy, one per scenario × variant × locale. */
+export const COMPARE_TEMPLATES: TemplateDef[] = ALL_TEMPLATES.filter((t) => t.kind === "compare");
+/** Ask AMIL: approved phrases (help, refusals, clarifications…), per variant × locale. */
+export const ASSISTANT_TEMPLATES: TemplateDef[] = ALL_TEMPLATES.filter(
+  (t) => t.kind === "assistant",
+);
+
+/** Approved title of a compare option ("today", "cheapest_date", …). */
+export function optionTitle(locale: "en" | "ar", optionKey: string): string {
+  return FILES.compare.optionTitles?.[locale][optionKey] ?? optionKey;
+}
+
+/** Approved suggested question for Ask AMIL, by topic key ("card.close", "explain.charge", …). */
+export function suggestion(locale: "en" | "ar", topic: string): string | undefined {
+  return FILES.assistant.suggestions?.[locale][topic];
 }
 
 /** Approved label for a fact chip (falls back to the fact key, which tests prevent). */

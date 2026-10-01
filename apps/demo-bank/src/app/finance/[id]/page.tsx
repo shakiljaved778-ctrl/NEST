@@ -59,6 +59,13 @@ export default async function FinanceDetail({ params }: { params: Promise<{ id: 
         {t("actions.topUp")}
       </Link>
       <Link
+        href={`/compare/settlement?financeId=${f.id}`}
+        className={buttonVariants({ variant: "outline", block: true })}
+        data-testid="compare-settlement"
+      >
+        {t("compare.settlement")}
+      </Link>
+      <Link
         href={`/finance/${id}/settle`}
         className={buttonVariants({ block: true })}
         data-testid="settle-early"

@@ -91,6 +91,8 @@ export type OptionKey =
   | "continue_account_close"
   // account.dormancy (proactive)
   | "make_a_transaction"
+  // Ask AMIL: explain my charge
+  | "view_charge"
   // every pack
   | "talk_to_someone";
 

@@ -1,0 +1,1023 @@
+{
+  "$comment": "Bank-approved copy (demo) for compare views (kind 'compare') and Ask AMIL phrases (kind 'assistant'). Seeded 'approved' (conventional) and 'sharia_approved' (Islamic). Syntax as for insight templates. No literal digits: every number is a fact. Doha Demo Bank is fictional.",
+  "templates": [
+    {
+      "key": "assistant.help.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.help",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Ask me about your own products",
+      "body": "I can tell you what changes before you close a card, settle a finance early, break a deposit or move your salary. I can also explain a charge on your statement and compare your options. I only use your Doha Demo Bank products and the bank's published rules.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.help.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.help",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "اسألني عن منتجاتك",
+      "body": "يمكنني أن أوضح لك ما يتغيّر قبل إغلاق بطاقة أو سداد تمويل مبكراً أو كسر وديعة أو نقل راتبك، كما يمكنني شرح أي رسوم في كشف حسابك ومقارنة خياراتك. أستخدم فقط منتجاتك في بنك الدوحة التجريبي وقواعد البنك المنشورة.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.help.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.help",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Ask me about your own products",
+      "body": "I can tell you what changes before you close a card, settle a finance early, break a deposit or move your salary. I can also explain a charge on your statement and compare your options. I only use your Doha Demo Bank products and the bank's published rules.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.help.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.help",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "اسألني عن منتجاتك",
+      "body": "يمكنني أن أوضح لك ما يتغيّر قبل إغلاق بطاقة أو سداد تمويل مبكراً أو كسر وديعة أو نقل راتبك، كما يمكنني شرح أي رسوم في كشف حسابك ومقارنة خياراتك. أستخدم فقط منتجاتك في بنك الدوحة التجريبي وقواعد البنك المنشورة.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.refuse_advice.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.refuse_advice",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "I can't give investment or product advice",
+      "body": "I can explain your own products and the bank's published rules, but I can't recommend investments, products or what to buy. For advice, you can talk to someone at the bank.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.refuse_advice.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.refuse_advice",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لا أستطيع تقديم نصائح استثمارية أو توصيات بمنتجات",
+      "body": "يمكنني شرح منتجاتك وقواعد البنك المنشورة، لكن لا أستطيع التوصية باستثمارات أو منتجات أو بما تشتريه. للحصول على المشورة يمكنك التحدث إلى موظف في البنك.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.refuse_advice.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.refuse_advice",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "I can't give investment or product advice",
+      "body": "I can explain your own products and the bank's published rules, but I can't recommend investments, products or what to buy. For advice, you can talk to someone at the bank.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.refuse_advice.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.refuse_advice",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لا أستطيع تقديم نصائح استثمارية أو توصيات بمنتجات",
+      "body": "يمكنني شرح منتجاتك وقواعد البنك المنشورة، لكن لا أستطيع التوصية باستثمارات أو منتجات أو بما تشتريه. للحصول على المشورة يمكنك التحدث إلى موظف في البنك.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.refuse_scope.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.refuse_scope",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "That's outside what I can help with",
+      "body": "I can answer questions about your Doha Demo Bank accounts, cards, finance and deposits, and the bank's published rules.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.refuse_scope.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.refuse_scope",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "هذا خارج نطاق ما يمكنني المساعدة فيه",
+      "body": "يمكنني الإجابة عن أسئلتك حول حساباتك وبطاقاتك وتمويلاتك وودائعك في بنك الدوحة التجريبي، وعن قواعد البنك المنشورة.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.refuse_scope.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.refuse_scope",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "That's outside what I can help with",
+      "body": "I can answer questions about your Doha Demo Bank accounts, cards, finance and deposits, and the bank's published rules.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.refuse_scope.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.refuse_scope",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "هذا خارج نطاق ما يمكنني المساعدة فيه",
+      "body": "يمكنني الإجابة عن أسئلتك حول حساباتك وبطاقاتك وتمويلاتك وودائعك في بنك الدوحة التجريبي، وعن قواعد البنك المنشورة.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_consent.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_consent",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Ask AMIL needs your permission",
+      "body": "To answer using your accounts, cards and finance, Ask AMIL needs your consent. You can turn it on in Settings. Until then I can only share general information.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_consent.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_consent",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "يحتاج اسأل عميل إلى إذنك",
+      "body": "للإجابة باستخدام حساباتك وبطاقاتك وتمويلاتك، يحتاج اسأل عميل إلى موافقتك. يمكنك تفعيلها من الإعدادات، وحتى ذلك الحين يمكنني مشاركة معلومات عامة فقط.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_consent.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_consent",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Ask AMIL needs your permission",
+      "body": "To answer using your accounts, cards and finance, Ask AMIL needs your consent. You can turn it on in Settings. Until then I can only share general information.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_consent.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_consent",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "يحتاج اسأل عميل إلى إذنك",
+      "body": "للإجابة باستخدام حساباتك وبطاقاتك وتمويلاتك، يحتاج اسأل عميل إلى موافقتك. يمكنك تفعيلها من الإعدادات، وحتى ذلك الحين يمكنني مشاركة معلومات عامة فقط.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.unknown.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.unknown",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "I'm not sure I understood",
+      "body": "Try asking, for example, what happens if you close your card, or why you were charged a fee.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.unknown.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.unknown",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لم أتمكن من فهم سؤالك",
+      "body": "جرّب أن تسأل مثلاً عمّا يحدث إذا أغلقت بطاقتك، أو عن سبب رسوم في كشف حسابك.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.unknown.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.unknown",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "I'm not sure I understood",
+      "body": "Try asking, for example, what happens if you close your card, or why you were charged a fee.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.unknown.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.unknown",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لم أتمكن من فهم سؤالك",
+      "body": "جرّب أن تسأل مثلاً عمّا يحدث إذا أغلقت بطاقتك، أو عن سبب رسوم في كشف حسابك.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.clarify.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.clarify",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Which product do you mean?",
+      "body": "Your question could be about several of your products. Choose the product you mean below.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.clarify.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.clarify",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "أيّها تقصد؟",
+      "body": "قد يتعلق سؤالك بأكثر من منتج لديك. اختر المنتج الذي تقصده مما يلي.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.clarify.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.clarify",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Which product do you mean?",
+      "body": "Your question could be about several of your products. Choose the product you mean below.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.clarify.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.clarify",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "أيّها تقصد؟",
+      "body": "قد يتعلق سؤالك بأكثر من منتج لديك. اختر المنتج الذي تقصده مما يلي.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.ask_amount.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.ask_amount",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "How much are you thinking of?",
+      "body": "Tell me the amount, or pick an amount below, and I will show you what it costs.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.ask_amount.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.ask_amount",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "ما المبلغ الذي تفكر فيه؟",
+      "body": "أخبرني بالمبلغ أو اختر مبلغاً مما يلي، وسأوضح لك تكلفته.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.ask_amount.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.ask_amount",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "How much are you thinking of?",
+      "body": "Tell me the amount, or pick an amount below, and I will show you what it costs.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.ask_amount.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.ask_amount",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "ما المبلغ الذي تفكر فيه؟",
+      "body": "أخبرني بالمبلغ أو اختر مبلغاً مما يلي، وسأوضح لك تكلفته.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_product.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_product",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "I couldn't find a product for that",
+      "body": "You don't hold a Doha Demo Bank product this question is about.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_product.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_product",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لم أجد منتجاً يتعلق بذلك",
+      "body": "لا تملك منتجاً في بنك الدوحة التجريبي يتعلق به هذا السؤال.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_product.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_product",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "I couldn't find a product for that",
+      "body": "You don't hold a Doha Demo Bank product this question is about.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_product.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_product",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لم أجد منتجاً يتعلق بذلك",
+      "body": "لا تملك منتجاً في بنك الدوحة التجريبي يتعلق به هذا السؤال.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.nothing.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.nothing",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Nothing to flag for this",
+      "body": "Based on your current products, AMIL found nothing you would gain or lose by doing this. The bank's own screens show the full terms.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.nothing.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.nothing",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لا يوجد ما يستدعي التنبيه",
+      "body": "بناءً على منتجاتك الحالية، لم يجد عميل ما تكسبه أو تخسره بهذا الإجراء. تعرض شاشات البنك الشروط كاملة.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.nothing.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.nothing",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Nothing to flag for this",
+      "body": "Based on your current products, AMIL found nothing you would gain or lose by doing this. The bank's own screens show the full terms.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.nothing.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.nothing",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لا يوجد ما يستدعي التنبيه",
+      "body": "بناءً على منتجاتك الحالية، لم يجد عميل ما تكسبه أو تخسره بهذا الإجراء. تعرض شاشات البنك الشروط كاملة.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.products.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.products",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Your products at Doha Demo Bank",
+      "body": "[[accountsCount: Accounts: {accountsCount}. ]][[cardsCount: Cards: {cardsCount}. ]][[financesCount: Finance: {financesCount}. ]][[depositsCount: Deposits: {depositsCount}.]]",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.products.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.products",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "منتجاتك في بنك الدوحة التجريبي",
+      "body": "[[accountsCount: الحسابات: {accountsCount}. ]][[cardsCount: البطاقات: {cardsCount}. ]][[financesCount: التمويلات: {financesCount}. ]][[depositsCount: الودائع: {depositsCount}.]]",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.products.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.products",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Your products at Doha Demo Bank",
+      "body": "[[accountsCount: Accounts: {accountsCount}. ]][[cardsCount: Cards: {cardsCount}. ]][[financesCount: Finance: {financesCount}. ]][[depositsCount: Deposits: {depositsCount}.]]",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.products.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.products",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "منتجاتك في بنك الدوحة التجريبي",
+      "body": "[[accountsCount: الحسابات: {accountsCount}. ]][[cardsCount: البطاقات: {cardsCount}. ]][[financesCount: التمويلات: {financesCount}. ]][[depositsCount: الودائع: {depositsCount}.]]",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.charge.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.charge",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Your latest charge was {chargeAmount} on {chargeDate}",
+      "body": "[[chargeMatches: It matches the bank's published fee. ]]Open it to see what it is and how to avoid it.",
+      "options": [
+        {
+          "key": "view_charge",
+          "label": "See how it was worked out"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.charge.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.charge",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "آخر رسوم احتُسبت عليك {chargeAmount} في {chargeDate}",
+      "body": "[[chargeMatches: وهي مطابقة للرسوم المنشورة لدى البنك. ]]افتحها لمعرفة ماهيتها وكيفية تجنبها.",
+      "options": [
+        {
+          "key": "view_charge",
+          "label": "عرض طريقة الاحتساب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.charge.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.charge",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Your latest charge was {chargeAmount} on {chargeDate}",
+      "body": "[[chargeMatches: It matches the bank's published fee. ]]Open it to see what it is and how to avoid it.",
+      "options": [
+        {
+          "key": "view_charge",
+          "label": "See how it was worked out"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.charge.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.charge",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "آخر رسوم احتُسبت عليك {chargeAmount} في {chargeDate}",
+      "body": "[[chargeMatches: وهي مطابقة للرسوم المنشورة لدى البنك. ]]افتحها لمعرفة ماهيتها وكيفية تجنبها.",
+      "options": [
+        {
+          "key": "view_charge",
+          "label": "عرض طريقة الاحتساب"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_charges.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_charges",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "No recent charges",
+      "body": "There are no fees or charges on your recent statements.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_charges.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_charges",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لا توجد رسوم حديثة",
+      "body": "لا توجد رسوم في كشوف حساباتك الأخيرة.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_charges.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_charges",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "No recent charges",
+      "body": "There are no fees or charges on your recent statements.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.no_charges.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.no_charges",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "لا توجد رسوم حديثة",
+      "body": "لا توجد رسوم في كشوف حساباتك الأخيرة.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.unavailable.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.unavailable",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "That information isn't available right now",
+      "body": "I can't show this here at the moment. The bank's own screens have the details, or you can talk to someone.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.unavailable.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.unavailable",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "هذه المعلومات غير متاحة حالياً",
+      "body": "لا يمكنني عرض ذلك هنا في الوقت الحالي. تجد التفاصيل في شاشات البنك، أو يمكنك التحدث إلى موظف.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.unavailable.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.unavailable",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "That information isn't available right now",
+      "body": "I can't show this here at the moment. The bank's own screens have the details, or you can talk to someone.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.unavailable.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.unavailable",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "هذه المعلومات غير متاحة حالياً",
+      "body": "لا يمكنني عرض ذلك هنا في الوقت الحالي. تجد التفاصيل في شاشات البنك، أو يمكنك التحدث إلى موظف.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.faq.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.faq",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "From the bank's published rules",
+      "body": "Here is what the bank's published rules say.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.faq.conventional.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.faq",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "من قواعد البنك المنشورة",
+      "body": "إليك ما تنص عليه قواعد البنك المنشورة.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "assistant.faq.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.faq",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "From the bank's published rules",
+      "body": "Here is what the bank's published rules say.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "assistant.faq.islamic.info",
+      "kind": "assistant",
+      "rulePackKey": "assistant.faq",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "من قواعد البنك المنشورة",
+      "body": "إليك ما تنص عليه قواعد البنك المنشورة.",
+      "options": [
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "accountsCount": "Accounts",
+      "cardsCount": "Cards",
+      "financesCount": "Finance",
+      "depositsCount": "Deposits",
+      "chargeAmount": "Charge",
+      "chargeDate": "Posted on",
+      "chargeMatches": "Matches the published fee"
+    },
+    "ar": {
+      "accountsCount": "الحسابات",
+      "cardsCount": "البطاقات",
+      "financesCount": "التمويلات",
+      "depositsCount": "الودائع",
+      "chargeAmount": "الرسوم",
+      "chargeDate": "تاريخ القيد",
+      "chargeMatches": "مطابقة للرسوم المنشورة"
+    }
+  },
+  "explanations": {
+    "en": {},
+    "ar": {}
+  },
+  "suggestions": {
+    "en": {
+      "card.close": "What happens if I close my card?",
+      "finance.early_settlement": "When is the cheapest day to settle my finance?",
+      "deposit.break": "Should I wait or break my deposit now?",
+      "card.minimum_payment": "What if I only pay the minimum?",
+      "card.cash_withdrawal": "What does a cash withdrawal on my card cost?",
+      "salary.transfer_change": "What changes if I move my salary?",
+      "explain.charge": "Why was I charged a fee?",
+      "products": "What products do I have?",
+      "rewards.expiry": "When do my points expire?",
+      "account.dormancy": "Is any account about to become dormant?"
+    },
+    "ar": {
+      "card.close": "ماذا يحدث إذا أغلقت بطاقتي؟",
+      "finance.early_settlement": "ما أقل الأيام تكلفة لسداد تمويلي؟",
+      "deposit.break": "هل أنتظر أم أكسر وديعتي الآن؟",
+      "card.minimum_payment": "ماذا لو سددت الحد الأدنى فقط؟",
+      "card.cash_withdrawal": "كم يكلّف السحب النقدي ببطاقتي؟",
+      "salary.transfer_change": "ما الذي يتغيّر إذا نقلت راتبي؟",
+      "explain.charge": "لماذا احتُسبت عليّ رسوم؟",
+      "products": "ما المنتجات التي أملكها؟",
+      "rewards.expiry": "متى تنتهي صلاحية نقاطي؟",
+      "account.dormancy": "هل يقترب أي حساب من الخمول؟"
+    }
+  }
+}

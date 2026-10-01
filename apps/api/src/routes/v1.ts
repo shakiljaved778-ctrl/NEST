@@ -3,8 +3,11 @@ import { hashCustomerRef, type PrismaClient } from "@amil/db";
 import type { ModelGateway } from "@amil/gateway";
 import {
   AlertListQuery,
+  AssistantMessageRequest,
+  type AssistantStreamEvent,
   CheckRequest,
   CheckResponse,
+  CompareRequest,
   EventRequest,
   ExplainChargeRequest,
   InsightCard,
@@ -21,7 +24,9 @@ import { z } from "zod";
 import { assertCustomer, authenticate, type AuthDeps } from "../auth/guard";
 import { mintSessionToken } from "../auth/session";
 import { badRequest, forbidden, notFound, parseOr400 } from "../errors";
+import { runAssistant } from "../assistant/service";
 import { explainCharge } from "../services/charges";
+import { runCompare } from "../services/compare";
 import { type CheckDeps, runCheck } from "../services/checks";
 
 export interface V1Deps extends AuthDeps {
@@ -308,6 +313,58 @@ export function v1Routes(app: FastifyInstance, deps: V1Deps): void {
       body,
       auth.kind === "session" ? auth.locale : undefined,
     );
+  });
+
+  // ── Compare the customer's options ──
+  app.post("/v1/compare", async (req) => {
+    const auth = await authenticate(req, deps, "compare:read");
+    const body = parseOr400(CompareRequest, req.body);
+    assertCustomer(auth, body.customerRef);
+    return runCompare(
+      checkDeps(req.log),
+      auth.bankId,
+      body,
+      auth.kind === "session" ? auth.locale : undefined,
+    );
+  });
+
+  // ── Ask AMIL (server-sent events) ──
+  app.post("/v1/assistant/messages", async (req, reply) => {
+    const auth = await authenticate(req, deps, "assistant:chat");
+    const body = parseOr400(AssistantMessageRequest, req.body);
+    assertCustomer(auth, body.customerRef);
+    await customerId(auth.bankId, body.customerRef); // 404 as JSON, before the stream opens
+    reply.hijack();
+    // Keep headers set by plugins (CORS) on the hijacked response.
+    const inherited = Object.fromEntries(
+      Object.entries(reply.getHeaders()).filter(
+        (e): e is [string, string | number | string[]] => e[1] !== undefined,
+      ),
+    );
+    reply.raw.writeHead(200, {
+      ...inherited,
+      "content-type": "text/event-stream; charset=utf-8",
+      "cache-control": "no-cache, no-transform",
+      connection: "keep-alive",
+      "x-accel-buffering": "no",
+    });
+    const emit = (e: AssistantStreamEvent) =>
+      reply.raw.write(`event: ${e.event}\ndata: ${JSON.stringify(e.data)}\n\n`);
+    try {
+      await runAssistant(
+        checkDeps(req.log),
+        auth.bankId,
+        body,
+        emit,
+        auth.kind === "session" ? auth.locale : undefined,
+      );
+    } catch (error) {
+      // Never leak details to the customer: a generic error event, then the stream ends.
+      req.log.error({ err: error }, "assistant_failed");
+      emit({ event: "error", data: { error: "internal_error" } });
+      emit({ event: "done", data: {} });
+    }
+    reply.raw.end();
   });
 
   // ── Inbound product events (bank backend only, idempotent) ──

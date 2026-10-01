@@ -1,0 +1,409 @@
+{
+  "$comment": "Bank-approved copy (demo) for compare views (kind 'compare') and Ask AMIL phrases (kind 'assistant'). Seeded 'approved' (conventional) and 'sharia_approved' (Islamic). Syntax as for insight templates. No literal digits: every number is a fact. Doha Demo Bank is fictional.",
+  "templates": [
+    {
+      "key": "compare.settlement_timing.conventional.info",
+      "kind": "compare",
+      "rulePackKey": "compare.settlement_timing",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "[[savingIfSettledOnCheapestDate: Settling on {cheapestSettlementDate} costs {savingIfSettledOnCheapestDate} less than today]][[!savingIfSettledOnCheapestDate: Settling today costs the least in the next {settlementHorizonDays} days]]",
+      "body": "Each option counts the scheduled instalments you would pay before settling, and any refund due back to you. Settling today costs {netOutflowToday} in total.",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "Settle on the cheaper date"
+        },
+        {
+          "key": "settle_now",
+          "label": "Settle today"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "compare.settlement_timing.conventional.info",
+      "kind": "compare",
+      "rulePackKey": "compare.settlement_timing",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "[[savingIfSettledOnCheapestDate: السداد في {cheapestSettlementDate} يكلّف {savingIfSettledOnCheapestDate} أقل من اليوم]][[!savingIfSettledOnCheapestDate: السداد اليوم هو الأقل تكلفة خلال الأيام الـ{settlementHorizonDays} القادمة]]",
+      "body": "يشمل كل خيار الأقساط المجدولة التي تدفعها قبل السداد وأي مبلغ يُردّ إليك. السداد اليوم يكلّف {netOutflowToday} إجمالاً.",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "السداد في التاريخ الأقل تكلفة"
+        },
+        {
+          "key": "settle_now",
+          "label": "السداد اليوم"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "compare.settlement_timing.islamic.info",
+      "kind": "compare",
+      "rulePackKey": "compare.settlement_timing",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "[[savingIfSettledOnCheapestDate: Settling on {cheapestSettlementDate} costs {savingIfSettledOnCheapestDate} less than today]][[!savingIfSettledOnCheapestDate: Settling today costs the least in the next {settlementHorizonDays} days]]",
+      "body": "Each option counts the scheduled instalments you would pay before settling, and any refund due back to you. Settling today costs {netOutflowToday} in total.",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "Settle on the cheaper date"
+        },
+        {
+          "key": "settle_now",
+          "label": "Settle today"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "compare.settlement_timing.islamic.info",
+      "kind": "compare",
+      "rulePackKey": "compare.settlement_timing",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "[[savingIfSettledOnCheapestDate: السداد في {cheapestSettlementDate} يكلّف {savingIfSettledOnCheapestDate} أقل من اليوم]][[!savingIfSettledOnCheapestDate: السداد اليوم هو الأقل تكلفة خلال الأيام الـ{settlementHorizonDays} القادمة]]",
+      "body": "يشمل كل خيار الأقساط المجدولة التي تدفعها قبل السداد وأي مبلغ يُردّ إليك. السداد اليوم يكلّف {netOutflowToday} إجمالاً.",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "السداد في التاريخ الأقل تكلفة"
+        },
+        {
+          "key": "settle_now",
+          "label": "السداد اليوم"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "compare.min_vs_custom_payment.conventional.info",
+      "kind": "compare",
+      "rulePackKey": "compare.min_vs_custom_payment",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Paying only the minimum costs {totalInterestMinimum} over {monthsToClearMinimum} months",
+      "body": "Here is your statement balance of {statementBalance} paid in different ways, at {aprPct} a year. Paying the full balance by the due date has no charges.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "Pay the full balance"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "Pay a different amount"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "Pay the minimum"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "compare.min_vs_custom_payment.conventional.info",
+      "kind": "compare",
+      "rulePackKey": "compare.min_vs_custom_payment",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "سداد الحد الأدنى فقط يكلّف {totalInterestMinimum} على مدى {monthsToClearMinimum} شهراً",
+      "body": "إليك رصيد كشف حسابك البالغ {statementBalance} مسدداً بطرق مختلفة، بمعدل {aprPct} سنوياً. سداد كامل الرصيد قبل تاريخ الاستحقاق لا تترتب عليه رسوم.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "سداد كامل الرصيد"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "سداد مبلغ آخر"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "سداد الحد الأدنى"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "compare.min_vs_custom_payment.islamic.info",
+      "kind": "compare",
+      "rulePackKey": "compare.min_vs_custom_payment",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Paying only the minimum costs {totalInterestMinimum} over {monthsToClearMinimum} months",
+      "body": "Here is your statement balance of {statementBalance} paid in different ways, at {aprPct} a year. Paying the full balance by the due date has no charges.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "Pay the full balance"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "Pay a different amount"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "Pay the minimum"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "compare.min_vs_custom_payment.islamic.info",
+      "kind": "compare",
+      "rulePackKey": "compare.min_vs_custom_payment",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "سداد الحد الأدنى فقط يكلّف {totalInterestMinimum} على مدى {monthsToClearMinimum} شهراً",
+      "body": "إليك رصيد كشف حسابك البالغ {statementBalance} مسدداً بطرق مختلفة، بمعدل {aprPct} سنوياً. سداد كامل الرصيد قبل تاريخ الاستحقاق لا تترتب عليه رسوم.",
+      "options": [
+        {
+          "key": "pay_statement_balance",
+          "label": "سداد كامل الرصيد"
+        },
+        {
+          "key": "pay_custom_amount",
+          "label": "سداد مبلغ آخر"
+        },
+        {
+          "key": "continue_minimum_payment",
+          "label": "سداد الحد الأدنى"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "compare.deposit_break_vs_wait.conventional.info",
+      "kind": "compare",
+      "rulePackKey": "compare.deposit_break_vs_wait",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Keeping this deposit to {maturityDate} pays {differenceIfKeptToMaturity} more",
+      "body": "Breaking before maturity pays a reduced return and may have a penalty. Your deposit matures in {daysToMaturity} days.",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "Keep until maturity"
+        },
+        {
+          "key": "continue_break",
+          "label": "Break today"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "compare.deposit_break_vs_wait.conventional.info",
+      "kind": "compare",
+      "rulePackKey": "compare.deposit_break_vs_wait",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "إبقاء هذه الوديعة حتى {maturityDate} يمنحك {differenceIfKeptToMaturity} أكثر",
+      "body": "الكسر قبل الاستحقاق يمنح عائداً أقل وقد تترتب عليه غرامة. تستحق وديعتك بعد {daysToMaturity} يوماً.",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "الإبقاء حتى الاستحقاق"
+        },
+        {
+          "key": "continue_break",
+          "label": "الكسر اليوم"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "compare.deposit_break_vs_wait.islamic.info",
+      "kind": "compare",
+      "rulePackKey": "compare.deposit_break_vs_wait",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Keeping this investment to {maturityDate} pays {differenceIfKeptToMaturity} more",
+      "body": "Breaking before maturity pays a reduced profit and may have a penalty. Your investment matures in {daysToMaturity} days.",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "Keep until maturity"
+        },
+        {
+          "key": "continue_break",
+          "label": "Break today"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "compare.deposit_break_vs_wait.islamic.info",
+      "kind": "compare",
+      "rulePackKey": "compare.deposit_break_vs_wait",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "إبقاء هذا الاستثمار حتى {maturityDate} يمنحك {differenceIfKeptToMaturity} أكثر",
+      "body": "الكسر قبل الاستحقاق يمنح ربحاً أقل وقد تترتب عليه غرامة. يستحق استثمارك بعد {daysToMaturity} يوماً.",
+      "options": [
+        {
+          "key": "keep_until_maturity",
+          "label": "الإبقاء حتى الاستحقاق"
+        },
+        {
+          "key": "continue_break",
+          "label": "الكسر اليوم"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ],
+  "factLabels": {
+    "en": {
+      "settlementDate": "Settlement date",
+      "instalmentsBefore": "Instalments before settling",
+      "settlementAmount": "Settlement amount",
+      "coverRefund": "Refund due to you",
+      "totalOutflow": "Total you pay",
+      "savingVsToday": "Less than today",
+      "extraVsToday": "More than today",
+      "cheapestSettlementDate": "Cheapest date",
+      "savingIfSettledOnCheapestDate": "Saving",
+      "netOutflowToday": "Total if settled today",
+      "settlementHorizonDays": "Days checked",
+      "monthlyPayment": "Each month",
+      "monthsToClear": "Months to clear",
+      "totalCharges": "Total charges",
+      "totalPaid": "Total paid",
+      "clearsBalance": "Clears the balance",
+      "statementBalance": "Statement balance",
+      "aprPct": "Annual rate",
+      "totalInterestMinimum": "Charges paying the minimum",
+      "monthsToClearMinimum": "Months paying the minimum",
+      "receiveDate": "You receive on",
+      "amountReceived": "Amount received",
+      "returnEarned": "Return",
+      "penalty": "Penalty",
+      "daysToMaturity": "Days to maturity",
+      "maturityDate": "Maturity date",
+      "differenceIfKeptToMaturity": "Difference",
+      "minimumDue": "Minimum due"
+    },
+    "ar": {
+      "settlementDate": "تاريخ السداد",
+      "instalmentsBefore": "الأقساط قبل السداد",
+      "settlementAmount": "مبلغ السداد",
+      "coverRefund": "مبلغ يُردّ إليك",
+      "totalOutflow": "إجمالي ما تدفعه",
+      "savingVsToday": "أقل من اليوم",
+      "extraVsToday": "أكثر من اليوم",
+      "cheapestSettlementDate": "التاريخ الأقل تكلفة",
+      "savingIfSettledOnCheapestDate": "التوفير",
+      "netOutflowToday": "الإجمالي عند السداد اليوم",
+      "settlementHorizonDays": "الأيام التي تم فحصها",
+      "monthlyPayment": "كل شهر",
+      "monthsToClear": "أشهر السداد",
+      "totalCharges": "إجمالي الرسوم",
+      "totalPaid": "إجمالي المدفوع",
+      "clearsBalance": "يسدد الرصيد",
+      "statementBalance": "رصيد الكشف",
+      "aprPct": "المعدل السنوي",
+      "totalInterestMinimum": "الرسوم بسداد الحد الأدنى",
+      "monthsToClearMinimum": "الأشهر بسداد الحد الأدنى",
+      "receiveDate": "تحصل عليه في",
+      "amountReceived": "المبلغ المستلم",
+      "returnEarned": "العائد",
+      "penalty": "الغرامة",
+      "daysToMaturity": "الأيام حتى الاستحقاق",
+      "maturityDate": "تاريخ الاستحقاق",
+      "differenceIfKeptToMaturity": "الفرق",
+      "minimumDue": "الحد الأدنى المستحق"
+    }
+  },
+  "explanations": {
+    "en": {},
+    "ar": {}
+  },
+  "optionTitles": {
+    "en": {
+      "today": "Settle today",
+      "cheapest_date": "Cheapest date",
+      "after_next_instalment": "After the next instalment",
+      "minimum": "Minimum only",
+      "custom": "A higher fixed amount",
+      "full": "Full balance now",
+      "break_today": "Break today",
+      "wait_to_maturity": "Keep to maturity"
+    },
+    "ar": {
+      "today": "السداد اليوم",
+      "cheapest_date": "التاريخ الأقل تكلفة",
+      "after_next_instalment": "بعد القسط القادم",
+      "minimum": "الحد الأدنى فقط",
+      "custom": "مبلغ ثابت أعلى",
+      "full": "كامل الرصيد الآن",
+      "break_today": "الكسر اليوم",
+      "wait_to_maturity": "الإبقاء حتى الاستحقاق"
+    }
+  }
+}

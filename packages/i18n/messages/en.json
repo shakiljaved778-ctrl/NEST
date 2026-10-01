@@ -25,5 +25,42 @@
     "disclosure": "Explained from {bankName}'s published fee schedule (version {version}) and your own transactions. No AI is used for charge explanations.",
     "generic": "General information. No account data was used. Ask us about any charge on your statement.",
     "notAFee": "This line is not a fee or charge."
+  },
+  "assistant": {
+    "title": "Ask AMIL",
+    "intro": "Ask about your own products: what changes before you act, why you were charged, or how your options compare.",
+    "placeholder": "Ask a question",
+    "send": "Send",
+    "you": "You",
+    "amil": "AMIL",
+    "unavailable": "Ask AMIL is not available right now. Please try again later.",
+    "best": "Best option",
+    "steps": {
+      "classify_intent": "Understanding your question",
+      "fetch_customer_context": "Looking at your products",
+      "compute": "Working out the figures",
+      "draft_answer": "Writing the answer",
+      "validate_numbers": "Checking every figure",
+      "guard": "Final checks",
+      "respond": "Done"
+    },
+    "starters": [
+      {
+        "topic": "card.close",
+        "label": "What happens if I close my card?"
+      },
+      {
+        "topic": "explain.charge",
+        "label": "Why was I charged a fee?"
+      },
+      {
+        "topic": "finance.early_settlement",
+        "label": "When is the cheapest day to settle my finance?"
+      },
+      {
+        "topic": "products",
+        "label": "What products do I have?"
+      }
+    ]
   }
 }

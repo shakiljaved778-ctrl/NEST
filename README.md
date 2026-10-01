@@ -33,6 +33,9 @@ with the header toggle.
 - **Omar**: Settings → **Move my salary to another bank**.
 - **Hessa**: her current account → **Close account** (cheques and standing orders).
 - **Ravi**: Gold card → **Pay card**, or **Statement** → tap a fee line to see how it was worked out.
+- **Ask AMIL** tab: "What happens if I close my card?" as Khalid; try "Should I invest in stocks?".
+- **Compare**: Fatima's finance → **Compare settlement dates**; Aisha's deposit → **Break now or
+  wait?**; any card → **Compare payments**.
 - **Alerts**: run `pnpm proactive:run` (what the 06:00 schedule does), then open **Alerts** as
   Khalid (points expiring) or Grace (account about to become dormant).
 

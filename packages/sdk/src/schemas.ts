@@ -33,6 +33,8 @@ export const Scope = z
     "consents:write",
     "alerts:read",
     "charges:explain",
+    "compare:read",
+    "assistant:chat",
   ])
   .meta({ id: "Scope" });
 export const ConsentPurpose = z
@@ -250,6 +252,119 @@ export const ChargeExplanation = z
   })
   .meta({ id: "ChargeExplanation" });
 
+// ── Compare ───────────────────────────────────────────────────────────────────────────────────
+export const CompareScenario = z
+  .enum(["settlement_timing", "min_vs_custom_payment", "deposit_break_vs_wait"])
+  .meta({ id: "CompareScenario" });
+export const CompareRequest = z
+  .object({
+    customerRef: CustomerRef,
+    scenario: CompareScenario,
+    params: z
+      .object({
+        financeId: ProductId.optional(),
+        cardId: ProductId.optional(),
+        depositId: ProductId.optional(),
+        paymentAmount: Amount.optional(),
+      })
+      .strict()
+      .meta({
+        description:
+          "settlement_timing: financeId; min_vs_custom_payment: cardId (+ paymentAmount); deposit_break_vs_wait: depositId",
+      }),
+    locale: Locale.optional(),
+  })
+  .strict()
+  .meta({ id: "CompareRequest" });
+export const CompareOption = z
+  .object({
+    key: z.string(),
+    title: z.string(),
+    best: z.boolean().meta({ description: "The lowest-cost (or highest-value) option" }),
+    facts: z.array(FactChip),
+    action: CardOption.nullable().meta({ description: "Bank deep link to act on this option" }),
+  })
+  .meta({ id: "CompareOption" });
+export const CompareResponse = z
+  .object({
+    compareId: z.string(),
+    scenario: CompareScenario,
+    kind: z.enum(["comparison", "generic", "none"]),
+    headline: z.string().nullable(),
+    body: z.string().nullable(),
+    options: z.array(CompareOption),
+    actions: z.array(CardOption),
+    disclosure: z.string(),
+  })
+  .meta({ id: "CompareResponse" });
+
+// ── Ask AMIL ──────────────────────────────────────────────────────────────────────────────────
+export const AssistantContext = CheckContext.extend({
+  topic: z
+    .string()
+    .max(64)
+    .regex(/^[a-z_.]+$/)
+    .optional(),
+})
+  .strict()
+  .meta({
+    id: "AssistantContext",
+    description: "Set when the customer taps a suggestion (topic + product), never free text",
+  });
+export const AssistantMessageRequest = z
+  .object({
+    customerRef: CustomerRef,
+    message: z.string().trim().min(1).max(500),
+    conversationId: z.string().uuid().optional(),
+    context: AssistantContext.optional(),
+    locale: Locale.optional(),
+  })
+  .strict()
+  .meta({ id: "AssistantMessageRequest" });
+export const AssistantSuggestion = z
+  .object({ label: z.string(), message: z.string(), context: AssistantContext.optional() })
+  .meta({ id: "AssistantSuggestion" });
+export const AssistantAnswer = z
+  .object({
+    messageId: z.string(),
+    conversationId: z.string(),
+    intent: z.string(),
+    kind: z.enum([
+      "insight",
+      "comparison",
+      "charge",
+      "faq",
+      "products",
+      "clarify",
+      "refusal",
+      "help",
+      "no_consent",
+      "nothing",
+      "unknown",
+    ]),
+    severity: Severity.nullable(),
+    headline: z.string(),
+    body: z.string(),
+    details: z
+      .array(z.string())
+      .meta({ description: "Further approved paragraphs (FAQ, fee schedule)" }),
+    why: z.array(z.string()).meta({ description: "Approved 'Why am I seeing this?' reasons" }),
+    facts: z.array(FactChip),
+    options: z.array(CardOption),
+    suggestions: z.array(AssistantSuggestion),
+    comparison: CompareResponse.nullable(),
+    aiDisclosure: z.string(),
+  })
+  .meta({ id: "AssistantAnswer" });
+/** Server-sent events of POST /v1/assistant/messages, in order: status*, delta*, answer, done. */
+export const AssistantStreamEvent = z.discriminatedUnion("event", [
+  z.object({ event: z.literal("status"), data: z.object({ step: z.string() }) }),
+  z.object({ event: z.literal("delta"), data: z.object({ text: z.string() }) }),
+  z.object({ event: z.literal("answer"), data: AssistantAnswer }),
+  z.object({ event: z.literal("error"), data: z.object({ error: z.string() }) }),
+  z.object({ event: z.literal("done"), data: z.object({}) }),
+]);
+
 // ── Inbound product events (bank -> AMIL) ─────────────────────────────────────────────────────
 export const EventType = z
   .enum([
@@ -299,6 +414,7 @@ export const InsightResponseAck = z
   .meta({ id: "InsightResponseAck" });
 
 export type Locale = z.infer<typeof Locale>;
+export type Severity = z.infer<typeof Severity>;
 export type Scope = z.infer<typeof Scope>;
 export type CheckAction = z.infer<typeof CheckAction>;
 export type SessionRequest = z.infer<typeof SessionRequest>;
@@ -314,6 +430,16 @@ export type InsightResponseRequest = z.infer<typeof InsightResponseRequest>;
 export type InsightResponseAck = z.infer<typeof InsightResponseAck>;
 export type CheckContext = z.infer<typeof CheckContext>;
 export type EventRequest = z.infer<typeof EventRequest>;
+export type CompareScenario = z.infer<typeof CompareScenario>;
+export type CompareRequest = z.infer<typeof CompareRequest>;
+export type CompareOption = z.infer<typeof CompareOption>;
+export type CardOption = z.infer<typeof CardOption>;
+export type CompareResponse = z.infer<typeof CompareResponse>;
+export type AssistantContext = z.infer<typeof AssistantContext>;
+export type AssistantMessageRequest = z.infer<typeof AssistantMessageRequest>;
+export type AssistantSuggestion = z.infer<typeof AssistantSuggestion>;
+export type AssistantAnswer = z.infer<typeof AssistantAnswer>;
+export type AssistantStreamEvent = z.infer<typeof AssistantStreamEvent>;
 export type EventAck = z.infer<typeof EventAck>;
 export type AlertPack = z.infer<typeof AlertPack>;
 export type Alert = z.infer<typeof Alert>;
@@ -330,6 +456,8 @@ export const DEFAULT_SESSION_SCOPES: Scope[] = [
   "consents:write",
   "alerts:read",
   "charges:explain",
+  "compare:read",
+  "assistant:chat",
 ];
 
 /** HTTP headers for bank-to-AMIL calls. */

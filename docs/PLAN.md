@@ -91,8 +91,8 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] `POST /v1/insights/:id/responses`
 - [x] `GET /v1/alerts` + `POST /v1/alerts/:id/read` (Phase 5, D-038)
 - [x] `POST /v1/explain-charge` (Phase 5, D-040)
-- [ ] `POST /v1/compare` (Phase 6)
-- [ ] `POST /v1/assistant/messages` SSE (Phase 6)
+- [x] `POST /v1/compare` (Phase 6, D-049)
+- [x] `POST /v1/assistant/messages` SSE (Phase 6, D-045..D-047)
 - [x] `POST /v1/events` with idempotency key (Phase 5, recorded only in the MVP, D-043)
 - [ ] `/v1/admin/*` RBAC (Phase 7)
 - [x] `GET /healthz`, `GET /readyz`, `GET /docs`
@@ -109,13 +109,15 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 9: Ask AMIL (Phase 6)
 
-- [ ] LangGraph graph: classify_intent → fetch_customer_context → compute → draft_answer → validate_numbers → guard → respond
-- [ ] Tools: getProducts, evaluatePack, explainCharge, compareScenario, searchProductRules (knowledge markdown)
-- [ ] Out-of-scope refusal + "Talk to someone"; fact chips with sources; conversation audit
+- [x] LangGraph graph: classify_intent → fetch_customer_context → compute → draft_answer → validate_numbers → guard → respond (`apps/api/src/assistant`, D-046)
+- [x] Tools: getProducts, evaluatePack, explainCharge, compareScenario, searchProductRules (knowledge markdown in `packages/rule-packs/knowledge`, D-050)
+- [x] Out-of-scope and investment-advice refusal + "Talk to someone"; fact chips with sources; conversation audit (one event per turn, D-051)
+- [x] Free text never reaches the model: local en/ar intent classification (D-045); answers stream only after validation (D-047)
+- [x] `<amil-assistant>` web component (streaming, fact chips, compare table, suggestions, RTL)
 
 ## Section 10: Demo bank app (Phase 4+)
 
-- [~] Phone-framed app, persona switcher, home, card/finance/deposit/account detail, one AMIL-checked flow for every action, deep-link targets, settings (Phases 4–5) · [x] deposit break, salary change, account close, statements with tappable charges, alerts inbox (Phase 5) · [ ] Ask AMIL (Phase 6)
+- [~] Phone-framed app, persona switcher, home, card/finance/deposit/account detail, one AMIL-checked flow for every action, deep-link targets, settings (Phases 4–5) · [x] deposit break, salary change, account close, statements with tappable charges, alerts inbox (Phase 5) · [x] Ask AMIL tab, compare views (Phase 6)
 - [x] Critical severity requires "I understand" before "Continue" enables
 
 ## Section 11: Bank console (Phase 7)
@@ -146,7 +148,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] **Phase 3: Insight API + gateway.** Redaction property tests, validator (Arabic-Indic), audit chain verifies, p95 < 400 ms with mock
 - [x] **Phase 4: Demo bank app + widget.** Playwright: Khalid sees points insight in en + ar, deep-links to "Redeem points"
 - [x] **Phase 5: Remaining packs + proactive + explain.** Every pack fires for ≥ 2 personas; alerts after scheduler; all fee lines explainable
-- [ ] **Phase 6: Ask AMIL + compare.** Khalid card-close answer with fact chips; refuses investment advice; compare matches engine
+- [x] **Phase 6: Ask AMIL + compare.** Khalid card-close answer with fact chips; refuses investment advice; compare matches engine
 - [ ] **Phase 7: Bank console.** Point-value change flows to next insight; kill switch immediate; complaints lookup shows Khalid
 - [ ] **Phase 8: Hardening + demo.** Headers, encryption, rate limits, CI, Terraform, DEMO_SCRIPT, INTEGRATION_GUIDE, SECURITY; fresh clone to running demo in ≤ 3 commands
 

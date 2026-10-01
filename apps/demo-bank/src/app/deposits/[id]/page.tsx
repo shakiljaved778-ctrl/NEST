@@ -45,6 +45,13 @@ export default async function DepositDetail({ params }: { params: Promise<{ id: 
         </CardContent>
       </Card>
       <Link
+        href={`/compare/deposit?depositId=${d.id}`}
+        className={buttonVariants({ variant: "outline", block: true })}
+        data-testid="compare-deposit"
+      >
+        {t("compare.deposit")}
+      </Link>
+      <Link
         href={actHref("deposit.break", { depositId: d.id })}
         className={buttonVariants({ variant: "destructive", block: true })}
         data-testid="break-deposit"

@@ -372,3 +372,114 @@ store.
 - Literal digits never appear in copy: every number comes from a fact, so the validator accepts the
   approved wording.
 - Per-pack severity thresholds were added to the demo bank (synthetic, D-002).
+
+## D-045: Ask AMIL never sends the customer's free text to a model (Phase 6)
+
+Non-negotiable 6 says the model sees only a de-identified fact template, never free text, and a
+question can contain anything (names, account numbers). So `classify_intent` is a deterministic,
+local en/ar classifier (`apps/api/src/assistant/classify.ts`): patterns for each pack, the three
+comparisons, explain-a-charge, products, help, and refusals (investment advice, out of scope), with
+the bank's FAQ as the fallback. It also extracts amounts (including Arabic-Indic digits), months and
+product hints ("platinum", "murabaha"). A question about the customer's own products ("my card")
+is answered from them; a definitional one ("What is ibra?") from the FAQ. The model's only role is
+the one it already has: wording a computed fact set, through the same gateway, redactor and number
+validator as a pre-action check. Suggestions carry a topic and a product id, never free text.
+
+## D-046: The assistant graph and its tools (Phase 6)
+
+LangGraph.js (`@langchain/langgraph`) runs `classify_intent → fetch_customer_context → compute →
+draft_answer → validate_numbers → guard → respond`. Refusals, help and FAQ skip
+`fetch_customer_context`: no customer data is read for them. Tools are injected, so the graph is
+unit-tested with fakes and has no I/O of its own:
+
+- `getProducts`, `evaluatePack` (the check pipeline up to, not including, its audit:
+  `prepareInsight`), `compareScenario`, `latestCharge`, `explainCharge`, `searchProductRules`;
+- `phrase`, which renders an approved Ask AMIL phrase.
+
+When a question fits several products the assistant asks which (suggestions carry the product id).
+When an action needs an amount it offers example amounts. Pack kill switches and approvals apply
+exactly as for checks: a disabled pack or template yields the approved "unavailable" phrase, never
+an error.
+
+## D-047: The answer streams only after it has been validated (Phase 6)
+
+`POST /v1/assistant/messages` is server-sent events: one `status` event per graph step while the
+answer is computed, then `delta` events with the answer text, one `answer` event with the
+structured answer, and `done`. Streaming model tokens as they arrive would show the customer
+figures before the number validator and the guard had run (non-negotiable 2), so the text streams
+only once it has passed both. Errors after the stream opens become a generic `error` event; errors
+before it (auth, validation, unknown customer) are ordinary JSON errors.
+
+## D-048: Validator and guard run on every answer, and on the approved copy itself (Phase 6)
+
+`validate_numbers` re-checks the headline and body of every answer against its facts (defence in
+depth: computed answers were already validated by the gateway). `guard` applies the copy policy
+(selling terms, Sharia terminology) plus advice patterns ("I recommend", "you should buy", "أنصحك").
+Detail paragraphs are the bank's own approved text (FAQ, fee schedule) and never pass through a
+model. A failure replaces the answer with an approved phrase ("unavailable", or the advice
+refusal).
+
+A new gateway test runs every approved phrase, compare summary and FAQ entry through the real
+validator. It caught approved copy that would always have been rejected:
+
+- "pick **one** below" contains a spelled-out number;
+- the Arabic "لست" ("I'm not") reads as ل + ست ("six").
+
+Both were reworded.
+
+## D-049: Compare views are engine functions with template-only copy (Phase 6)
+
+`compareSettlementTiming`, `compareMinVsCustomPayment` and `compareDepositBreakVsWait`
+(`packages/rule-packs/src/compare`) are pure and built on the same calculators as the packs, so a
+comparison cannot disagree with the insight card for the same product. Tests and the API
+integration test assert it field by field.
+
+- **Settlement timing** shows today, the earliest cheapest date in the horizon, and the day after
+  the next instalment, when that is a different date in the horizon.
+- **Payment** shows the minimum, a fixed higher amount (the customer's, or the pack's default
+  multiple), and the full balance.
+- **Deposit** shows breaking today against keeping it to maturity.
+
+The best option is marked (the first, on ties). `POST /v1/compare` applies consent
+(`pre_decision_insights`), the underlying pack's kill switch and stored parameters, and approved
+summary copy rendered from the facts with no model. Each comparison is audited as
+`compare.<scenario>`.
+
+## D-050: The bank's FAQ is markdown, compiled into the bundle (Phase 6)
+
+`searchProductRules` searches bank-approved FAQ entries in
+`packages/rule-packs/knowledge/{en,ar}/*.md` (front matter: id, title, keywords).
+`pnpm --filter @amil/rule-packs gen:knowledge` compiles them into `knowledge.generated.ts`, and a
+test fails if that file is stale.
+
+- FAQ copy contains no figures: numbers only ever come from the engine. It is linted with the
+  Islamic copy rules because it serves both variants.
+- Matching folds Arabic letter variants, diacritics and the definite article.
+- A question in either language finds the entry, and the answer is given in the customer's
+  language.
+
+## D-051: Ask AMIL's copy is bank-approved templates; each turn is one audit event (Phase 6)
+
+Ask AMIL's phrases (help, refusals, consent, clarification, products, charge, nothing to flag,
+unavailable) and the compare summaries are templates like the pack copy:
+
+- kinds `assistant` and `compare`, seeded `approved` / `sharia_approved` (260 templates in total);
+- served only when approved and enabled.
+
+The assistant needs the `assistant` consent purpose, which is separate from pre-decision insights.
+Each turn writes one `InsightEvent` (`rulePackKey: assistant`, `trigger: assistant`) with:
+
+- the question, the intent and the checks run;
+- exactly what was shown;
+- the model provider and version, if the wording used one.
+
+The question is stored because a complaints review needs it, and it stays in-country in the bank's
+audit store (D-024). Comparisons and charge explanations used by a turn keep their own audit
+events.
+
+## D-052: API integration test files run one at a time (Phase 6)
+
+The API's integration tests share one database, and some toggle kill switches (for example,
+disabling `card.close`). Running files in parallel made a Phase 6 test see a disabled pack. Vitest
+runs the API's test files sequentially (`fileParallelism: false`); tests within a file were already
+sequential.

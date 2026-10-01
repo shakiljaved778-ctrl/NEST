@@ -198,5 +198,16 @@
     "body": "This is the bank's own screen. AMIL only linked you here; it never moves money or changes your products.",
     "done": "Back to home",
     "details": "Details"
+  },
+  "ask": {
+    "title": "Ask AMIL",
+    "unavailable": "Ask AMIL is not available right now."
+  },
+  "compare": {
+    "settlement": "Compare settlement dates",
+    "payment": "Compare payments",
+    "deposit": "Break now or wait?",
+    "best": "Best option",
+    "unavailable": "A comparison is not available for this product right now."
   }
 }

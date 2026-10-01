@@ -3,11 +3,15 @@
  * backend (POST /v1/sessions). It never sees the bank's API secret.
  */
 import { parseResponse } from "./http";
+import { readAssistantStream } from "./sse";
 import {
   Alert,
   AlertList,
   ChargeExplanation,
+  type AssistantMessageRequest,
   type CheckRequest,
+  type CompareRequest,
+  CompareResponse,
   CheckResponse,
   type ExplainChargeRequest,
   ConsentList,
@@ -83,5 +87,14 @@ export class AmilWidgetClient {
 
   async explainCharge(req: ExplainChargeRequest) {
     return parseResponse(await this.call("POST", "/v1/explain-charge", req), ChargeExplanation);
+  }
+
+  async compare(req: CompareRequest) {
+    return parseResponse(await this.call("POST", "/v1/compare", req), CompareResponse);
+  }
+
+  /** Ask AMIL: yields status, delta, answer and done events as the server streams them. */
+  async *ask(req: AssistantMessageRequest) {
+    yield* readAssistantStream(await this.call("POST", "/v1/assistant/messages", req));
   }
 }

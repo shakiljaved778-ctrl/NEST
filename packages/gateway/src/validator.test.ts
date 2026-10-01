@@ -1,3 +1,4 @@
+import { ASSISTANT_TEMPLATES, COMPARE_TEMPLATES, KNOWLEDGE } from "@amil/rule-packs";
 import {
   cardClosePacks,
   financeEarlySettlementPacks,
@@ -116,5 +117,28 @@ describe("number validator: rejects injected or altered figures (adversarial)", 
 
   it("a text with no figures at all is fine", () => {
     expect(validateNumbers("Before you close this card, here is what changes.", K).ok).toBe(true);
+  });
+});
+
+describe("approved Ask AMIL, compare and FAQ copy never trips the validator by itself", () => {
+  const all = [
+    ...ASSISTANT_TEMPLATES.flatMap((t) =>
+      [t.headline, t.body].map((x) => [`${t.key}/${t.locale}`, x] as const),
+    ),
+    ...COMPARE_TEMPLATES.flatMap((t) =>
+      [t.headline, t.body].map((x) => [`${t.key}/${t.locale}`, x] as const),
+    ),
+    ...KNOWLEDGE.flatMap((e) =>
+      [e.title, ...e.paragraphs].map((x) => [`faq/${e.locale}/${e.id}`, x] as const),
+    ),
+  ];
+  it.each(all)("%s", (_name, text) => {
+    // Placeholders are filled from facts; the literal copy around them must contain no numbers,
+    // including spelled-out ones ("one", "ست").
+    const literal = text
+      .replace(/\{\w+\}/g, " ")
+      .replace(/\[\[!?\w+:/g, " ")
+      .replace(/\]\]/g, " ");
+    expect(validateNumbers(literal, { _sources: [] })).toEqual({ ok: true, offending: [] });
   });
 });

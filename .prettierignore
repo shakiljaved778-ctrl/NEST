@@ -5,3 +5,4 @@ dist
 coverage
 pnpm-lock.yaml
 **/migrations/**/*.sql
+**/knowledge.generated.ts

@@ -43,6 +43,8 @@ const PATHS: Record<OptionKey, string> = {
   continue_account_close: "accounts/{accountId}/close/confirm",
   // account.dormancy
   make_a_transaction: "accounts/{accountId}/transfer",
+  // Ask AMIL: explain my charge
+  view_charge: "charges/{transactionId}",
   // every pack
   talk_to_someone: "support/callback?topic={action}",
 };

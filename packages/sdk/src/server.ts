@@ -5,11 +5,15 @@
  */
 import { createHmac } from "node:crypto";
 import { parseResponse } from "./http";
+import { readAssistantStream } from "./sse";
 import {
   Alert,
   AlertList,
   ChargeExplanation,
+  type AssistantMessageRequest,
   type CheckRequest,
+  type CompareRequest,
+  CompareResponse,
   CheckResponse,
   type EventRequest,
   EventAck,
@@ -118,5 +122,14 @@ export class AmilServerClient {
   /** Push a product event (bank backend only). Safe to retry with the same idempotency key. */
   async pushEvent(req: EventRequest) {
     return parseResponse(await this.call("POST", "/v1/events", req), EventAck);
+  }
+
+  async compare(req: CompareRequest) {
+    return parseResponse(await this.call("POST", "/v1/compare", req), CompareResponse);
+  }
+
+  /** Ask AMIL: yields status, delta, answer and done events as the server streams them. */
+  async *ask(req: AssistantMessageRequest) {
+    yield* readAssistantStream(await this.call("POST", "/v1/assistant/messages", req));
   }
 }

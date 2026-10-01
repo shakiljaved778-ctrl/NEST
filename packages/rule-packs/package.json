@@ -15,7 +15,8 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run --coverage"
+    "test": "vitest run --coverage",
+    "gen:knowledge": "node scripts/gen-knowledge.mjs"
   },
   "dependencies": {
     "@amil/rules-engine": "workspace:*",

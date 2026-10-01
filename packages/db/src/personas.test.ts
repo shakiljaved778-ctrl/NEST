@@ -165,9 +165,10 @@ describe("seeded rule packs and templates", () => {
     expect(data.rulePacks.every((p) => p.enabled && p.status === "active")).toBe(true);
   });
 
-  it("seeds 144 insight + 48 generic templates; Islamic ones are sharia_approved (non-negotiable 8)", () => {
-    // 12 packs × 2 variants × 2 locales × (3 severities + 1 generic)
-    expect(data.templates).toHaveLength(192);
+  it("seeds every approved template; Islamic ones are sharia_approved (non-negotiable 8)", () => {
+    // 12 packs × 2 variants × 2 locales × (3 severities + 1 generic) = 192,
+    // + 3 compare views × 4 + 14 Ask AMIL phrases × 4 = 68
+    expect(data.templates).toHaveLength(260);
     expect(data.templates.filter((t) => t.key.endsWith(".generic"))).toHaveLength(48);
     for (const t of data.templates) {
       expect(t.status).toBe(t.variant === "islamic" ? "sharia_approved" : "approved");

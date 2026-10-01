@@ -66,6 +66,13 @@ export default async function CardDetail({ params }: { params: Promise<{ id: str
           {t("actions.pay")}
         </Link>
         <Link
+          href={`/compare/payment?cardId=${card.id}`}
+          className={`${buttonVariants({ variant: "outline" })} col-span-2`}
+          data-testid="action-compare-payments"
+        >
+          {t("compare.payment")}
+        </Link>
+        <Link
           href={`/cards/${id}/statement`}
           className={buttonVariants({ variant: "outline" })}
           data-testid="action-statement"

@@ -5,5 +5,11 @@ export {
   type AmilReadyDetail,
 } from "./amil-insight";
 
-/** Lit web components. `<amil-assistant>` arrives in Phase 6. */
+export {
+  AmilAssistant,
+  defineAmilAssistant,
+  type AmilAssistantOptionDetail,
+} from "./amil-assistant";
+
+/** Lit web components. */
 export const WIDGET_TAGS = ["amil-insight", "amil-assistant"] as const;

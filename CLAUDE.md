@@ -105,6 +105,14 @@ disposable database. They are skipped when it is unset.
 - Audit: append through `appendInsightEvent` only (via `makeAudit` in the API); never write
   `insight_event` directly. Checks, scheduled alerts and charge explanations all share
   `deliverInsight` / `makeAudit` (`apps/api/src/services/checks.ts`).
+- Ask AMIL (`apps/api/src/assistant`): the customer's question is classified locally
+  (`classify.ts`, en/ar) and never sent to a model. Figures come only from tools that call the
+  engine; answers are validated (numbers) and guarded (advice, selling, Sharia terms) before they
+  stream. Every phrase it can say is an approved template (`templates/assistant.json`); approved copy
+  must contain no literal or spelled-out numbers (a gateway test runs it through the validator).
+- Compare views (`packages/rule-packs/src/compare`) reuse the pack calculators and must match them
+  (tested field by field). FAQ answers come from `packages/rule-packs/knowledge/{en,ar}/*.md`; run
+  `pnpm --filter @amil/rule-packs gen:knowledge` after editing them.
 - Proactive alerts: only customers with a live `proactive_alerts` consent are read; one alert per
   product and event date (dedupe key); each alert is worded and audited in every bank locale
   (D-038).

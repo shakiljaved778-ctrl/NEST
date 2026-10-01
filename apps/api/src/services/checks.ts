@@ -173,33 +173,35 @@ export interface Delivered {
   auditEventId: string | null;
 }
 
+export type AuditFields = Parameters<Audit>[0];
+
+/** The outcome of the pipeline before anything is audited. */
+export type Prepared =
+  | { shown: false; reason: string; evaluation: AnyEvaluation | null; auditFields: AuditFields }
+  | {
+      shown: true;
+      evaluation: AnyEvaluation;
+      card: InsightCard;
+      wording: WordingResult;
+      auditFields: AuditFields;
+    };
+
 /**
- * The shared pipeline for checks and scheduled alerts:
+ * The shared pipeline for checks, scheduled alerts and Ask AMIL, up to (not including) the audit:
  *   rule-pack kill switch (9) -> evaluation (1) -> approved, enabled template (8, 9) ->
- *   gateway wording (2, 6) -> card -> audit (7).
- * Any gate that closes yields "no insight", never an error.
+ *   gateway wording (2, 6) -> card.
+ * Returns what to audit. `null` when a scheduled run's precheck says to stop silently.
  */
-export async function deliverInsight(
+export async function prepareInsight(
   deps: CheckDeps,
   bank: Bank,
   now: Date,
   locale: Locale,
-  insightId: string,
-  audit: Audit,
   subject: InsightSubject,
-  /**
-   * Scheduled runs only: called after the pure evaluation. Returning false stops here without an
-   * audit event (not applicable, or the customer was already alerted about this event).
-   */
   precheck?: (evaluation: AnyEvaluation) => Promise<boolean>,
-): Promise<Delivered> {
+): Promise<Prepared | null> {
   const { packKey, variant } = subject;
   const pack = getPack(packKey, variant);
-  const nothing = (): Delivered => ({
-    response: none(insightId),
-    evaluation: null,
-    auditEventId: null,
-  });
 
   // ── Kill switch and parameters (latest active version effective now) ──
   const packRow = await deps.prisma.rulePack.findFirst({
@@ -212,24 +214,32 @@ export async function deliverInsight(
     },
     orderBy: [{ effectiveFrom: "desc" }, { createdAt: "desc" }],
   });
-  const suppressed = async (reason: string, extra: Partial<AuditEventContent> = {}) => {
+  const suppressed = (
+    reason: string,
+    evaluation: AnyEvaluation | null = null,
+    extra: Partial<AuditFields> = {},
+  ): Prepared => {
     deps.log.info({ action: packKey, reason }, "insight_suppressed");
-    await audit({
-      rulePackVersion: packRow?.version ?? "n/a",
-      variant,
-      inputSnapshotHash: "",
-      applicable: false,
-      severity: null,
-      facts: {},
-      templateKey: null,
-      templateVersion: null,
-      modelProvider: null,
-      modelVersion: null,
-      validatorResult: "not_used",
-      shown: { suppressed: reason },
-      ...extra,
-    });
-    return nothing();
+    return {
+      shown: false,
+      reason,
+      evaluation,
+      auditFields: {
+        rulePackVersion: packRow?.version ?? "n/a",
+        variant,
+        inputSnapshotHash: "",
+        applicable: false,
+        severity: null,
+        facts: {},
+        templateKey: null,
+        templateVersion: null,
+        modelProvider: null,
+        modelVersion: null,
+        validatorResult: "not_used",
+        shown: { suppressed: reason },
+        ...extra,
+      },
+    };
   };
   if (!packRow || !packRow.enabled) return suppressed("rule_pack_disabled");
 
@@ -249,33 +259,27 @@ export async function deliverInsight(
     thresholdsFor(bank.severityThresholds, packKey),
     now,
   );
-  if (precheck && !(await precheck(evaluation))) return nothing();
+  if (precheck && !(await precheck(evaluation))) return null;
   const evaluated = {
     rulePackVersion: packRow.version,
     variant,
     inputSnapshotHash: sha256(canonicalJson(subject.input)),
     facts: stripSources(evaluation),
   };
-  if (!evaluation.applicable) {
-    await audit({
+  if (!evaluation.applicable)
+    return suppressed("not_applicable", evaluation, {
       ...evaluated,
-      applicable: false,
       severity: evaluation.severity,
-      templateKey: null,
-      templateVersion: null,
-      modelProvider: null,
-      modelVersion: null,
-      validatorResult: "not_used",
-      shown: { suppressed: "not_applicable" },
     });
-    return nothing();
-  }
 
   // ── Approved, enabled template ──
   const templateKey = `${packKey}.${variant}.${evaluation.severity}`;
   const template = await findTemplate(deps, bank.id, templateKey, locale, variant);
   if (!template)
-    return suppressed("template_unavailable", { ...evaluated, severity: evaluation.severity });
+    return suppressed("template_unavailable", evaluation, {
+      ...evaluated,
+      severity: evaluation.severity,
+    });
 
   // ── Wording ──
   let wording: WordingResult;
@@ -296,30 +300,60 @@ export async function deliverInsight(
     });
   } catch (error) {
     if (error instanceof TemplateRenderError)
-      return suppressed("template_render_failed", { ...evaluated, severity: evaluation.severity });
+      return suppressed("template_render_failed", evaluation, {
+        ...evaluated,
+        severity: evaluation.severity,
+      });
     throw error;
   }
 
   const card = buildCard(bank, packKey, subject.context, locale, evaluation, template, wording);
   const aiUsed = wording.source !== "template" && wording.provider !== "mock";
-  const row = await audit({
-    ...evaluated,
-    applicable: true,
-    severity: evaluation.severity,
-    templateKey: template.key,
-    templateVersion: template.version,
-    modelProvider: wording.source === "template" ? null : wording.provider,
-    modelVersion: wording.source === "template" ? null : wording.model,
-    validatorResult: wording.validatorResult,
-    shown: {
-      ...card,
-      wordingSource: wording.source,
-      aiAssisted: aiUsed,
-      explanation: evaluation.explanation,
-      wordingRejections: wording.reasons,
+  return {
+    shown: true,
+    evaluation,
+    card,
+    wording,
+    auditFields: {
+      ...evaluated,
+      applicable: true,
+      severity: evaluation.severity,
+      templateKey: template.key,
+      templateVersion: template.version,
+      modelProvider: wording.source === "template" ? null : wording.provider,
+      modelVersion: wording.source === "template" ? null : wording.model,
+      validatorResult: wording.validatorResult,
+      shown: {
+        ...card,
+        wordingSource: wording.source,
+        aiAssisted: aiUsed,
+        explanation: evaluation.explanation,
+        wordingRejections: wording.reasons,
+      },
     },
-  });
+  };
+}
 
+/** prepareInsight + audit: what a check and a scheduled alert deliver. */
+export async function deliverInsight(
+  deps: CheckDeps,
+  bank: Bank,
+  now: Date,
+  locale: Locale,
+  insightId: string,
+  audit: Audit,
+  subject: InsightSubject,
+  /**
+   * Scheduled runs only: called after the pure evaluation. Returning false stops here without an
+   * audit event (not applicable, or the customer was already alerted about this event).
+   */
+  precheck?: (evaluation: AnyEvaluation) => Promise<boolean>,
+): Promise<Delivered> {
+  const prepared = await prepareInsight(deps, bank, now, locale, subject, precheck);
+  if (!prepared) return { response: none(insightId), evaluation: null, auditEventId: null };
+  const row = await audit(prepared.auditFields);
+  if (!prepared.shown) return { response: none(insightId), evaluation: null, auditEventId: null };
+  const { evaluation, card } = prepared;
   return {
     response: {
       insightId,
@@ -351,7 +385,7 @@ function stripSources(evaluation: AnyEvaluation): Record<string, unknown> {
 }
 
 /** Approved (Islamic: Sharia-approved), enabled template, latest version (non-negotiables 8, 9). */
-async function findTemplate(
+export async function findTemplate(
   deps: CheckDeps,
   bankId: string,
   key: string,

@@ -41,6 +41,7 @@ export default tseslint.config(
       "**/*.config.{js,mjs,cjs}",
       "**/scripts/**/*.mjs",
       "**/prompts.generated.ts",
+      "**/knowledge.generated.ts",
     ],
   },
   js.configs.recommended,
