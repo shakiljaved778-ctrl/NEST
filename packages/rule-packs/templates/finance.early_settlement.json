@@ -1,0 +1,341 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional.",
+  "templates": [
+    {
+      "key": "finance.early_settlement.conventional.critical",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "Settling on {cheapestSettlementDate} instead of today costs {savingIfSettledOnCheapestDate} less",
+      "body": "To settle today you would pay {settlementAmountToday}: outstanding principal of {outstandingPrincipal}, interest accrued to date of {accruedInterest} and a settlement fee of {settlementFee}. [[arrearsAmount: This includes overdue instalments of {arrearsAmount}. ]][[coverRefundToday: An insurance refund of {coverRefundToday} is due back to you. ]][[savingIfSettledOnCheapestDate: If you settle on {cheapestSettlementDate}, after the scheduled instalments due before then ({instalmentsBeforeCheapestDate}), your total outflow is {savingIfSettledOnCheapestDate} lower. ]][[salaryLinked: This loan is linked to your salary transfer, so benefits tied to it may change once it is settled.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "Settle on the cheaper date"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "Make a partial prepayment"
+        },
+        {
+          "key": "settle_now",
+          "label": "Continue to settle today"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.conventional.caution",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "Your early settlement amount today is {settlementAmountToday}",
+      "body": "To settle today you would pay {settlementAmountToday}: outstanding principal of {outstandingPrincipal}, interest accrued to date of {accruedInterest} and a settlement fee of {settlementFee}. [[arrearsAmount: This includes overdue instalments of {arrearsAmount}. ]][[coverRefundToday: An insurance refund of {coverRefundToday} is due back to you. ]][[savingIfSettledOnCheapestDate: If you settle on {cheapestSettlementDate}, after the scheduled instalments due before then ({instalmentsBeforeCheapestDate}), your total outflow is {savingIfSettledOnCheapestDate} lower. ]][[salaryLinked: This loan is linked to your salary transfer, so benefits tied to it may change once it is settled.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "Settle on the cheaper date"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "Make a partial prepayment"
+        },
+        {
+          "key": "settle_now",
+          "label": "Continue to settle today"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.conventional.info",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Your early settlement amount today is {settlementAmountToday}",
+      "body": "To settle today you would pay {settlementAmountToday}: outstanding principal of {outstandingPrincipal}, interest accrued to date of {accruedInterest} and a settlement fee of {settlementFee}. [[arrearsAmount: This includes overdue instalments of {arrearsAmount}. ]][[coverRefundToday: An insurance refund of {coverRefundToday} is due back to you. ]][[savingIfSettledOnCheapestDate: If you settle on {cheapestSettlementDate}, after the scheduled instalments due before then ({instalmentsBeforeCheapestDate}), your total outflow is {savingIfSettledOnCheapestDate} lower. ]][[salaryLinked: This loan is linked to your salary transfer, so benefits tied to it may change once it is settled.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "Settle on the cheaper date"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "Make a partial prepayment"
+        },
+        {
+          "key": "settle_now",
+          "label": "Continue to settle today"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.conventional.critical",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "السداد في {cheapestSettlementDate} بدلاً من اليوم يقلّل ما تدفعه بمقدار {savingIfSettledOnCheapestDate}",
+      "body": "لسداد القرض اليوم تدفع {settlementAmountToday}، ويشمل أصل القرض المتبقي {outstandingPrincipal} والفائدة المستحقة حتى اليوم {accruedInterest} ورسوم السداد المبكر {settlementFee}. [[arrearsAmount: ويشمل أيضاً أقساطاً متأخرة بقيمة {arrearsAmount}. ]][[coverRefundToday: ويُردّ إليك مبلغ {coverRefundToday} من قسط التأمين. ]][[savingIfSettledOnCheapestDate: إذا سدّدت في {cheapestSettlementDate} بعد سداد الأقساط المجدولة المستحقة قبله ({instalmentsBeforeCheapestDate})، ينخفض إجمالي ما تدفعه بمقدار {savingIfSettledOnCheapestDate}. ]][[salaryLinked: هذا القرض مرتبط بتحويل راتبك، لذا قد تتغير المزايا المرتبطة به بعد سداده.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "جدولة السداد في التاريخ الأقل تكلفة"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "سداد جزئي مبكر"
+        },
+        {
+          "key": "settle_now",
+          "label": "متابعة السداد اليوم"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.conventional.caution",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "مبلغ السداد المبكر اليوم {settlementAmountToday}",
+      "body": "لسداد القرض اليوم تدفع {settlementAmountToday}، ويشمل أصل القرض المتبقي {outstandingPrincipal} والفائدة المستحقة حتى اليوم {accruedInterest} ورسوم السداد المبكر {settlementFee}. [[arrearsAmount: ويشمل أيضاً أقساطاً متأخرة بقيمة {arrearsAmount}. ]][[coverRefundToday: ويُردّ إليك مبلغ {coverRefundToday} من قسط التأمين. ]][[savingIfSettledOnCheapestDate: إذا سدّدت في {cheapestSettlementDate} بعد سداد الأقساط المجدولة المستحقة قبله ({instalmentsBeforeCheapestDate})، ينخفض إجمالي ما تدفعه بمقدار {savingIfSettledOnCheapestDate}. ]][[salaryLinked: هذا القرض مرتبط بتحويل راتبك، لذا قد تتغير المزايا المرتبطة به بعد سداده.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "جدولة السداد في التاريخ الأقل تكلفة"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "سداد جزئي مبكر"
+        },
+        {
+          "key": "settle_now",
+          "label": "متابعة السداد اليوم"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.conventional.info",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "مبلغ السداد المبكر اليوم {settlementAmountToday}",
+      "body": "لسداد القرض اليوم تدفع {settlementAmountToday}، ويشمل أصل القرض المتبقي {outstandingPrincipal} والفائدة المستحقة حتى اليوم {accruedInterest} ورسوم السداد المبكر {settlementFee}. [[arrearsAmount: ويشمل أيضاً أقساطاً متأخرة بقيمة {arrearsAmount}. ]][[coverRefundToday: ويُردّ إليك مبلغ {coverRefundToday} من قسط التأمين. ]][[savingIfSettledOnCheapestDate: إذا سدّدت في {cheapestSettlementDate} بعد سداد الأقساط المجدولة المستحقة قبله ({instalmentsBeforeCheapestDate})، ينخفض إجمالي ما تدفعه بمقدار {savingIfSettledOnCheapestDate}. ]][[salaryLinked: هذا القرض مرتبط بتحويل راتبك، لذا قد تتغير المزايا المرتبطة به بعد سداده.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "جدولة السداد في التاريخ الأقل تكلفة"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "سداد جزئي مبكر"
+        },
+        {
+          "key": "settle_now",
+          "label": "متابعة السداد اليوم"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.islamic.critical",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "Settling on {cheapestSettlementDate} instead of today costs {savingIfSettledOnCheapestDate} less",
+      "body": "To settle your finance today you would pay {settlementAmountToday}. [[ibraRebate: This is the remaining sale price of {deferredPriceOutstanding} less an ibra (rebate) of {ibraRebate}, which is {ibraRebatePct} of the deferred profit not yet due. ]][[futureProfitNotCharged: This covers the outstanding amount of {outstandingPrincipal} and profit accrued to date of {accruedProfit}; future rental profit of {futureProfitNotCharged} is not charged. ]][[settlementFee: It includes a settlement fee of {settlementFee}. ]][[arrearsAmount: It also includes overdue instalments of {arrearsAmount}. ]][[coverRefundToday: A takaful refund of {coverRefundToday} is due back to you. ]][[savingIfSettledOnCheapestDate: If you settle on {cheapestSettlementDate}, after the scheduled instalments due before then ({instalmentsBeforeCheapestDate}), your total outflow is {savingIfSettledOnCheapestDate} lower. ]][[salaryLinked: This finance is linked to your salary transfer, so benefits tied to it may change once it is settled.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "Settle on the cheaper date"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "Make a partial prepayment"
+        },
+        {
+          "key": "settle_now",
+          "label": "Continue to settle today"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.islamic.caution",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "Your early settlement amount today is {settlementAmountToday}",
+      "body": "To settle your finance today you would pay {settlementAmountToday}. [[ibraRebate: This is the remaining sale price of {deferredPriceOutstanding} less an ibra (rebate) of {ibraRebate}, which is {ibraRebatePct} of the deferred profit not yet due. ]][[futureProfitNotCharged: This covers the outstanding amount of {outstandingPrincipal} and profit accrued to date of {accruedProfit}; future rental profit of {futureProfitNotCharged} is not charged. ]][[settlementFee: It includes a settlement fee of {settlementFee}. ]][[arrearsAmount: It also includes overdue instalments of {arrearsAmount}. ]][[coverRefundToday: A takaful refund of {coverRefundToday} is due back to you. ]][[savingIfSettledOnCheapestDate: If you settle on {cheapestSettlementDate}, after the scheduled instalments due before then ({instalmentsBeforeCheapestDate}), your total outflow is {savingIfSettledOnCheapestDate} lower. ]][[salaryLinked: This finance is linked to your salary transfer, so benefits tied to it may change once it is settled.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "Settle on the cheaper date"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "Make a partial prepayment"
+        },
+        {
+          "key": "settle_now",
+          "label": "Continue to settle today"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.islamic.info",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Your early settlement amount today is {settlementAmountToday}",
+      "body": "To settle your finance today you would pay {settlementAmountToday}. [[ibraRebate: This is the remaining sale price of {deferredPriceOutstanding} less an ibra (rebate) of {ibraRebate}, which is {ibraRebatePct} of the deferred profit not yet due. ]][[futureProfitNotCharged: This covers the outstanding amount of {outstandingPrincipal} and profit accrued to date of {accruedProfit}; future rental profit of {futureProfitNotCharged} is not charged. ]][[settlementFee: It includes a settlement fee of {settlementFee}. ]][[arrearsAmount: It also includes overdue instalments of {arrearsAmount}. ]][[coverRefundToday: A takaful refund of {coverRefundToday} is due back to you. ]][[savingIfSettledOnCheapestDate: If you settle on {cheapestSettlementDate}, after the scheduled instalments due before then ({instalmentsBeforeCheapestDate}), your total outflow is {savingIfSettledOnCheapestDate} lower. ]][[salaryLinked: This finance is linked to your salary transfer, so benefits tied to it may change once it is settled.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "Settle on the cheaper date"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "Make a partial prepayment"
+        },
+        {
+          "key": "settle_now",
+          "label": "Continue to settle today"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.islamic.critical",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "السداد في {cheapestSettlementDate} بدلاً من اليوم يقلّل ما تدفعه بمقدار {savingIfSettledOnCheapestDate}",
+      "body": "لسداد التمويل اليوم تدفع {settlementAmountToday}. [[ibraRebate: وهو باقي ثمن البيع البالغ {deferredPriceOutstanding} بعد خصم الإبراء بقيمة {ibraRebate}، أي {ibraRebatePct} من الأرباح المؤجلة غير المستحقة بعد. ]][[futureProfitNotCharged: ويشمل المبلغ المتبقي {outstandingPrincipal} والربح المستحق حتى اليوم {accruedProfit}، ولا تُحتسب أرباح الإجارة المستقبلية البالغة {futureProfitNotCharged}. ]][[settlementFee: ويشمل رسوم سداد مبكر بقيمة {settlementFee}. ]][[arrearsAmount: ويشمل أيضاً أقساطاً متأخرة بقيمة {arrearsAmount}. ]][[coverRefundToday: ويُردّ إليك مبلغ {coverRefundToday} من اشتراك التكافل. ]][[savingIfSettledOnCheapestDate: إذا سدّدت في {cheapestSettlementDate} بعد سداد الأقساط المجدولة المستحقة قبله ({instalmentsBeforeCheapestDate})، ينخفض إجمالي ما تدفعه بمقدار {savingIfSettledOnCheapestDate}. ]][[salaryLinked: هذا التمويل مرتبط بتحويل راتبك، لذا قد تتغير المزايا المرتبطة به بعد سداده.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "جدولة السداد في التاريخ الأقل تكلفة"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "سداد جزئي مبكر"
+        },
+        {
+          "key": "settle_now",
+          "label": "متابعة السداد اليوم"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.islamic.caution",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "مبلغ السداد المبكر اليوم {settlementAmountToday}",
+      "body": "لسداد التمويل اليوم تدفع {settlementAmountToday}. [[ibraRebate: وهو باقي ثمن البيع البالغ {deferredPriceOutstanding} بعد خصم الإبراء بقيمة {ibraRebate}، أي {ibraRebatePct} من الأرباح المؤجلة غير المستحقة بعد. ]][[futureProfitNotCharged: ويشمل المبلغ المتبقي {outstandingPrincipal} والربح المستحق حتى اليوم {accruedProfit}، ولا تُحتسب أرباح الإجارة المستقبلية البالغة {futureProfitNotCharged}. ]][[settlementFee: ويشمل رسوم سداد مبكر بقيمة {settlementFee}. ]][[arrearsAmount: ويشمل أيضاً أقساطاً متأخرة بقيمة {arrearsAmount}. ]][[coverRefundToday: ويُردّ إليك مبلغ {coverRefundToday} من اشتراك التكافل. ]][[savingIfSettledOnCheapestDate: إذا سدّدت في {cheapestSettlementDate} بعد سداد الأقساط المجدولة المستحقة قبله ({instalmentsBeforeCheapestDate})، ينخفض إجمالي ما تدفعه بمقدار {savingIfSettledOnCheapestDate}. ]][[salaryLinked: هذا التمويل مرتبط بتحويل راتبك، لذا قد تتغير المزايا المرتبطة به بعد سداده.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "جدولة السداد في التاريخ الأقل تكلفة"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "سداد جزئي مبكر"
+        },
+        {
+          "key": "settle_now",
+          "label": "متابعة السداد اليوم"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "finance.early_settlement.islamic.info",
+      "rulePackKey": "finance.early_settlement",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "مبلغ السداد المبكر اليوم {settlementAmountToday}",
+      "body": "لسداد التمويل اليوم تدفع {settlementAmountToday}. [[ibraRebate: وهو باقي ثمن البيع البالغ {deferredPriceOutstanding} بعد خصم الإبراء بقيمة {ibraRebate}، أي {ibraRebatePct} من الأرباح المؤجلة غير المستحقة بعد. ]][[futureProfitNotCharged: ويشمل المبلغ المتبقي {outstandingPrincipal} والربح المستحق حتى اليوم {accruedProfit}، ولا تُحتسب أرباح الإجارة المستقبلية البالغة {futureProfitNotCharged}. ]][[settlementFee: ويشمل رسوم سداد مبكر بقيمة {settlementFee}. ]][[arrearsAmount: ويشمل أيضاً أقساطاً متأخرة بقيمة {arrearsAmount}. ]][[coverRefundToday: ويُردّ إليك مبلغ {coverRefundToday} من اشتراك التكافل. ]][[savingIfSettledOnCheapestDate: إذا سدّدت في {cheapestSettlementDate} بعد سداد الأقساط المجدولة المستحقة قبله ({instalmentsBeforeCheapestDate})، ينخفض إجمالي ما تدفعه بمقدار {savingIfSettledOnCheapestDate}. ]][[salaryLinked: هذا التمويل مرتبط بتحويل راتبك، لذا قد تتغير المزايا المرتبطة به بعد سداده.]]",
+      "options": [
+        {
+          "key": "schedule_settlement",
+          "label": "جدولة السداد في التاريخ الأقل تكلفة"
+        },
+        {
+          "key": "partial_prepayment",
+          "label": "سداد جزئي مبكر"
+        },
+        {
+          "key": "settle_now",
+          "label": "متابعة السداد اليوم"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ]
+}

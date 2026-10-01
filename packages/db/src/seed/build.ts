@@ -20,6 +20,7 @@ import {
   toMoneyString,
   type Dec,
 } from "@amil/rules-engine";
+import { ALL_PACK_DEFINITIONS, TEMPLATES } from "@amil/rule-packs";
 import { bank, BANK_ID, consoleUsers, proactiveJobs } from "./bank";
 import { customers, type CardSpec, type CustomerSpec, type FinanceSpec } from "./customers";
 import { FEE_AMOUNTS, FEE_CODES, feeSchedule } from "./fees";
@@ -174,6 +175,8 @@ export interface SeedData {
   finances: Prisma.FinanceCreateManyInput[];
   deposits: Prisma.DepositCreateManyInput[];
   transactions: Prisma.TransactionCreateManyInput[];
+  rulePacks: Prisma.RulePackCreateManyInput[];
+  templates: Prisma.TemplateCreateManyInput[];
 }
 
 type TxnInput = Omit<Prisma.TransactionCreateManyInput, "id">;
@@ -229,6 +232,41 @@ export function buildSeedData(now: Date): SeedData {
     finances: [],
     deposits: [],
     transactions: [],
+    // Implemented packs with their versioned default parameters (Phase 2: the two flagships).
+    rulePacks: ALL_PACK_DEFINITIONS.map((d) => ({
+      id: `rp_${d.key}_${d.variant}_${d.version}`,
+      bankId: BANK_ID,
+      key: d.key,
+      version: d.version,
+      variant: d.variant,
+      productFamily: d.productFamily,
+      status: "active",
+      enabled: true,
+      parameters: d.parameters as Prisma.InputJsonValue,
+      effectiveFrom: addDays(N, -30),
+      createdBy: "cu_product",
+    })),
+    // Bank-approved demo copy (non-negotiable 8): Islamic packs carry sharia_approved.
+    templates: TEMPLATES.map((t) => {
+      const islamic = t.variant === "islamic";
+      return {
+        id: `tpl_${t.key}_${t.locale}_v${t.version}`,
+        bankId: BANK_ID,
+        key: t.key,
+        rulePackKey: t.rulePackKey,
+        variant: t.variant,
+        locale: t.locale,
+        severity: t.severity,
+        headline: t.headline,
+        body: t.body,
+        options: t.options,
+        status: islamic ? "sharia_approved" : "approved",
+        version: t.version,
+        approvedBy: islamic ? "cu_sharia" : "cu_compliance",
+        approvedAt: addDays(N, -30),
+        enabled: true,
+      };
+    }),
   };
 
   customers.forEach((spec, i) => buildCustomer(data, spec, i + 1, N, windowStart));

@@ -1,0 +1,180 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
+  "key": "card.close",
+  "version": "1.0.0",
+  "variant": "islamic",
+  "productFamily": "cards",
+  "triggers": [
+    {
+      "type": "action",
+      "event": "card.close"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Card",
+      "fields": [
+        "balance",
+        "annualFee",
+        "annualFeeChargedAt",
+        "annualFeeWaived",
+        "feeRefundRule",
+        "supplementaryCount",
+        "type"
+      ]
+    },
+    {
+      "entity": "RewardsLedger",
+      "fields": ["balance", "pointValueQar", "expiryBuckets", "pendingCashback", "asOf"]
+    },
+    {
+      "entity": "InstalmentPlan",
+      "fields": [
+        "principalRemaining",
+        "monthsRemaining",
+        "monthlyAmount",
+        "earlyClosureFeeRule",
+        "status"
+      ]
+    }
+  ],
+  "parameters": {
+    "pointsExpiryWindowDays": 90,
+    "pendingCashbackOnClosure": "forfeited",
+    "roundingMode": "half_up"
+  },
+  "facts": [
+    {
+      "key": "pointsBalance",
+      "unit": "points",
+      "source": "rewards_ledger",
+      "description": "Reward points balance on the card"
+    },
+    {
+      "key": "pointValueQar",
+      "unit": "QAR",
+      "source": "rewards_ledger",
+      "description": "QAR value of one point"
+    },
+    {
+      "key": "pointsValue",
+      "unit": "QAR",
+      "source": "rewards_ledger",
+      "description": "QAR value of the points balance"
+    },
+    {
+      "key": "pointsExpiringSoon",
+      "unit": "points",
+      "source": "rewards_ledger",
+      "description": "Points expiring within the expiry window"
+    },
+    {
+      "key": "pointsExpiringSoonValue",
+      "unit": "QAR",
+      "source": "rewards_ledger",
+      "description": "QAR value of the points expiring within the window"
+    },
+    {
+      "key": "nextPointsExpiryDate",
+      "unit": "date",
+      "source": "rewards_ledger",
+      "description": "Earliest expiry date within the window (empty if none)"
+    },
+    {
+      "key": "pointsExpiryWindowDays",
+      "unit": "days",
+      "source": "rule_pack",
+      "description": "Look-ahead window for expiring points"
+    },
+    {
+      "key": "pendingCashback",
+      "unit": "QAR",
+      "source": "rewards_ledger",
+      "description": "Cashback earned but not yet credited"
+    },
+    {
+      "key": "pendingCashbackForfeited",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Pending cashback lost on closure (per pack parameter)"
+    },
+    {
+      "key": "forfeitedValue",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Total value forfeited on closure: points value + forfeited cashback"
+    },
+    {
+      "key": "activeInstalmentPlans",
+      "unit": "count",
+      "source": "instalment_plan",
+      "description": "Instalment plans with principal remaining"
+    },
+    {
+      "key": "instalmentsRemainingPrincipal",
+      "unit": "QAR",
+      "source": "instalment_plan",
+      "description": "Principal remaining across instalment plans"
+    },
+    {
+      "key": "instalmentEarlyClosureFees",
+      "unit": "QAR",
+      "source": "instalment_plan",
+      "description": "Early-closure fees on instalment plans, per each plan's rule"
+    },
+    {
+      "key": "instalmentsPayableOnClosure",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Remaining principal + early-closure fees"
+    },
+    {
+      "key": "annualFee",
+      "unit": "QAR",
+      "source": "card",
+      "description": "Card annual fee"
+    },
+    {
+      "key": "annualFeeRefundEligible",
+      "unit": "boolean",
+      "source": "card",
+      "description": "Whether a pro-rata annual fee refund is due"
+    },
+    {
+      "key": "annualFeeMonthsUsed",
+      "unit": "months",
+      "source": "computed",
+      "description": "Started months since the annual fee was charged"
+    },
+    {
+      "key": "annualFeeRefund",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Pro-rata annual fee refund"
+    },
+    {
+      "key": "supplementaryCards",
+      "unit": "count",
+      "source": "card",
+      "description": "Supplementary cards that close with the primary card"
+    },
+    {
+      "key": "outstandingBalance",
+      "unit": "QAR",
+      "source": "card",
+      "description": "Card balance to clear"
+    },
+    {
+      "key": "netAmountToClear",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Outstanding balance + instalments payable - annual fee refund (not below zero)"
+    },
+    {
+      "key": "avoidableLoss",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Value lost by closing now rather than first acting on it: forfeited value + early-closure fees. Severity basis."
+    }
+  ]
+}

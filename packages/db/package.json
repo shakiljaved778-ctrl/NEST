@@ -8,7 +8,8 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./seed-data": "./src/seed/build.ts"
+    "./seed-data": "./src/seed/build.ts",
+    "./adapters": "./src/adapters.ts"
   },
   "scripts": {
     "lint": "eslint .",
@@ -26,7 +27,9 @@
   },
   "dependencies": {
     "@amil/rules-engine": "workspace:*",
-    "@prisma/client": "~6.19.0"
+    "@prisma/client": "~6.19.0",
+    "@amil/rule-packs": "workspace:*",
+    "zod": "^4.1.0"
   },
   "devDependencies": {
     "dotenv-cli": "^8.0.0",

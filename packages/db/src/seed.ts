@@ -27,6 +27,8 @@ async function main(): Promise<void> {
         await tx.customer.deleteMany({ where: { bankId: BANK_ID } });
         await tx.feeSchedule.deleteMany({ where: { bankId: BANK_ID } });
         await tx.proactiveJob.deleteMany({ where: { bankId: BANK_ID } });
+        await tx.rulePack.deleteMany({ where: { bankId: BANK_ID } });
+        await tx.template.deleteMany({ where: { bankId: BANK_ID } });
 
         for (const u of data.consoleUsers) {
           const { id, ...rest } = u;
@@ -44,6 +46,8 @@ async function main(): Promise<void> {
         await tx.finance.createMany({ data: data.finances });
         await tx.deposit.createMany({ data: data.deposits });
         await tx.transaction.createMany({ data: data.transactions });
+        await tx.rulePack.createMany({ data: data.rulePacks });
+        await tx.template.createMany({ data: data.templates });
       },
       { timeout: 60_000 },
     );
@@ -56,6 +60,7 @@ async function main(): Promise<void> {
         `  cards ${data.cards.length}, rewards ledgers ${data.rewardsLedgers.length}, instalment plans ${data.instalmentPlans.length}`,
         `  finance ${data.finances.length}, deposits ${data.deposits.length}`,
         `  transactions ${data.transactions.length}, fee schedule ${data.feeSchedule.length}`,
+        `  rule packs ${data.rulePacks.length}, templates ${data.templates.length}`,
         `  console users ${data.consoleUsers.length}`,
       ].join("\n"),
     );

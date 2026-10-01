@@ -19,16 +19,16 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 2: Non-negotiables (enforced in code, tests and CLAUDE.md)
 
-- [ ] 1. Facts are computed by the deterministic rules engine; the LLM only writes wording around a fact set (Phase 2–3)
+- [~] 1. Facts are computed by the deterministic rules engine; the LLM only writes wording around a fact set (engine + facts with sources in Phase 2; gateway in Phase 3)
 - [ ] 2. Number validator rejects any LLM number, amount, percentage or date absent from the fact set (incl. Arabic-Indic digits ٠-٩); falls back to the approved static template; adversarial tests (Phase 3)
 - [ ] 3. Inform, never execute: options are `bank://` deep links configured per bank (Phase 3–4)
-- [ ] 4. No selling: banned-term lint test over all templates (configurable list, en + ar) (Phase 3, 5, 7)
+- [~] 4. No selling: banned-term lint test over all templates (configurable list, en + ar): `policy/copy-policy.json` + tests in Phase 2; console checker in Phase 7
 - [ ] 5. Consent first: no customer data read for insights without a consent record; otherwise generic info only (Phase 3)
 - [ ] 6. Data stays in-country: gateway modes `redacted` (default) and `in_country`; redaction test suite (Phase 3)
 - [~] 7. Everything audited: immutable `InsightEvent` with hash chain; retention default 10 years (schema and append-only DB trigger in Phase 1; writer in Phase 3)
-- [ ] 8. Bank approves all copy: only `approved` templates served (`sharia_approved` for Islamic) (Phase 3, 7)
+- [~] 8. Bank approves all copy: templates seeded `approved` / `sharia_approved` (Phase 2); serving rule enforced in Phase 3
 - [ ] 9. Kill switches per rule pack and per template; disabled → no insight, never an error (Phase 3, 7)
-- [~] 10. Money is decimal (`decimal.js`), QAR 2 dp, rounding mode is a rule-pack parameter (money helpers in Phase 1; engine in Phase 2)
+- [x] 10. Money is decimal (`decimal.js`), QAR 2 dp, rounding mode is a rule-pack parameter (`roundingMode` in every pack)
 
 ## Section 3: Stack
 
@@ -37,8 +37,8 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [~] `apps/demo-bank`: Next.js 15, Tailwind; shadcn/ui, next-intl and RTL arrive in Phase 4
 - [~] `apps/console`: Next.js 15 (full console in Phase 7)
 - [~] `apps/api`: Fastify with health endpoints (OpenAPI 3.1 + Swagger in Phase 3)
-- [~] `packages/rules-engine`: money helpers now; engine in Phase 2
-- [ ] `packages/rule-packs`: 12 packs as versioned JSON + calculators (Phase 2, 5)
+- [x] `packages/rules-engine`: contract, facts, severity, money and date helpers
+- [~] `packages/rule-packs`: versioned JSON + calculators + approved copy; 2 of 12 packs (Phase 2), rest in Phase 5
 - [ ] `packages/widget`: Lit `<amil-insight>`, `<amil-assistant>` (Phase 4, 6)
 - [ ] `packages/sdk`: typed API client (Phase 3)
 - [ ] `packages/gateway`: providers (anthropic, in_country, mock), redactor, number validator (Phase 3)
@@ -61,15 +61,15 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 5: Rules engine contract (Phase 2)
 
-- [ ] `RulePack<I, F>` / `Evaluation<F>` interfaces as specified; pure, `now` injected, no I/O
-- [ ] Facts carry `{ key, value, unit, source, asOf }`
-- [ ] Severity computed from facts + bank thresholds
-- [ ] 100% branch coverage target on calculators; table-driven tests with hand-worked examples
+- [x] `RulePack` / `Evaluation` interfaces as specified; pure, `now` injected, no I/O (ESLint-enforced)
+- [x] Facts carry `{ key, value, unit, source, asOf }`; `_sources` lists each distinct source
+- [x] Severity computed from facts + bank thresholds (D-012)
+- [x] 100% branch coverage on calculators (enforced by Vitest thresholds); table-driven tests with hand-worked examples
 
 ## Section 6: Rule packs (conventional + Islamic variants)
 
-- [ ] 1. card.close (flagship, Phase 2)
-- [ ] 2. finance.early_settlement (flagship, cheapest date within 60 days, Phase 2)
+- [x] 1. card.close (flagship): both variants
+- [x] 2. finance.early_settlement (flagship, cheapest date within 60 days): conventional, murabaha (ibra), ijara
 - [ ] 3. finance.top_up (Phase 5)
 - [ ] 4. card.cash_withdrawal (Phase 5)
 - [ ] 5. card.minimum_payment (Phase 5)
@@ -80,7 +80,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [ ] 10. account.close (Phase 5)
 - [ ] 11. account.dormancy (proactive, Phase 5)
 - [ ] 12. rewards.expiry (proactive, Phase 5)
-- [ ] Islamic variants use Sharia terminology and require `sharia_approved` templates
+- [~] Islamic variants use Sharia terminology (lint-enforced) and are seeded `sharia_approved` (flagships done; rest in Phase 5)
 
 ## Section 7: API (Phase 3+)
 
@@ -129,7 +129,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] Named personas: Khalid, Fatima, Ravi, Aisha, Omar with the specified holdings
 - [x] Holdings designed so every rule pack can fire for ≥ 2 personas (coverage map in `packages/db/src/seed/customers.ts`; verified in Phase 5)
 - [x] 6 months of transactions per customer incl. fee lines mapped to `FeeSchedule` codes
-- [ ] Templates: 12 packs × 2 locales × severities, `approved` / `sharia_approved` (seeded alongside each pack, Phase 2 and 5)
+- [~] Templates: 12 packs × 2 locales × severities, `approved` / `sharia_approved`: 24 flagship templates seeded (Phase 2); the rest in Phase 5
 
 ## Section 13: Security and quality
 
@@ -142,7 +142,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 ## Section 14: Phases
 
 - [x] **Phase 1: Foundation.** Monorepo, tooling, docker-compose, Prisma schema, migrations, seed. ✅ `pnpm dev` runs all apps; `pnpm db:seed` works; `docs/data-model.md`
-- [ ] **Phase 2: Rules engine + flagship packs.** ≥ 40 table-driven tests; Khalid and Fatima match expected facts exactly
+- [x] **Phase 2: Rules engine + flagship packs.** ≥ 40 table-driven tests; Khalid and Fatima match expected facts exactly
 - [ ] **Phase 3: Insight API + gateway.** Redaction property tests, validator (Arabic-Indic), audit chain verifies, p95 < 400 ms with mock
 - [ ] **Phase 4: Demo bank app + widget.** Playwright: Khalid sees points insight in en + ar, deep-links to "Redeem points"
 - [ ] **Phase 5: Remaining packs + proactive + explain.** Every pack fires for ≥ 2 personas; alerts after scheduler; all fee lines explainable
@@ -152,7 +152,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 15: Voice and copy rules (all templates)
 
-- [ ] Calm, factual, second person; no alarmism, emojis or exclamation marks (enforced by template lint test)
-- [ ] Lead with consequence and value; avoid-the-loss option first, then Continue, then Talk to someone
-- [ ] Arabic written natively, reviewed against the glossary
+- [x] Calm, factual, second person; no alarmism, emojis or exclamation marks (enforced by template lint test)
+- [x] Lead with consequence and value; avoid-the-loss option first, then Continue, then Talk to someone (option order lint-enforced)
+- [~] Arabic written natively against the glossary (flagship copy); glossary injection into the prompt in Phase 3
 - [ ] Footer: "Figures from Doha Demo Bank records as of {asOf}. Wording assisted by AI." (+ Arabic)

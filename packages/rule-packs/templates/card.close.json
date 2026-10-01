@@ -1,0 +1,341 @@
+{
+  "$comment": "Bank-approved copy (demo). Conventional templates are seeded as 'approved'; Islamic as 'sharia_approved'. Syntax: {fact}, [[fact: shown when fact is non-zero]], [[!fact: shown when fact is zero]]. Doha Demo Bank is fictional.",
+  "templates": [
+    {
+      "key": "card.close.conventional.critical",
+      "rulePackKey": "card.close",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[pointsBalance: Closing this card forfeits {pointsBalance} points (about {pointsValue})]][[!pointsBalance: Closing this card now has a cost of {avoidableLoss}]]",
+      "body": "[[pointsBalance: Your {pointsBalance} reward points, worth about {pointsValue}, end when the card closes. ]][[pointsExpiringSoon: Of these, {pointsExpiringSoon} points were due to expire within {pointsExpiryWindowDays} days. ]][[pendingCashbackForfeited: Pending cashback of {pendingCashbackForfeited} also ends. ]][[activeInstalmentPlans: Your instalment plans become payable in full: {instalmentsPayableOnClosure}, including {instalmentEarlyClosureFees} in early-closure fees. ]][[annualFeeRefund: You are due a refund of {annualFeeRefund} from the annual fee. ]][[supplementaryCards: Supplementary cards on this card ({supplementaryCards}) close too. ]][[outstandingBalance: The balance to clear is {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points first"
+        },
+        {
+          "key": "view_instalments",
+          "label": "View instalment plans"
+        },
+        {
+          "key": "continue_closure",
+          "label": "Continue closing the card"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.close.conventional.caution",
+      "rulePackKey": "card.close",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "Before you close this card, here is what changes",
+      "body": "[[pointsBalance: Your {pointsBalance} reward points, worth about {pointsValue}, end when the card closes. ]][[pointsExpiringSoon: Of these, {pointsExpiringSoon} points were due to expire within {pointsExpiryWindowDays} days. ]][[pendingCashbackForfeited: Pending cashback of {pendingCashbackForfeited} also ends. ]][[activeInstalmentPlans: Your instalment plans become payable in full: {instalmentsPayableOnClosure}, including {instalmentEarlyClosureFees} in early-closure fees. ]][[annualFeeRefund: You are due a refund of {annualFeeRefund} from the annual fee. ]][[supplementaryCards: Supplementary cards on this card ({supplementaryCards}) close too. ]][[outstandingBalance: The balance to clear is {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points first"
+        },
+        {
+          "key": "view_instalments",
+          "label": "View instalment plans"
+        },
+        {
+          "key": "continue_closure",
+          "label": "Continue closing the card"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.close.conventional.info",
+      "rulePackKey": "card.close",
+      "variant": "conventional",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Here is what happens when you close this card",
+      "body": "[[pointsBalance: Your {pointsBalance} reward points, worth about {pointsValue}, end when the card closes. ]][[pointsExpiringSoon: Of these, {pointsExpiringSoon} points were due to expire within {pointsExpiryWindowDays} days. ]][[pendingCashbackForfeited: Pending cashback of {pendingCashbackForfeited} also ends. ]][[activeInstalmentPlans: Your instalment plans become payable in full: {instalmentsPayableOnClosure}, including {instalmentEarlyClosureFees} in early-closure fees. ]][[annualFeeRefund: You are due a refund of {annualFeeRefund} from the annual fee. ]][[supplementaryCards: Supplementary cards on this card ({supplementaryCards}) close too. ]][[outstandingBalance: The balance to clear is {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points first"
+        },
+        {
+          "key": "view_instalments",
+          "label": "View instalment plans"
+        },
+        {
+          "key": "continue_closure",
+          "label": "Continue closing the card"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.close.conventional.critical",
+      "rulePackKey": "card.close",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[pointsBalance: إغلاق هذه البطاقة يُفقدك {pointsBalance} نقطة (نحو {pointsValue})]][[!pointsBalance: إغلاق هذه البطاقة الآن تترتب عليه تكلفة قدرها {avoidableLoss}]]",
+      "body": "[[pointsBalance: تنتهي نقاط المكافآت البالغة {pointsBalance} نقطة، وقيمتها نحو {pointsValue}، عند إغلاق البطاقة. ]][[pointsExpiringSoon: ومنها {pointsExpiringSoon} نقطة كان موعد انتهائها خلال {pointsExpiryWindowDays} يوماً. ]][[pendingCashbackForfeited: كما ينتهي الاسترداد النقدي المعلّق البالغ {pendingCashbackForfeited}. ]][[activeInstalmentPlans: تصبح خطط التقسيط مستحقة بالكامل بمبلغ {instalmentsPayableOnClosure}، منها {instalmentEarlyClosureFees} رسوم إغلاق مبكر. ]][[annualFeeRefund: يُستردّ لك من الرسوم السنوية مبلغ {annualFeeRefund}. ]][[supplementaryCards: تُغلق أيضاً البطاقات الإضافية المرتبطة بهذه البطاقة ({supplementaryCards}). ]][[outstandingBalance: الرصيد المستحق للسداد {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدل النقاط أولاً"
+        },
+        {
+          "key": "view_instalments",
+          "label": "عرض خطط التقسيط"
+        },
+        {
+          "key": "continue_closure",
+          "label": "متابعة إغلاق البطاقة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.close.conventional.caution",
+      "rulePackKey": "card.close",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "قبل إغلاق هذه البطاقة، إليك ما سيتغيّر",
+      "body": "[[pointsBalance: تنتهي نقاط المكافآت البالغة {pointsBalance} نقطة، وقيمتها نحو {pointsValue}، عند إغلاق البطاقة. ]][[pointsExpiringSoon: ومنها {pointsExpiringSoon} نقطة كان موعد انتهائها خلال {pointsExpiryWindowDays} يوماً. ]][[pendingCashbackForfeited: كما ينتهي الاسترداد النقدي المعلّق البالغ {pendingCashbackForfeited}. ]][[activeInstalmentPlans: تصبح خطط التقسيط مستحقة بالكامل بمبلغ {instalmentsPayableOnClosure}، منها {instalmentEarlyClosureFees} رسوم إغلاق مبكر. ]][[annualFeeRefund: يُستردّ لك من الرسوم السنوية مبلغ {annualFeeRefund}. ]][[supplementaryCards: تُغلق أيضاً البطاقات الإضافية المرتبطة بهذه البطاقة ({supplementaryCards}). ]][[outstandingBalance: الرصيد المستحق للسداد {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدل النقاط أولاً"
+        },
+        {
+          "key": "view_instalments",
+          "label": "عرض خطط التقسيط"
+        },
+        {
+          "key": "continue_closure",
+          "label": "متابعة إغلاق البطاقة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.close.conventional.info",
+      "rulePackKey": "card.close",
+      "variant": "conventional",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "إليك ما يترتب على إغلاق هذه البطاقة",
+      "body": "[[pointsBalance: تنتهي نقاط المكافآت البالغة {pointsBalance} نقطة، وقيمتها نحو {pointsValue}، عند إغلاق البطاقة. ]][[pointsExpiringSoon: ومنها {pointsExpiringSoon} نقطة كان موعد انتهائها خلال {pointsExpiryWindowDays} يوماً. ]][[pendingCashbackForfeited: كما ينتهي الاسترداد النقدي المعلّق البالغ {pendingCashbackForfeited}. ]][[activeInstalmentPlans: تصبح خطط التقسيط مستحقة بالكامل بمبلغ {instalmentsPayableOnClosure}، منها {instalmentEarlyClosureFees} رسوم إغلاق مبكر. ]][[annualFeeRefund: يُستردّ لك من الرسوم السنوية مبلغ {annualFeeRefund}. ]][[supplementaryCards: تُغلق أيضاً البطاقات الإضافية المرتبطة بهذه البطاقة ({supplementaryCards}). ]][[outstandingBalance: الرصيد المستحق للسداد {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدل النقاط أولاً"
+        },
+        {
+          "key": "view_instalments",
+          "label": "عرض خطط التقسيط"
+        },
+        {
+          "key": "continue_closure",
+          "label": "متابعة إغلاق البطاقة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.close.islamic.critical",
+      "rulePackKey": "card.close",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[pointsBalance: Closing this card forfeits {pointsBalance} points (about {pointsValue})]][[!pointsBalance: Closing this card now has a cost of {avoidableLoss}]]",
+      "body": "[[pointsBalance: Your {pointsBalance} reward points, worth about {pointsValue}, end when the card closes. ]][[pointsExpiringSoon: Of these, {pointsExpiringSoon} points were due to expire within {pointsExpiryWindowDays} days. ]][[pendingCashbackForfeited: Pending cashback of {pendingCashbackForfeited} also ends. ]][[activeInstalmentPlans: Your instalment plans become payable in full: {instalmentsPayableOnClosure}, including {instalmentEarlyClosureFees} in early-closure fees. ]][[annualFeeRefund: You are due a refund of {annualFeeRefund} from the annual fee. ]][[supplementaryCards: Supplementary cards on this card ({supplementaryCards}) close too. ]][[outstandingBalance: The balance to clear is {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points first"
+        },
+        {
+          "key": "view_instalments",
+          "label": "View instalment plans"
+        },
+        {
+          "key": "continue_closure",
+          "label": "Continue closing the card"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.close.islamic.caution",
+      "rulePackKey": "card.close",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "caution",
+      "version": 1,
+      "headline": "Before you close this card, here is what changes",
+      "body": "[[pointsBalance: Your {pointsBalance} reward points, worth about {pointsValue}, end when the card closes. ]][[pointsExpiringSoon: Of these, {pointsExpiringSoon} points were due to expire within {pointsExpiryWindowDays} days. ]][[pendingCashbackForfeited: Pending cashback of {pendingCashbackForfeited} also ends. ]][[activeInstalmentPlans: Your instalment plans become payable in full: {instalmentsPayableOnClosure}, including {instalmentEarlyClosureFees} in early-closure fees. ]][[annualFeeRefund: You are due a refund of {annualFeeRefund} from the annual fee. ]][[supplementaryCards: Supplementary cards on this card ({supplementaryCards}) close too. ]][[outstandingBalance: The balance to clear is {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points first"
+        },
+        {
+          "key": "view_instalments",
+          "label": "View instalment plans"
+        },
+        {
+          "key": "continue_closure",
+          "label": "Continue closing the card"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.close.islamic.info",
+      "rulePackKey": "card.close",
+      "variant": "islamic",
+      "locale": "en",
+      "severity": "info",
+      "version": 1,
+      "headline": "Here is what happens when you close this card",
+      "body": "[[pointsBalance: Your {pointsBalance} reward points, worth about {pointsValue}, end when the card closes. ]][[pointsExpiringSoon: Of these, {pointsExpiringSoon} points were due to expire within {pointsExpiryWindowDays} days. ]][[pendingCashbackForfeited: Pending cashback of {pendingCashbackForfeited} also ends. ]][[activeInstalmentPlans: Your instalment plans become payable in full: {instalmentsPayableOnClosure}, including {instalmentEarlyClosureFees} in early-closure fees. ]][[annualFeeRefund: You are due a refund of {annualFeeRefund} from the annual fee. ]][[supplementaryCards: Supplementary cards on this card ({supplementaryCards}) close too. ]][[outstandingBalance: The balance to clear is {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "Redeem points first"
+        },
+        {
+          "key": "view_instalments",
+          "label": "View instalment plans"
+        },
+        {
+          "key": "continue_closure",
+          "label": "Continue closing the card"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "Talk to someone"
+        }
+      ]
+    },
+    {
+      "key": "card.close.islamic.critical",
+      "rulePackKey": "card.close",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "critical",
+      "version": 1,
+      "headline": "[[pointsBalance: إغلاق هذه البطاقة يُفقدك {pointsBalance} نقطة (نحو {pointsValue})]][[!pointsBalance: إغلاق هذه البطاقة الآن تترتب عليه تكلفة قدرها {avoidableLoss}]]",
+      "body": "[[pointsBalance: تنتهي نقاط المكافآت البالغة {pointsBalance} نقطة، وقيمتها نحو {pointsValue}، عند إغلاق البطاقة. ]][[pointsExpiringSoon: ومنها {pointsExpiringSoon} نقطة كان موعد انتهائها خلال {pointsExpiryWindowDays} يوماً. ]][[pendingCashbackForfeited: كما ينتهي الاسترداد النقدي المعلّق البالغ {pendingCashbackForfeited}. ]][[activeInstalmentPlans: تصبح خطط التقسيط مستحقة بالكامل بمبلغ {instalmentsPayableOnClosure}، منها {instalmentEarlyClosureFees} رسوم إغلاق مبكر. ]][[annualFeeRefund: يُستردّ لك من الرسوم السنوية مبلغ {annualFeeRefund}. ]][[supplementaryCards: تُغلق أيضاً البطاقات الإضافية المرتبطة بهذه البطاقة ({supplementaryCards}). ]][[outstandingBalance: الرصيد المستحق للسداد {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدل النقاط أولاً"
+        },
+        {
+          "key": "view_instalments",
+          "label": "عرض خطط التقسيط"
+        },
+        {
+          "key": "continue_closure",
+          "label": "متابعة إغلاق البطاقة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.close.islamic.caution",
+      "rulePackKey": "card.close",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "caution",
+      "version": 1,
+      "headline": "قبل إغلاق هذه البطاقة، إليك ما سيتغيّر",
+      "body": "[[pointsBalance: تنتهي نقاط المكافآت البالغة {pointsBalance} نقطة، وقيمتها نحو {pointsValue}، عند إغلاق البطاقة. ]][[pointsExpiringSoon: ومنها {pointsExpiringSoon} نقطة كان موعد انتهائها خلال {pointsExpiryWindowDays} يوماً. ]][[pendingCashbackForfeited: كما ينتهي الاسترداد النقدي المعلّق البالغ {pendingCashbackForfeited}. ]][[activeInstalmentPlans: تصبح خطط التقسيط مستحقة بالكامل بمبلغ {instalmentsPayableOnClosure}، منها {instalmentEarlyClosureFees} رسوم إغلاق مبكر. ]][[annualFeeRefund: يُستردّ لك من الرسوم السنوية مبلغ {annualFeeRefund}. ]][[supplementaryCards: تُغلق أيضاً البطاقات الإضافية المرتبطة بهذه البطاقة ({supplementaryCards}). ]][[outstandingBalance: الرصيد المستحق للسداد {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدل النقاط أولاً"
+        },
+        {
+          "key": "view_instalments",
+          "label": "عرض خطط التقسيط"
+        },
+        {
+          "key": "continue_closure",
+          "label": "متابعة إغلاق البطاقة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    },
+    {
+      "key": "card.close.islamic.info",
+      "rulePackKey": "card.close",
+      "variant": "islamic",
+      "locale": "ar",
+      "severity": "info",
+      "version": 1,
+      "headline": "إليك ما يترتب على إغلاق هذه البطاقة",
+      "body": "[[pointsBalance: تنتهي نقاط المكافآت البالغة {pointsBalance} نقطة، وقيمتها نحو {pointsValue}، عند إغلاق البطاقة. ]][[pointsExpiringSoon: ومنها {pointsExpiringSoon} نقطة كان موعد انتهائها خلال {pointsExpiryWindowDays} يوماً. ]][[pendingCashbackForfeited: كما ينتهي الاسترداد النقدي المعلّق البالغ {pendingCashbackForfeited}. ]][[activeInstalmentPlans: تصبح خطط التقسيط مستحقة بالكامل بمبلغ {instalmentsPayableOnClosure}، منها {instalmentEarlyClosureFees} رسوم إغلاق مبكر. ]][[annualFeeRefund: يُستردّ لك من الرسوم السنوية مبلغ {annualFeeRefund}. ]][[supplementaryCards: تُغلق أيضاً البطاقات الإضافية المرتبطة بهذه البطاقة ({supplementaryCards}). ]][[outstandingBalance: الرصيد المستحق للسداد {outstandingBalance}.]]",
+      "options": [
+        {
+          "key": "redeem_points",
+          "label": "استبدل النقاط أولاً"
+        },
+        {
+          "key": "view_instalments",
+          "label": "عرض خطط التقسيط"
+        },
+        {
+          "key": "continue_closure",
+          "label": "متابعة إغلاق البطاقة"
+        },
+        {
+          "key": "talk_to_someone",
+          "label": "التحدث إلى موظف"
+        }
+      ]
+    }
+  ]
+}

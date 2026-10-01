@@ -73,5 +73,15 @@ disposable database. They are skipped when it is unset.
 - PII lives only on `Customer` (displayName, displayNameAr, phone, email), `Account` (number, iban) and `Card` (pan). Never pass these to the gateway.
 - Audit tables (`insight_event`, `customer_response`) are append-only (Postgres triggers). Never `UPDATE` or `DELETE` them in code.
 - Seed IDs are deterministic (for example `cus_khalid`, `card_khalid_platinum`) so demo links stay stable across reseeds. Dates in the seed are relative to `SEED_NOW` (default: now).
+- Rule packs (`packages/rule-packs`): each pack is `packs/<key>.<variant>.json` (versioned
+  parameters, triggers, required data, declared facts) + a pure calculator + approved copy in
+  `templates/<key>.json`. Tests assert that the declared facts match the emitted facts, that every
+  pack × variant × locale × severity has exactly one template, and that templates render without
+  missing placeholders. Copy policy (banned terms, Sharia terminology, no `!`/emojis, option order)
+  lives in `policy/copy-policy.json`.
+- Template syntax: `{fact}`, `[[fact: shown when non-zero]]`, `[[!fact: shown when zero]]` (D-013).
+- Use `AnyEvaluation` / `AnyFactSet` for code that handles evaluations without knowing the pack.
+- Product rules on DB rows reach the engine only through `@amil/db/adapters`, which Zod-validate
+  them. Malformed rules throw and are never defaulted.
 - Commits: `phase-N: <summary>` at phase ends; otherwise conventional short messages.
 - At the end of each phase, write `docs/phase-N-report.md`, update `docs/PLAN.md`, then stop for review.

@@ -1,0 +1,187 @@
+{
+  "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Settlement fee and ibra/rebate terms come from each Finance record; these are pack-level parameters only.",
+  "key": "finance.early_settlement",
+  "version": "1.0.0",
+  "variant": "islamic",
+  "productFamily": "finance",
+  "triggers": [
+    {
+      "type": "action",
+      "event": "finance.early_settlement"
+    }
+  ],
+  "requiredData": [
+    {
+      "entity": "Finance",
+      "fields": [
+        "type",
+        "ratePct",
+        "tenorMonths",
+        "startAt",
+        "schedule",
+        "settlementFeeRule",
+        "rebateRule",
+        "insuranceOrTakaful",
+        "salaryLinked"
+      ]
+    }
+  ],
+  "parameters": {
+    "horizonDays": 60,
+    "dayCountBasis": 365,
+    "roundingMode": "half_up",
+    "partialPrepaymentAllowed": true
+  },
+  "facts": [
+    {
+      "key": "financeType",
+      "unit": "code",
+      "source": "finance",
+      "description": "conventional | murabaha | ijara"
+    },
+    {
+      "key": "settlementAmountToday",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Amount to settle in full today"
+    },
+    {
+      "key": "deferredPriceOutstanding",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Remaining murabaha sale price (instalments not yet due)"
+    },
+    {
+      "key": "deferredProfitNotYetDue",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Deferred profit within the remaining sale price"
+    },
+    {
+      "key": "ibraRebatePct",
+      "unit": "percent",
+      "source": "finance",
+      "description": "Ibra (rebate) percentage per the bank's policy tier reached"
+    },
+    {
+      "key": "ibraRebate",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Ibra (rebate) amount"
+    },
+    {
+      "key": "outstandingPrincipal",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Outstanding amount (principal of rentals not yet due)"
+    },
+    {
+      "key": "accruedProfit",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Rental profit accrued since the last due date (actual/basis)"
+    },
+    {
+      "key": "futureProfitNotCharged",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Future rental profit not charged on settlement"
+    },
+    {
+      "key": "settlementFee",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Settlement fee per the finance's fee rule"
+    },
+    {
+      "key": "settlementFeePct",
+      "unit": "percent",
+      "source": "finance",
+      "description": "Settlement fee percentage (percentage rules only)"
+    },
+    {
+      "key": "arrearsAmount",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Unpaid instalments that were due before today"
+    },
+    {
+      "key": "coverKind",
+      "unit": "code",
+      "source": "finance",
+      "description": "insurance | takaful (only when cover exists)"
+    },
+    {
+      "key": "coverRefundToday",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Insurance/takaful refund if settled today"
+    },
+    {
+      "key": "netOutflowToday",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Total outflow if settled today, net of cover refund"
+    },
+    {
+      "key": "nextInstalmentDate",
+      "unit": "date",
+      "source": "finance_schedule",
+      "description": "Next scheduled instalment date"
+    },
+    {
+      "key": "nextInstalmentAmount",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Next scheduled instalment amount"
+    },
+    {
+      "key": "settlementHorizonDays",
+      "unit": "days",
+      "source": "rule_pack",
+      "description": "Look-ahead window for the cheapest date"
+    },
+    {
+      "key": "cheapestSettlementDate",
+      "unit": "date",
+      "source": "computed",
+      "description": "Earliest date with the lowest total outflow"
+    },
+    {
+      "key": "daysToCheapestDate",
+      "unit": "days",
+      "source": "computed",
+      "description": "Days from today to the cheapest date"
+    },
+    {
+      "key": "instalmentsBeforeCheapestDate",
+      "unit": "count",
+      "source": "finance_schedule",
+      "description": "Scheduled instalments paid before the cheapest date"
+    },
+    {
+      "key": "instalmentsAmountBeforeCheapestDate",
+      "unit": "QAR",
+      "source": "finance_schedule",
+      "description": "Amount of those scheduled instalments"
+    },
+    {
+      "key": "netOutflowOnCheapestDate",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "Total outflow (instalments + settlement - cover refund) on the cheapest date"
+    },
+    {
+      "key": "savingIfSettledOnCheapestDate",
+      "unit": "QAR",
+      "source": "computed",
+      "description": "netOutflowToday - netOutflowOnCheapestDate"
+    },
+    {
+      "key": "salaryLinked",
+      "unit": "boolean",
+      "source": "finance",
+      "description": "Whether pricing or benefits are linked to salary transfer"
+    }
+  ]
+}

@@ -64,3 +64,51 @@ instructions live in `CLAUDE.md`.
 with a per-deployment secret). There is no foreign key to `Customer`. The audit trail therefore
 survives product-data resets and customer offboarding, and the audit table holds no directly
 identifying value. A complaints lookup hashes the ref the same way to find a customer's events.
+
+## D-010: Phase 1 open questions resolved with the defaults (Phase 2)
+
+Confirmed by the product owner:
+
+- **Fatima's cheaper date** comes from the tiered ibra policy on her murabaha: 50% of deferred
+  profit not yet due before 12 instalments are paid, 75% from 12. Her 12th instalment falls due in
+  19 days, so settling then saves QAR 4,000.00 net of the instalment and the takaful refund. All
+  parameters are synthetic.
+- **No named persona starts without consent.** Priya and Ali remain the only no-consent customers.
+
+## D-011: Annual-fee refund counts started months as used (Phase 2)
+
+`card.close` refunds the annual fee pro rata over the refund window (`feeRefundRule.withinMonths`,
+12 in the demo). A partially used month counts as used, so the figure shown is never more than the
+bank's policy would actually refund. A fee charged on the day of closure is refunded in full.
+
+## D-012: Severity basis per flagship pack (Phase 2)
+
+Severity is the avoidable cost of acting now, compared with the bank's thresholds:
+
+- `card.close`: forfeited value (points + forfeited pending cashback) **plus** instalment
+  early-closure fees. This is the loss the "Redeem points first" / "View instalments" paths help
+  avoid. It is exposed as the `avoidableLoss` fact. Khalid: 420.00 + 72.00 = 492.00, which is at
+  least 250, so critical.
+- `finance.early_settlement`: the saving from settling on the cheapest date in the horizon rather
+  than today. Salary-linked finance is at least `caution`, because benefits may change. Fatima's
+  4,000.00 is at least 1,000, so critical.
+
+## D-013: Template mini-language (Phase 2)
+
+Approved copy uses `{fact}` placeholders and conditional sections: `[[fact: text]]` renders when
+the fact is non-zero/true, and `[[!fact: text]]` when it is zero/false/absent. This keeps irrelevant
+sentences, such as "0 points expire", out of the cards without generating any wording. An
+unresolved placeholder is reported as `missing`, and such copy must not be served. The copy lint
+judges the visible text with the markup stripped (`stripTemplateSyntax`).
+
+## D-014: Murabaha settlement and instalment assumptions (Phase 2)
+
+- A settlement quote for a future date assumes instalments due before then are paid on schedule,
+  which is the only assumption the bank's own schedule supports. Those instalments count in the
+  "total outflow" being compared.
+- Overdue unpaid instalments (arrears) are owed in full on settlement. They do not count towards
+  ibra tiers or takaful/insurance months.
+- Murabaha profit does not accrue daily (the sale price is fixed), so the outflow is flat between due
+  dates. Conventional and ijara accrue actual/365 (a pack parameter). For ijara, future rental profit
+  is not charged and is shown as `futureProfitNotCharged`.
+- The cheapest date is the **earliest** day with the minimum outflow.

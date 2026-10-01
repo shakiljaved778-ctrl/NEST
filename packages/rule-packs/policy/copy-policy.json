@@ -1,0 +1,39 @@
+{
+  "$comment": "Copy policy for every template (non-negotiable 4, section 15). Bank-configurable. Terms are matched case-insensitively; English terms match whole words. Arabic terms are multi-word on purpose: the single word عرض also means 'view'.",
+  "version": "1.0.0",
+  "bannedTerms": {
+    "en": [
+      "offer",
+      "offers",
+      "apply now",
+      "special rate",
+      "limited time",
+      "promotion",
+      "promo",
+      "upgrade",
+      "exclusive",
+      "deal",
+      "pre-approved",
+      "act now",
+      "hurry"
+    ],
+    "ar": [
+      "عرض خاص",
+      "عروض خاصة",
+      "قدّم الآن",
+      "قدم الآن",
+      "اطلب الآن",
+      "سعر خاص",
+      "لفترة محدودة",
+      "ترقية",
+      "حصري",
+      "موافقة مسبقة"
+    ]
+  },
+  "islamicForbiddenTerms": {
+    "en": ["interest", "loan", "insurance"],
+    "ar": ["فائدة", "الفائدة", "قرض", "القرض", "التأمين"]
+  },
+  "maxHeadlineChars": 90,
+  "maxBodyChars": 480
+}
