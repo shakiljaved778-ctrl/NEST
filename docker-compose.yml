@@ -44,6 +44,12 @@ services:
       API_PORT: "4000"
       DATABASE_URL: postgresql://amil:amil@postgres:5432/amil?schema=public
       REDIS_URL: redis://redis:6379
+      # Demo-only secrets (same as .env.example). Replace for any real deployment.
+      AMIL_API_KEYS: ddb-demo-key:demo-only-secret-change-me-0123456789abcdef:bank_ddb
+      SESSION_SECRET: demo-only-session-secret-change-me-0123456789
+      AUDIT_HASH_SECRET: demo-only-audit-hash-secret-change-me-0123456
+      WIDGET_ORIGINS: http://localhost:3000
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     ports: ["4000:4000"]
     depends_on:
       migrate: { condition: service_completed_successfully }
@@ -63,6 +69,12 @@ services:
   demo-bank:
     build: { context: ., dockerfile: apps/demo-bank/Dockerfile }
     environment:
+      DATABASE_URL: postgresql://amil:amil@postgres:5432/amil?schema=public
+      # Server-to-server (bank backend -> AMIL) inside the compose network
+      AMIL_API_URL: http://api:4000
+      AMIL_DEMO_KEY_ID: ddb-demo-key
+      AMIL_DEMO_KEY_SECRET: demo-only-secret-change-me-0123456789abcdef
+      # Browser -> AMIL (the widget), via the published port
       NEXT_PUBLIC_API_URL: http://localhost:4000
     ports: ["3000:3000"]
     depends_on: [api]

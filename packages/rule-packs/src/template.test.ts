@@ -1,6 +1,12 @@
 import type { Fact } from "@amil/rules-engine";
 import { describe, expect, it } from "vitest";
-import { isTruthyFact, renderTemplate, stripTemplateSyntax, templateFactKeys } from "./template";
+import {
+  isTruthyFact,
+  renderedFactKeys,
+  renderTemplate,
+  stripTemplateSyntax,
+  templateFactKeys,
+} from "./template";
 
 const fact = (key: string, value: string, unit: Fact["unit"]): Fact => ({
   key,
@@ -74,5 +80,13 @@ describe("stripTemplateSyntax", () => {
     expect(stripTemplateSyntax("[[a: one {b}.]][[!c: two]]").replace(/\s+/g, " ").trim()).toBe(
       "one {b}. two",
     );
+  });
+});
+
+describe("renderedFactKeys", () => {
+  it("lists only placeholders that are visible after sections are applied", () => {
+    expect(
+      renderedFactKeys("{points} [[zero: {value}]] [[!zero: {date}]] [[!points: {empty}]]", facts),
+    ).toEqual(["points", "date"]);
   });
 });

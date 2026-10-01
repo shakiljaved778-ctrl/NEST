@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Doha Demo Bank brand tokens (fictional bank). Mirrors Bank.brandTokens in the seed. */
+/* Doha Demo Bank brand tokens (fictional bank). Overridden at runtime from Bank.brandTokens. */
 :root {
   --ddb-primary: #7a1f3d;
   --ddb-primary-contrast: #ffffff;
@@ -10,7 +10,20 @@
   --ddb-text: #1f1a1c;
   --ddb-text-muted: #6b5f64;
   --ddb-radius: 14px;
+
+  /* shadcn-style primitives in @amil/ui read these */
+  --ui-primary: var(--ddb-primary);
+  --ui-primary-contrast: var(--ddb-primary-contrast);
+  --ui-surface: var(--ddb-surface);
+  --ui-surface-muted: var(--ddb-surface-muted);
+  --ui-text: var(--ddb-text);
+  --ui-text-muted: var(--ddb-text-muted);
+  --ui-border: #ece4e8;
+  --ui-critical: #b42318;
+  --ui-radius: var(--ddb-radius);
 }
+
+@source "../../../../packages/ui/src";
 
 @theme inline {
   --color-brand: var(--ddb-primary);

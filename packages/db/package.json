@@ -9,7 +9,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./seed-data": "./src/seed/build.ts",
-    "./adapters": "./src/adapters.ts"
+    "./adapters": "./src/adapters.ts",
+    "./client": "./src/client.ts"
   },
   "scripts": {
     "lint": "eslint .",

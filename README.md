@@ -23,6 +23,10 @@ pnpm dev        # api http://localhost:4000 (Swagger UI at /docs) · demo bank :
 To run the full stack in containers instead: `docker compose up --build`.
 
 Checks: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Audit chain: `pnpm audit:verify`.
+End-to-end: `pnpm --filter @amil/demo-bank e2e` (Playwright; starts the API and the demo bank).
+
+Try it: open http://localhost:3000, pick **Khalid** in the persona switcher, open his Platinum card
+and tap **Close card**. Switch to Arabic with the header toggle.
 
 Without `ANTHROPIC_API_KEY` the model gateway uses an offline mock that serves the bank-approved
 wording, so everything works with no network.

@@ -25,7 +25,7 @@ import {
   FinanceSettlementParamsSchema,
   financeEarlySettlementPacks,
   isTruthyFact,
-  templateFactKeys,
+  renderedFactKeys,
   variantForFinanceType,
 } from "@amil/rule-packs";
 import type { AnyEvaluation, SeverityThresholds, Variant } from "@amil/rules-engine";
@@ -351,10 +351,10 @@ function buildCard(
   wording: WordingResult,
 ): InsightCard {
   const display = { locale, digitStyle: bank.digitStyle };
-  const referenced = [template.headline, template.body].flatMap((t) => {
-    const k = templateFactKeys(t);
-    return [...k.placeholders, ...k.sections];
-  });
+  // Chips show only figures that appear in the approved copy as rendered for this customer.
+  const referenced = [template.headline, template.body].flatMap((t) =>
+    renderedFactKeys(t, evaluation.facts),
+  );
   const facts: FactChip[] = [];
   for (const key of new Set(referenced)) {
     const raw = evaluation.facts[key];

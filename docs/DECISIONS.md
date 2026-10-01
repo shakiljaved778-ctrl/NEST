@@ -186,3 +186,52 @@ The prompt suggests testcontainers. The build environment has no Docker daemon, 
 run against a disposable database named by `TEST_DATABASE_URL` (the CI workflow provides a Postgres
 service). Tests are skipped when it is unset. The assertions are the same as with testcontainers;
 switching later only changes where the database comes from.
+
+## D-024: The demo bank's server plays the bank backend; one shared demo database (Phase 4)
+
+`apps/demo-bank` is built the way a real bank app would integrate:
+
+- its Next.js server is the bank backend: it reads its own (synthetic) records, and holds the AMIL
+  HMAC credential;
+- the browser only receives a 15-minute AMIL session token for the logged-in customer;
+- `<amil-insight>` calls the AMIL API directly with that token (CORS allow-list).
+
+For the MVP, the demo bank and AMIL read the same PostgreSQL database of synthetic product
+records. In a pilot, AMIL keeps its own store, fed by the bank via `POST /v1/events` (Phase 5) or
+a replicated read-only view. The engine only sees products through the adapters, so swapping the
+source does not touch the rules.
+
+## D-025: The app locale lives in a cookie, not a URL prefix (Phase 4)
+
+next-intl runs without i18n routing. The locale is read from the `ddb_locale` cookie, and
+`<html lang dir>` is set from it. Bank deep links (`ddb://cards/{id}/rewards`) therefore stay
+locale-free, and the same link works for English and Arabic sessions.
+
+## D-026: shadcn/ui primitives are written into packages/ui directly (Phase 4)
+
+shadcn/ui is copy-in source rather than a dependency. The few primitives the apps need (Button,
+Card, Badge, `cn`) are authored in the shadcn style (cva + tailwind-merge + clsx), themed by
+`--ui-*` CSS variables. The build environment has no access to the shadcn registry. More
+components can be added the same way, or with the CLI where the registry is reachable.
+
+## D-027: The widget owns the AMIL interaction; the host owns navigation (Phase 4)
+
+`<amil-insight>` runs the check itself (session token), records the customer's response, and
+emits `amil-option` with the bank's deep link. It never navigates; the host app maps `ddb://` to
+its own routes. If AMIL has nothing to show (`kind: none`) or is unavailable, the widget emits
+`amil-ready` (`kind: none`) or `amil-unavailable` and the host shows its own Continue button. The
+customer is never blocked by AMIL (section 7). On critical cards, the continue-type option
+(`continue_closure`, `settle_now`) stays disabled until "I understand" is ticked; the
+loss-avoiding options are always available.
+
+## D-028: Playwright is pinned to the pre-installed browser build (Phase 4)
+
+`@playwright/test` is pinned to 1.56.1, which matches the Chromium build available in the build
+environment. CI installs the matching browser with `playwright install --with-deps chromium`.
+`PLAYWRIGHT_CHROMIUM_EXECUTABLE` can point the tests at any other Chromium.
+
+## D-029: Phase 3 open questions kept at their defaults (Phase 4)
+
+There is no answer yet on the wording model or mTLS. The defaults stay: `claude-opus-5-5`
+(switchable with `AMIL_ANTHROPIC_MODEL`), and the mTLS decision deferred to Phase 8. Neither
+affects Phase 4, which runs on the offline mock provider.

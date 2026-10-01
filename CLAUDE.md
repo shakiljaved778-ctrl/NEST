@@ -59,6 +59,7 @@ pnpm build
 pnpm db:migrate:dev --name <x>    # create a new migration (dev)
 pnpm db:reset                     # DEV ONLY: drop + re-migrate + seed (wipes the audit trail)
 pnpm audit:verify [bankId]        # verify the audit hash chain
+pnpm --filter @amil/demo-bank build && pnpm --filter @amil/demo-bank e2e   # Playwright (starts API + app)
 pnpm --filter @amil/gateway gen:prompts   # after editing packages/gateway/prompts/*.md
 pnpm format                       # prettier --write
 ```
@@ -91,6 +92,12 @@ disposable database. They are skipped when it is unset.
   OpenAPI document is generated from the same schemas. Errors carry generic codes only. "No insight"
   (consent, kill switch, template) is `200 { kind: "none" }`, never an error.
 - Audit: append through `appendInsightEvent` only; never write `insight_event` directly.
+- Demo bank: the Next server is the "bank backend" (reads its own records via `@amil/db/client`,
+  holds the AMIL HMAC key in `lib/amil.ts`); the browser gets only a session token. Bank deep links
+  `ddb://x` map to routes `/x`. UI strings live in `apps/demo-bank/src/messages/{en,ar}.json` with
+  identical keys. Every customer-facing page renders the demo footer through `AppShell`.
+- Widget: `<amil-insight>` (Lit, shadow DOM) is themed only through `--amil-*` CSS variables and
+  never navigates; hosts listen for `amil-option` / `amil-ready` / `amil-unavailable`.
 - Product rules on DB rows reach the engine only through `@amil/db/adapters`, which Zod-validate
   them. Malformed rules throw and are never defaulted.
 - Commits: `phase-N: <summary>` at phase ends; otherwise conventional short messages.

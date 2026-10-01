@@ -13,5 +13,13 @@
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "@amil/i18n": "workspace:*",
+    "@amil/sdk": "workspace:*",
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "happy-dom": "^20.14.5"
   }
 }

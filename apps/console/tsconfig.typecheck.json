@@ -1,0 +1,5 @@
+{
+  "//": "Standalone typecheck without Next-generated .next/types (next build adds that include and type-checks it itself; reading it here races with a parallel build).",
+  "extends": "./tsconfig.json",
+  "include": ["next-env.d.ts", "*.ts", "src/**/*.ts", "src/**/*.tsx", "e2e/**/*.ts"]
+}

@@ -45,7 +45,9 @@ export function shortenReference(
   maxBody = 280,
 ): { headline: string; body: string } {
   if (ref.body.length <= maxBody) return ref;
-  const sentences = ref.body.match(/[^.。؟?]+[.。؟?]?\s*/g) ?? [ref.body];
+  // A sentence ends at ".", "?" or "؟" followed by whitespace or the end, never at a decimal point
+  // ("QAR 1,250.00" stays whole).
+  const sentences = ref.body.match(/.+?(?:[.?؟](?=\s|$)|$)\s*/gs) ?? [ref.body];
   let body = "";
   for (const s of sentences) {
     if ((body + s).trim().length > maxBody) break;

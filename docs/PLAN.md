@@ -33,18 +33,18 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 ## Section 3: Stack
 
 - [x] Turborepo + pnpm monorepo, TypeScript strict, ESLint + Prettier, Vitest
-- [ ] Playwright (Phase 4)
-- [~] `apps/demo-bank`: Next.js 15, Tailwind; shadcn/ui, next-intl and RTL arrive in Phase 4
+- [x] Playwright (pinned 1.56.1, D-028)
+- [x] `apps/demo-bank`: Next.js 15, Tailwind v4, shadcn-style UI, next-intl (en/ar, RTL)
 - [~] `apps/console`: Next.js 15 (full console in Phase 7)
 - [x] `apps/api`: Fastify, OpenAPI 3.1 generated from Zod, Swagger UI at `/docs`
 - [x] `packages/rules-engine`: contract, facts, severity, money and date helpers
 - [~] `packages/rule-packs`: versioned JSON + calculators + approved copy; 2 of 12 packs (Phase 2), rest in Phase 5
-- [ ] `packages/widget`: Lit `<amil-insight>`, `<amil-assistant>` (Phase 4, 6)
+- [~] `packages/widget`: Lit `<amil-insight>` (Phase 4) · [ ] `<amil-assistant>` (Phase 6)
 - [x] `packages/sdk`: Zod contract + typed server (HMAC) and widget (session) clients
 - [x] `packages/gateway`: providers (anthropic, in_country, mock), redactor, number validator, wording cache
 - [x] `packages/db`: Prisma schema, migrations, seed
 - [~] `packages/i18n`: en/ar number, date and currency formatting, Arabic-Indic digits, glossary (catalogs grow per phase)
-- [ ] `packages/ui`: shared components (Phase 4)
+- [x] `packages/ui`: shared shadcn-style components (D-026)
 - [x] PostgreSQL 16, Redis 7 (docker-compose) · [ ] BullMQ (Phase 5)
 - [ ] LangGraph.js assistant (Phase 6)
 - [~] pino structured logs (Phase 1) · [ ] OpenTelemetry (Phase 8)
@@ -115,8 +115,8 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 10: Demo bank app (Phase 4+)
 
-- [~] Phone-framed app shell + demo footer (Phase 1) · [ ] full screens, persona switcher, flows (Phase 4–6)
-- [ ] Critical severity requires "I understand" before "Continue" enables
+- [~] Phone-framed app, persona switcher, home, card detail + Close card flow, finance detail + Settle early flow, deep-link targets, settings (language, consent) (Phase 4) · [ ] deposit break, salary change, statement with charges, alerts, Ask AMIL (Phase 5–6)
+- [x] Critical severity requires "I understand" before "Continue" enables
 
 ## Section 11: Bank console (Phase 7)
 
@@ -136,15 +136,15 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [~] Zod validation on every request (strict schemas), CORS allow-list for widget origins · [ ] rate limiting, helmet, CSP (Phase 8)
 - [ ] AES-256-GCM application-level PII encryption with KMS interface (Phase 8)
 - [ ] RBAC on console; console actions audited (Phase 7)
-- [~] Integration tests against real PostgreSQL via TEST_DATABASE_URL (D-023) · [ ] e2e (Playwright, Phase 4)
-- [x] CI: GitHub Actions lint, typecheck, test, build (`.github/workflows/ci.yml`) · [ ] Playwright on PR (Phase 4), dependency audit (Phase 8)
+- [x] Integration tests against real PostgreSQL via TEST_DATABASE_URL (D-023) · [~] e2e (Playwright): Khalid en/ar, Fatima, no-consent (Phase 4); console flows in Phase 7
+- [x] CI: GitHub Actions lint, typecheck, test, build, Playwright e2e (`.github/workflows/ci.yml`) · [ ] dependency audit (Phase 8)
 
 ## Section 14: Phases
 
 - [x] **Phase 1: Foundation.** Monorepo, tooling, docker-compose, Prisma schema, migrations, seed. ✅ `pnpm dev` runs all apps; `pnpm db:seed` works; `docs/data-model.md`
 - [x] **Phase 2: Rules engine + flagship packs.** ≥ 40 table-driven tests; Khalid and Fatima match expected facts exactly
 - [x] **Phase 3: Insight API + gateway.** Redaction property tests, validator (Arabic-Indic), audit chain verifies, p95 < 400 ms with mock
-- [ ] **Phase 4: Demo bank app + widget.** Playwright: Khalid sees points insight in en + ar, deep-links to "Redeem points"
+- [x] **Phase 4: Demo bank app + widget.** Playwright: Khalid sees points insight in en + ar, deep-links to "Redeem points"
 - [ ] **Phase 5: Remaining packs + proactive + explain.** Every pack fires for ≥ 2 personas; alerts after scheduler; all fee lines explainable
 - [ ] **Phase 6: Ask AMIL + compare.** Khalid card-close answer with fact chips; refuses investment advice; compare matches engine
 - [ ] **Phase 7: Bank console.** Point-value change flows to next insight; kill switch immediate; complaints lookup shows Khalid

@@ -1,5 +1,8 @@
 import path from "node:path";
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const config: NextConfig = {
   output: "standalone",
@@ -8,9 +11,10 @@ const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   // Internal workspace packages are shipped as TypeScript source.
-  transpilePackages: ["@amil/i18n"],
+  transpilePackages: ["@amil/i18n", "@amil/ui", "@amil/widget", "@amil/sdk", "@amil/db"],
+  serverExternalPackages: ["@prisma/client"],
   // Linting runs through the monorepo's ESLint config (`pnpm lint`), not during `next build`.
   eslint: { ignoreDuringBuilds: true },
 };
 
-export default config;
+export default withNextIntl(config);

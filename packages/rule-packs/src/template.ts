@@ -37,6 +37,15 @@ export function templateFactKeys(text: string): { sections: string[]; placeholde
   return { sections, placeholders };
 }
 
+type FactLookupSource = AnyFactSet | Readonly<Record<string, Fact>>;
+
+/** A fact by key, never `_sources` or any non-fact entry. */
+function lookupFact(facts: FactLookupSource, key: string): Fact | undefined {
+  if (key === "_sources") return undefined;
+  const value = (facts as Readonly<Record<string, Fact | FactSource[] | undefined>>)[key];
+  return value === undefined || Array.isArray(value) ? undefined : value;
+}
+
 export interface RenderResult {
   text: string;
   /** Placeholders with no matching fact. Non-empty means the copy must not be served. */
@@ -48,11 +57,7 @@ export function renderTemplate(
   facts: AnyFactSet | Readonly<Record<string, Fact>>,
   format: FactFormatter,
 ): RenderResult {
-  const lookup = (key: string): Fact | undefined => {
-    if (key === "_sources") return undefined;
-    const value = (facts as Readonly<Record<string, Fact | FactSource[] | undefined>>)[key];
-    return value === undefined || Array.isArray(value) ? undefined : value;
-  };
+  const lookup = (key: string) => lookupFact(facts, key);
   const missing: string[] = [];
   const withSections = text.replace(SECTION_RE, (_m, negate: string, key: string, body: string) =>
     isTruthyFact(lookup(key)) !== (negate === "!") ? body : "",
@@ -71,4 +76,15 @@ export function renderTemplate(
 /** The template's visible copy with section markers removed (placeholders kept), for linting. */
 export function stripTemplateSyntax(text: string): string {
   return text.replace(SECTION_RE, (_m, _negate: string, _key: string, body: string) => ` ${body} `);
+}
+
+/**
+ * Fact keys whose values actually appear in the rendered text: placeholders outside sections and
+ * inside sections that render. Used for fact chips, so a card never cites a figure it doesn't show.
+ */
+export function renderedFactKeys(text: string, facts: FactLookupSource): string[] {
+  const visible = text.replace(SECTION_RE, (_m, negate: string, key: string, body: string) =>
+    isTruthyFact(lookupFact(facts, key)) !== (negate === "!") ? body : "",
+  );
+  return [...new Set([...visible.matchAll(PLACEHOLDER_RE)].map((m) => String(m[1])))];
 }

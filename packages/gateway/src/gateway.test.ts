@@ -325,6 +325,14 @@ describe("shortenReference", () => {
       body: "One sentence here. Two sentence here.",
     });
     expect(shortenReference(ref)).toBe(ref);
+    // Decimal points are not sentence ends.
+    const money = {
+      headline: "H",
+      body: "You are due a refund of QAR 1,250.00 from the annual fee. Second sentence is here.",
+    };
+    expect(shortenReference(money, 60).body).toBe(
+      "You are due a refund of QAR 1,250.00 from the annual fee.",
+    );
   });
 });
 

@@ -1,0 +1,113 @@
+{
+  "app": {
+    "bank": "Doha Demo Bank",
+    "demoFooter": "Demo data — Doha Demo Bank is fictional",
+    "greeting": "Welcome, {name}",
+    "switchPersona": "Switch customer (demo)",
+    "language": "العربية",
+    "back": "Back"
+  },
+  "nav": {
+    "home": "Home",
+    "alerts": "Alerts",
+    "ask": "Ask AMIL",
+    "settings": "Settings"
+  },
+  "home": {
+    "accounts": "Accounts",
+    "cards": "Cards",
+    "finance": "Finance",
+    "deposits": "Deposits",
+    "available": "Balance",
+    "points": "{points} points",
+    "outstanding": "Outstanding",
+    "limit": "Limit {limit}",
+    "matures": "Matures {date}",
+    "instalment": "Instalment {amount}",
+    "islamic": "Islamic",
+    "none": "None"
+  },
+  "personas": {
+    "title": "Choose a demo customer",
+    "subtitle": "All customers are synthetic. Named personas from the demo script are listed first.",
+    "named": "Demo personas",
+    "others": "Other customers"
+  },
+  "card": {
+    "balance": "Outstanding balance",
+    "statement": "Statement balance",
+    "minDue": "Minimum due",
+    "limit": "Credit limit",
+    "points": "Reward points",
+    "instalments": "Instalment plans",
+    "remaining": "{amount} remaining · {months} months",
+    "close": "Close card",
+    "supplementary": "Supplementary cards",
+    "annualFee": "Annual fee"
+  },
+  "close": {
+    "title": "Close card",
+    "step": "Review before you confirm",
+    "intro": "Before you confirm, here is what closing {card} means for you.",
+    "continue": "Continue closing the card",
+    "unavailable": "You can continue with your request."
+  },
+  "confirm": {
+    "title": "Confirm",
+    "cardBody": "In a real bank app, the bank's own confirmation step for closing the card runs here.",
+    "financeBody": "In a real bank app, the bank's own settlement step runs here.",
+    "note": "Demo: nothing is changed. AMIL never closes cards or moves money.",
+    "home": "Back to home"
+  },
+  "rewards": {
+    "title": "Redeem points",
+    "body": "You have {points} points worth about {value}.",
+    "redeem": "Redeem (demo)",
+    "note": "Demo screen reached from the AMIL insight. Redemption itself is the bank's flow."
+  },
+  "instalments": {
+    "title": "Instalment plans",
+    "monthly": "{amount} a month",
+    "months": "{months} months left"
+  },
+  "finance": {
+    "outstanding": "Principal outstanding",
+    "instalment": "Monthly instalment",
+    "next": "Next instalment",
+    "tenor": "{elapsed} of {tenor} instalments paid",
+    "settle": "Settle early",
+    "murabaha": "Murabaha",
+    "ijara": "Ijara",
+    "conventional": "Personal loan"
+  },
+  "settle": {
+    "title": "Settle early",
+    "step": "Review before you confirm",
+    "intro": "Before you settle, here is what settling now means.",
+    "continue": "Continue to settle today",
+    "scheduleTitle": "Schedule settlement",
+    "scheduleBody": "Settlement scheduled for {date} (demo). Instalments due before then are paid as usual.",
+    "prepayTitle": "Partial prepayment",
+    "prepayBody": "Demo screen: the bank's partial prepayment flow runs here."
+  },
+  "support": {
+    "title": "Talk to someone",
+    "body": "A Doha Demo Bank advisor will call you back (demo). Your request is about: {topic}."
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "english": "English",
+    "arabic": "العربية",
+    "consent": "AMIL insights",
+    "consentBody": "Allow Doha Demo Bank to show you what you gain or lose before important actions, using your account data. You can withdraw at any time.",
+    "granted": "On",
+    "withdrawn": "Off",
+    "grant": "Turn on",
+    "withdraw": "Turn off"
+  },
+  "soon": {
+    "title": "Coming soon",
+    "body": "This part of the demo arrives in a later phase."
+  }
+}
