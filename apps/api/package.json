@@ -13,7 +13,8 @@
     "test": "dotenv -e ../../.env -- vitest run",
     "worker": "dotenv -e ../../.env -- tsx src/worker.ts",
     "worker:start": "node dist/worker.js",
-    "proactive:run": "dotenv -e ../../.env -- tsx src/scripts/proactive-run.ts"
+    "proactive:run": "dotenv -e ../../.env -- tsx src/scripts/proactive-run.ts",
+    "demo:traffic": "dotenv -e ../../.env -- tsx src/scripts/demo-traffic.ts"
   },
   "dependencies": {
     "@amil/db": "workspace:*",

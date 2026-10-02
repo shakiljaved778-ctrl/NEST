@@ -50,7 +50,8 @@ export function evaluateCardClose(
   const rewards = input.rewards;
   const rewardsAsOf = rewards ? isoDate(rewards.asOf) : cardAsOf;
   const points = rewards?.balance ?? 0;
-  const pointValue = D(rewards?.pointValueQar ?? "0");
+  const pointValue = D(params.programmePointValueQar ?? rewards?.pointValueQar ?? "0");
+  const pointValueSource = params.programmePointValueQar ? "rule_pack" : "rewards_ledger";
   const pointsValue = round(D(points).times(pointValue), mode);
   const windowEnd = addDays(today, params.pointsExpiryWindowDays);
   const expiringSoon = (rewards?.expiryBuckets ?? []).filter((b) => {
@@ -65,7 +66,7 @@ export function evaluateCardClose(
   const forfeitedValue = pointsValue.plus(cashbackForfeited);
 
   f.add("pointsBalance", String(points), "points", "rewards_ledger", rewardsAsOf)
-    .add("pointValueQar", toFixedString(pointValue, 4), "QAR", "rewards_ledger", rewardsAsOf)
+    .add("pointValueQar", toFixedString(pointValue, 4), "QAR", pointValueSource, rewardsAsOf)
     .add("pointsValue", toMoneyString(pointsValue), "QAR", "rewards_ledger", rewardsAsOf)
     .add("pointsExpiringSoon", String(expiringPoints), "points", "rewards_ledger", rewardsAsOf)
     .add(

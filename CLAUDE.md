@@ -60,6 +60,8 @@ pnpm db:migrate:dev --name <x>    # create a new migration (dev)
 pnpm db:reset                     # DEV ONLY: drop + re-migrate + seed (wipes the audit trail)
 pnpm audit:verify [bankId]        # verify the audit hash chain
 pnpm --filter @amil/demo-bank build && pnpm --filter @amil/demo-bank e2e   # Playwright (starts API + app)
+pnpm --filter @amil/console --filter @amil/demo-bank build && pnpm --filter @amil/console e2e   # console e2e
+pnpm --filter @amil/api demo:traffic [days] [perDay]   # synthetic checks + responses for the dashboard
 pnpm worker                       # proactive worker: BullMQ schedules from ProactiveJob rows
 pnpm proactive:run [pack] [--queue]   # run rewards.expiry / account.dormancy now
 pnpm --filter @amil/gateway gen:prompts   # after editing packages/gateway/prompts/*.md
@@ -120,6 +122,14 @@ disposable database. They are skipped when it is unset.
   holds the AMIL HMAC key in `lib/amil.ts`); the browser gets only a session token. Bank deep links
   `ddb://x` map to routes `/x`. UI strings live in `apps/demo-bank/src/messages/{en,ar}.json` with
   identical keys. Every customer-facing page renders the demo footer through `AppShell`.
+- Console (`apps/console`, `/v1/admin/*`): every route names a permission (`apps/api/src/admin/rbac.ts`)
+  and the console hides what a role cannot use; the API is what enforces it. Keep segregation of
+  duties: no role both drafts and approves copy (D-055). The console token stays in an httpOnly
+  cookie; pages read the API server-side and client components go through the `/api/admin` proxy
+  (D-054). Request schemas live in `apps/api/src/admin/schemas.ts` (routes and OpenAPI share them).
+  Console changes never edit history: pack parameters are new versions, copy is new draft versions,
+  and each change is in the approval log (D-056, D-058). Integration tests that change packs or
+  templates restore the seeded rows afterwards.
 - Widget: `<amil-insight>` (Lit, shadow DOM) is themed only through `--amil-*` CSS variables and
   never navigates; hosts listen for `amil-option` / `amil-ready` / `amil-unavailable`.
 - Product rules on DB rows reach the engine only through `@amil/db/adapters`, which Zod-validate

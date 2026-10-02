@@ -1,7 +1,7 @@
 {
   "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
   "key": "card.close",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "variant": "islamic",
   "productFamily": "cards",
   "triggers": [
@@ -41,7 +41,8 @@
   "parameters": {
     "pointsExpiryWindowDays": 90,
     "pendingCashbackOnClosure": "forfeited",
-    "roundingMode": "half_up"
+    "roundingMode": "half_up",
+    "programmePointValueQar": null
   },
   "facts": [
     {

@@ -1,7 +1,7 @@
 {
   "$comment": "SYNTHETIC demo parameters for the fictional Doha Demo Bank. Not real product terms.",
   "key": "rewards.expiry",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "variant": "islamic",
   "productFamily": "cards",
   "triggers": [
@@ -24,7 +24,8 @@
     "shortWindowDays": 30,
     "midWindowDays": 60,
     "longWindowDays": 90,
-    "roundingMode": "half_up"
+    "roundingMode": "half_up",
+    "programmePointValueQar": null
   },
   "facts": [
     {

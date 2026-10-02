@@ -197,6 +197,22 @@ export class ModelGateway {
     await Promise.allSettled([...this.inflight]);
   }
 
+  /** What the gateway is configured with (the console's model card). No secrets. */
+  describe(): {
+    redacted: { name: string; model: string } | null;
+    inCountry: { name: string; model: string } | null;
+    timeoutMs: number;
+    cache: boolean;
+  } {
+    const p = (x: Provider | undefined) => (x ? { name: x.name, model: x.model } : null);
+    return {
+      redacted: p(this.options.redactedProvider),
+      inCountry: p(this.options.inCountryProvider),
+      timeoutMs: this.timeoutMs,
+      cache: Boolean(this.options.cache),
+    };
+  }
+
   private track(p: Promise<unknown>): void {
     this.inflight.add(p);
     void p.finally(() => this.inflight.delete(p));

@@ -22,12 +22,12 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] 1. Facts are computed by the deterministic rules engine; the LLM only rewords the approved copy from a redacted fact template
 - [x] 2. Number validator rejects any LLM number, amount, percentage or date absent from the fact set (Arabic-Indic, extended and full-width digits, zero-width tricks, spelled-out numbers); falls back to the approved template; adversarial tests
 - [x] 3. Inform, never execute: options are deep links on the bank's scheme (`ddb://…`)
-- [~] 4. No selling: banned-term lint over all templates and over model output (configurable, en + ar); console checker in Phase 7
+- [x] 4. No selling: banned-term lint over all templates and over model output (configurable, en + ar); console copy checker on every draft and approval (Phase 7, D-058)
 - [x] 5. Consent first: no product data read without an active consent; generic, data-free copy otherwise (D-019)
 - [x] 6. Data stays in-country: gateway modes `redacted` (default), `in_country`, `off`; fail-closed redactor with property tests
 - [x] 7. Everything audited: immutable, hash-chained `InsightEvent` per evaluation (including suppressed ones), customer responses, retention 10 years; `pnpm audit:verify`
 - [x] 8. Bank approves all copy: only `approved` templates served, Islamic only `sharia_approved`
-- [x] 9. Kill switches per rule pack and per template; disabled → `kind: none`, never an error (console UI in Phase 7)
+- [x] 9. Kill switches per rule pack and per template; disabled → `kind: none`, never an error; console switches (Phase 7, D-057)
 - [x] 10. Money is decimal (`decimal.js`), QAR 2 dp, rounding mode is a rule-pack parameter (`roundingMode` in every pack)
 
 ## Section 3: Stack
@@ -35,18 +35,18 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] Turborepo + pnpm monorepo, TypeScript strict, ESLint + Prettier, Vitest
 - [x] Playwright (pinned 1.56.1, D-028)
 - [x] `apps/demo-bank`: Next.js 15, Tailwind v4, shadcn-style UI, next-intl (en/ar, RTL)
-- [~] `apps/console`: Next.js 15 (full console in Phase 7)
+- [x] `apps/console`: Next.js 15, Tailwind v4, Chart.js (Phase 7)
 - [x] `apps/api`: Fastify, OpenAPI 3.1 generated from Zod, Swagger UI at `/docs`
 - [x] `packages/rules-engine`: contract, facts, severity, money and date helpers
 - [x] `packages/rule-packs`: versioned JSON + calculators + approved copy; all 12 packs × 2 variants (Phases 2, 5)
-- [~] `packages/widget`: Lit `<amil-insight>` (Phase 4) · [ ] `<amil-assistant>` (Phase 6)
+- [x] `packages/widget`: Lit `<amil-insight>` (Phase 4) · `<amil-assistant>` (Phase 6)
 - [x] `packages/sdk`: Zod contract + typed server (HMAC) and widget (session) clients
 - [x] `packages/gateway`: providers (anthropic, in_country, mock), redactor, number validator, wording cache
 - [x] `packages/db`: Prisma schema, migrations, seed
 - [~] `packages/i18n`: en/ar number, date and currency formatting, Arabic-Indic digits, glossary (catalogs grow per phase)
 - [x] `packages/ui`: shared shadcn-style components (D-026)
 - [x] PostgreSQL 16, Redis 7 (docker-compose) · [x] BullMQ (Phase 5: proactive worker, schedules mirrored from ProactiveJob, D-039)
-- [ ] LangGraph.js assistant (Phase 6)
+- [x] LangGraph.js assistant (Phase 6)
 - [~] pino structured logs (Phase 1) · [ ] OpenTelemetry (Phase 8)
 - [x] `docker-compose.yml`, `Dockerfile` per app · [ ] `infra/terraform` skeleton (Phase 8)
 - [x] `.env.example`; `ANTHROPIC_API_KEY` optional (mock provider fallback, Phase 3)
@@ -94,7 +94,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] `POST /v1/compare` (Phase 6, D-049)
 - [x] `POST /v1/assistant/messages` SSE (Phase 6, D-045..D-047)
 - [x] `POST /v1/events` with idempotency key (Phase 5, recorded only in the MVP, D-043)
-- [ ] `/v1/admin/*` RBAC (Phase 7)
+- [x] `/v1/admin/*` with RBAC: sign-in, dashboard, rule packs, templates + workflow, approvals, audit, complaints, compliance (Phase 7, D-054..D-062)
 - [x] `GET /healthz`, `GET /readyz`, `GET /docs`
 - [x] Errors never leak to the customer UI (generic error codes; no-insight is never an error)
 
@@ -122,7 +122,12 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 11: Bank console (Phase 7)
 
-- [ ] Dashboard, rule packs, templates + approval workflow, kill switches, audit + hash-chain verify + export, complaints lookup, compliance pack page, Chart.js
+- [x] Dashboard (Chart.js): insights by pack and severity, per day, responses, reconsidered actions, estimated value protected, validator rejection rate, latency (D-060)
+- [x] Rule packs: list, kill switch, parameter editor with validation, diff review, effective date, version history, change log (D-056, D-057)
+- [x] Templates: editor, live preview at each severity beside the other language, copy checker as you type, approval workflow product → compliance → Sharia, kill switch, versions and history (D-058, D-059)
+- [x] Audit: search by customer ref (keyed hash), pack and dates; event view with hash and link check; whole-chain verify; CSV and JSON export (D-061)
+- [x] Complaints lookup: what a customer was shown and how they responded, chain verified (D-061)
+- [x] Compliance pack: model card, data flow, fields each pack reads, live redaction proof, retention, consent purposes (D-062)
 
 ## Section 12: Seed data
 
@@ -137,8 +142,8 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 - [~] Zod validation on every request (strict schemas), CORS allow-list for widget origins · [ ] rate limiting, helmet, CSP (Phase 8)
 - [ ] AES-256-GCM application-level PII encryption with KMS interface (Phase 8)
-- [ ] RBAC on console; console actions audited (Phase 7)
-- [x] Integration tests against real PostgreSQL via TEST_DATABASE_URL (D-023) · [~] e2e (Playwright): Khalid en/ar, Fatima, no-consent (Phase 4); console flows in Phase 7
+- [x] RBAC on console with segregation of duties (D-055); console changes recorded in the approval log · [x] signed request nonce (D-063)
+- [x] Integration tests against real PostgreSQL via TEST_DATABASE_URL (D-023) · [x] e2e (Playwright): demo bank (16) and console (7) suites
 - [x] CI: GitHub Actions lint, typecheck, test, build, Playwright e2e (`.github/workflows/ci.yml`) · [ ] dependency audit (Phase 8)
 
 ## Section 14: Phases
@@ -149,7 +154,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] **Phase 4: Demo bank app + widget.** Playwright: Khalid sees points insight in en + ar, deep-links to "Redeem points"
 - [x] **Phase 5: Remaining packs + proactive + explain.** Every pack fires for ≥ 2 personas; alerts after scheduler; all fee lines explainable
 - [x] **Phase 6: Ask AMIL + compare.** Khalid card-close answer with fact chips; refuses investment advice; compare matches engine
-- [ ] **Phase 7: Bank console.** Point-value change flows to next insight; kill switch immediate; complaints lookup shows Khalid
+- [x] **Phase 7: Bank console.** Point-value change flows to next insight; kill switch immediate; complaints lookup shows Khalid
 - [ ] **Phase 8: Hardening + demo.** Headers, encryption, rate limits, CI, Terraform, DEMO_SCRIPT, INTEGRATION_GUIDE, SECURITY; fresh clone to running demo in ≤ 3 commands
 
 ## Section 15: Voice and copy rules (all templates)

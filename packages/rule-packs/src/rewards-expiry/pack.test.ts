@@ -81,6 +81,20 @@ describe("rewards.expiry", () => {
     expect(evaluateRewardsExpiry(closed, params, thresholds, NOW).applicable).toBe(false);
   });
 
+  it("uses the bank's programme point value when set: 8,000 × 0.0125 = 100.00", () => {
+    const ev = evaluateRewardsExpiry(
+      rewardsExpiry(),
+      { ...params, programmePointValueQar: "0.0125" },
+      thresholds,
+      NOW,
+    );
+    expect([
+      ev.facts.pointsExpiringLongValue.value,
+      ev.facts.pointsValue.value,
+      ev.severity,
+    ]).toEqual(["100.00", "525.00", "caution"]);
+  });
+
   it("rejects windows that do not increase", () => {
     expect(
       RewardsExpiryParamsSchema.safeParse({

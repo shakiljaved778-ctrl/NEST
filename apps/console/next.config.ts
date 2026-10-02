@@ -8,7 +8,7 @@ const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   // Internal workspace packages are shipped as TypeScript source.
-  transpilePackages: ["@amil/i18n"],
+  transpilePackages: ["@amil/ui", "@amil/sdk"],
   // Linting runs through the monorepo's ESLint config (`pnpm lint`), not during `next build`.
   eslint: { ignoreDuringBuilds: true },
 };

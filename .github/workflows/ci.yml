@@ -108,16 +108,23 @@ jobs:
       - name: Migrate and seed
         run: pnpm db:migrate && pnpm db:seed
 
-      - name: Build demo bank
-        run: pnpm turbo run build --filter=@amil/demo-bank
+      - name: Build demo bank and console
+        run: pnpm turbo run build --filter=@amil/demo-bank --filter=@amil/console
 
-      - name: Playwright
+      - name: Playwright (demo bank)
         run: pnpm --filter @amil/demo-bank e2e
 
-      - name: Upload Playwright report
+      # The console suite changes packs and copy through the UI and checks the demo bank; it
+      # restores what it changes, and runs after the demo-bank suite.
+      - name: Playwright (bank console)
+        run: pnpm --filter @amil/console e2e
+
+      - name: Upload Playwright reports
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: apps/demo-bank/playwright-report
+          path: |
+            apps/demo-bank/playwright-report
+            apps/console/playwright-report
           retention-days: 7

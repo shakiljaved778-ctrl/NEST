@@ -460,19 +460,48 @@ export const DEFAULT_SESSION_SCOPES: Scope[] = [
   "assistant:chat",
 ];
 
+/** Bank console staff (`/v1/admin/*`). The console backend signs them in over HMAC. */
+export const ConsoleRole = z.enum(["admin", "product", "compliance", "sharia", "viewer"]);
+export const ConsoleUser = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  role: ConsoleRole,
+});
+export const ConsoleUserList = z.object({ users: z.array(ConsoleUser) });
+export const ConsoleSessionResponse = z.object({
+  token: z.string(),
+  expiresAt: z.string(),
+  user: ConsoleUser,
+  permissions: z.array(z.string()),
+});
+export type ConsoleRole = z.infer<typeof ConsoleRole>;
+export type ConsoleUser = z.infer<typeof ConsoleUser>;
+export type ConsoleSessionResponse = z.infer<typeof ConsoleSessionResponse>;
+
 /** HTTP headers for bank-to-AMIL calls. */
 export const HEADERS = {
   key: "x-amil-key",
   timestamp: "x-amil-timestamp",
   signature: "x-amil-signature",
+  nonce: "x-amil-nonce",
 } as const;
 
-/** Signing input: timestamp, method, path and raw body (D-016). */
+/** An optional nonce: 16-64 letters, digits or hyphens (a UUID fits). */
+export const NONCE_PATTERN = /^[A-Za-z0-9-]{16,64}$/;
+
+/**
+ * Signing input: timestamp, method, path and raw body (D-016), then the nonce when one is sent
+ * (D-063). The nonce lets two identical requests in the same second both be accepted; it is
+ * signed, so it cannot be added to or stripped from a captured request.
+ */
 export function signingString(
   timestamp: string,
   method: string,
   path: string,
   body: string,
+  nonce?: string,
 ): string {
-  return `${timestamp}.${method.toUpperCase()}.${path}.${body}`;
+  const base = `${timestamp}.${method.toUpperCase()}.${path}.${body}`;
+  return nonce ? `${base}.${nonce}` : base;
 }

@@ -58,6 +58,53 @@ describe("HMAC verification", () => {
     });
   });
 
+  it("with a signed nonce, accepts identical requests in the same second (D-063)", async () => {
+    const store = new MemoryReplayStore(() => NOW * 1000);
+    const withNonce = (nonce: string) => {
+      const req = signed();
+      const ts = String(NOW);
+      return {
+        ...req,
+        headers: {
+          ...req.headers,
+          "x-amil-nonce": nonce,
+          "x-amil-signature": signRequest(
+            "s".repeat(40),
+            ts,
+            "POST",
+            "/v1/checks",
+            '{"a":1}',
+            nonce,
+          ),
+        },
+      };
+    };
+    const a = withNonce("0b6c1f0e-4f6b-4a51-9a39-1d6f3c3f2a01");
+    const b = withNonce("5d8e2a7c-1b3f-4c9d-8e6a-2f4b7c9d1e02");
+    expect((await verifyHmac(a, keys, store, NOW)).ok).toBe(true);
+    expect((await verifyHmac(b, keys, store, NOW)).ok).toBe(true);
+    // The same request and nonce again is a replay.
+    expect(await verifyHmac(a, keys, store, NOW)).toEqual({ ok: false, reason: "replayed" });
+    // The nonce is signed: changing or stripping it breaks the signature.
+    const swapped = {
+      ...b,
+      headers: { ...b.headers, "x-amil-nonce": "ffffffff-4f6b-4a51-9a39-1d6f3c3f2a01" },
+    };
+    expect(await verifyHmac(swapped, keys, new MemoryReplayStore(), NOW)).toEqual({
+      ok: false,
+      reason: "bad_signature",
+    });
+    const { "x-amil-nonce": _n, ...stripped } = b.headers;
+    expect(
+      await verifyHmac({ ...b, headers: stripped }, keys, new MemoryReplayStore(), NOW),
+    ).toEqual({ ok: false, reason: "bad_signature" });
+    const malformed = { ...a, headers: { ...a.headers, "x-amil-nonce": "short" } };
+    expect(await verifyHmac(malformed, keys, new MemoryReplayStore(), NOW)).toEqual({
+      ok: false,
+      reason: "bad_signature",
+    });
+  });
+
   it("accepts a timestamp 4 minutes old", async () => {
     expect(
       (await verifyHmac(signed({ ts: NOW - 240 }), keys, new MemoryReplayStore(), NOW)).ok,

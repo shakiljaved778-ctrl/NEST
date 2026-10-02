@@ -483,3 +483,113 @@ The API's integration tests share one database, and some toggle kill switches (f
 disabling `card.close`). Running files in parallel made a Phase 6 test see a disabled pack. Vitest
 runs the API's test files sequentially (`fileParallelism: false`); tests within a file were already
 sequential.
+
+## D-053: The point value is a bank programme parameter, not only ledger data (Phase 7)
+
+Section 11's acceptance test changes "Khalid's point value in the console". The ledger's
+`pointValueQar` is customer data the console must not edit, so `card.close` and `rewards.expiry`
+gain an optional parameter `programmePointValueQar` (up to 4 decimals, `null` by default). When
+set, it values every card's points and the fact's source reads `rule_pack`; when empty, each
+card's rewards ledger value is used as before. Both packs moved to version 1.1.0.
+
+## D-054: Console sign-in, tokens and the browser boundary (Phase 7)
+
+- **Sign-in.** The console's backend lists staff (`GET /v1/admin/users`) and mints an 8-hour
+  console token (`POST /v1/admin/sessions`) over the bank's HMAC key. A bank would put its own
+  SSO in front of this; the demo shows a staff picker.
+- **Tokens.** Console tokens (JWT HS256, audience `amil-console`) are signed with a key derived
+  from the session secret, so a widget token can never be used as a console token. Every request
+  re-reads the user, so deactivating a user or changing a role takes effect at once.
+- **Browser boundary.** The token lives only in an httpOnly, `SameSite=Strict` cookie (`Secure`
+  in production). Pages read the console API server-side; interactive parts call a same-origin
+  proxy (`/api/admin/*`) that attaches the token, refuses the sign-in routes, and rejects writes
+  whose `Origin` is not the console.
+
+## D-055: Console roles and segregation of duties (Phase 7)
+
+| Role       | Can                                                                             |
+| ---------- | ------------------------------------------------------------------------------- |
+| product    | edit pack parameters, draft and submit copy, use kill switches                  |
+| compliance | approve copy, search and export the audit log, complaints lookup, kill switches |
+| sharia     | give the final approval for Islamic copy (and send it back)                     |
+| admin      | edit pack parameters, use kill switches, read the audit log                     |
+| viewer     | read dashboards, packs, copy and the compliance pack                            |
+
+No role both drafts and approves copy. Kill switches stop harm, so three roles can use them.
+The console hides what a role cannot use; the API enforces it (403).
+
+## D-056: Pack parameter changes are new versions (Phase 7)
+
+A change writes a new `RulePack` row: the merged parameters are validated against the pack's own
+Zod schema first (staff see the field-level issues), the version's patch number is bumped
+(1.1.0 → 1.1.1), and an effective date (now or later) is set. The approval log records the
+changed keys before and after. The engine uses the latest active version already effective, so a
+scheduled version takes over by itself and the history is never edited.
+
+## D-057: A pack's kill switch covers all its versions (Phase 7)
+
+Disabling `card.close` (conventional) disables every version of it, including scheduled ones, so a
+version taking effect later cannot switch the pack back on. Customers get `kind: none`, never an
+error, and the bank's own flow continues.
+
+## D-058: Copy approval workflow (Phase 7)
+
+`draft → in_review` (product submits) `→ approved` (compliance), or for Islamic copy
+`→ compliance_approved → sharia_approved` (Sharia reviewer). Compliance or the Sharia reviewer
+can send copy back to draft. Template statuses gain `in_review` and `compliance_approved`.
+
+- **Checks** run on save and again on approval: copy policy (selling and banned terms, Sharia
+  terminology in Islamic copy, no "!" or emojis), only facts the pack declares, no literal digits
+  (figures come from facts), no customer data in generic copy, option keys and order unchanged.
+- **Headline length** is measured on its longest reading (text outside sections plus the longest
+  section), because headlines hold alternatives; the preview checks the rendered length.
+- **Final approval retires** the other approved versions, so exactly one version per key, language
+  and severity can be served. Each step is in the approval log.
+
+## D-059: Template preview uses synthetic demo customers (Phase 7)
+
+The editor renders the draft against a real evaluation of a demo persona for whom the pack fires,
+one per severity where possible, beside the live copy in the other language. Demo data only: a
+production console would preview against a bank-provided test profile, never a real customer.
+
+## D-060: How the dashboard measures outcomes (Phase 7)
+
+All figures come from the audit log for the chosen period.
+
+- **Reconsidered:** an action insight the customer answered without "continued" (another option,
+  talk to someone, or dismissed).
+- **Value surfaced / protected:** each pack names its value-at-stake fact (`VALUE_AT_STAKE_FACT`,
+  e.g. `avoidableLoss` for card closure; a test checks each is a declared QAR fact). Surfaced sums
+  it over shown insights; protected over reconsidered ones. It is an estimate, labelled as such:
+  AMIL never knows what the customer did next.
+- **Validator rejection rate:** rejected model wordings over all wordings that went through the
+  validator. **Latency:** p50 / p95 of shown action checks.
+
+`pnpm --filter @amil/api demo:traffic` adds 30 days of synthetic checks and responses through the
+real pipeline (same audit chain) so the dashboard has something to show.
+
+## D-061: Audit search, export and the complaints lookup (Phase 7)
+
+- **Search** by customer reference matches its keyed hash (the log never stores the reference),
+  plus pack and date range, newest first, paged by sequence number.
+- **Event view** recomputes the event's hash and checks its link to the previous event.
+- **Export** (CSV or JSON, the same filters, up to 10,000 events) is compliance-only. CSV cells are
+  quoted, and cells starting with `= + - @` are prefixed with `'` (spreadsheet formula injection).
+- **Complaints lookup** lists only insights actually shown (not suppressed or not-applicable
+  evaluations), with what each said, its facts and sources, the options, and the customer's
+  responses, and verifies the bank's whole chain.
+
+## D-062: The compliance pack is generated from the running system (Phase 7)
+
+Model card (mode, providers, prompt version, deadline, cache, safeguards), data flow, the fields
+each pack reads and the facts it computes, a real outbound model payload from the live redactor
+(Khalid's card closure) with the list of fields never sent, retention and consent purposes. It
+cannot drift from what the system does.
+
+## D-063: An optional signed nonce on bank-to-AMIL requests (Phase 7)
+
+Two identical signed requests in the same second have the same signature, so the replay guard
+rejected the second one (found when the console's sign-in page was reloaded quickly). Requests
+may now carry `X-AMIL-Nonce` (16–64 letters, digits or hyphens); it is appended to the signing
+string (`….${body}.${nonce}`), so it cannot be added, changed or stripped without breaking the
+signature. The SDK sends a fresh UUID on every call. Requests without a nonce verify as before.

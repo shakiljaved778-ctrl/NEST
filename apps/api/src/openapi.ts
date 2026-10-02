@@ -24,6 +24,8 @@ import {
   SessionResponse,
 } from "@amil/sdk";
 import { z } from "zod";
+import { type Permission, PERMISSIONS } from "./admin/rbac";
+import * as Admin from "./admin/schemas";
 import { API_VERSION } from "./version";
 
 /** OpenAPI 3.1 document generated from the same Zod schemas that validate requests. */
@@ -34,7 +36,7 @@ export function buildOpenApiDocument(): object {
     in: "header",
     name: "X-AMIL-Signature",
     description:
-      "Bank-to-AMIL calls. Send X-AMIL-Key (key id), X-AMIL-Timestamp (unix seconds, +/-5 min) and X-AMIL-Signature = hex HMAC-SHA256(secret, `${timestamp}.${METHOD}.${path-with-query}.${raw-body}`). Each signature is accepted once.",
+      "Bank-to-AMIL calls. Send X-AMIL-Key (key id), X-AMIL-Timestamp (unix seconds, +/-5 min), optionally X-AMIL-Nonce (16-64 letters, digits or hyphens; recommended: a UUID per request) and X-AMIL-Signature = hex HMAC-SHA256(secret, `${timestamp}.${METHOD}.${path-with-query}.${raw-body}` followed by `.${nonce}` when a nonce is sent). Each signature is accepted once.",
   });
   const bearer = registry.registerComponent("securitySchemes", "WidgetSession", {
     type: "http",
@@ -179,6 +181,8 @@ export function buildOpenApiDocument(): object {
       ...errors,
     },
   });
+  registerConsolePaths(registry, hmac.name, errors);
+
   registry.registerPath({
     method: "get",
     path: "/healthz",
@@ -202,4 +206,153 @@ export function buildOpenApiDocument(): object {
     },
     servers: [{ url: "/" }],
   });
+}
+
+type Registry = OpenAPIRegistry;
+type Errors = Record<number, { description: string; content: object }>;
+
+/** Console API (`/v1/admin/*`): each route lists the permission it needs and the roles holding it. */
+function registerConsolePaths(registry: Registry, hmacName: string, errors: Errors) {
+  const consoleAuth = registry.registerComponent("securitySchemes", "ConsoleSession", {
+    type: "http",
+    scheme: "bearer",
+    bearerFormat: "JWT",
+    description:
+      "8-hour console token for a bank staff member, minted by the console backend via POST /v1/admin/sessions. Every call re-reads the user and checks the role.",
+  });
+  const ok = { description: "OK", content: { "application/json": { schema: z.object({}) } } };
+  const roles = (p: Permission) => `Permission \`${p}\` (${PERMISSIONS[p].join(", ")}).`;
+  const route = (
+    method: "get" | "post" | "patch",
+    path: string,
+    summary: string,
+    permission: Permission | null,
+    request: Parameters<Registry["registerPath"]>[0]["request"] = undefined,
+    status = 200,
+  ) =>
+    registry.registerPath({
+      method,
+      path,
+      summary,
+      tags: ["Console"],
+      ...(permission ? { description: roles(permission) } : {}),
+      security: [{ [permission ? consoleAuth.name : hmacName]: [] }],
+      ...(request ? { request } : {}),
+      responses: { [status]: ok, ...errors },
+    });
+  const body = (schema: z.ZodType) => ({
+    body: { content: { "application/json": { schema } } },
+  });
+
+  route("get", "/v1/admin/users", "Staff who can sign in (console backend only)", null);
+  route(
+    "post",
+    "/v1/admin/sessions",
+    "Mint a console token for a staff member (console backend only)",
+    null,
+    body(Admin.ConsoleSessionRequest),
+    201,
+  );
+  route(
+    "get",
+    "/v1/admin/me",
+    "The signed-in staff member and their permissions",
+    "dashboard:read",
+  );
+  route(
+    "get",
+    "/v1/admin/dashboard",
+    "Insights shown, responses, reconsidered actions, value protected, validator rejections, latency",
+    "dashboard:read",
+    { query: Admin.DateRangeQuery },
+  );
+  route(
+    "get",
+    "/v1/admin/rule-packs",
+    "Packs with live version, schedule and history",
+    "packs:read",
+  );
+  route(
+    "post",
+    "/v1/admin/rule-packs/{key}/{variant}/versions",
+    "New parameter version (validated against the pack schema; diff recorded)",
+    "packs:write",
+    { params: Admin.PackParams, ...body(Admin.PackVersionRequest) },
+    201,
+  );
+  route(
+    "patch",
+    "/v1/admin/rule-packs/{key}/{variant}",
+    "Pack kill switch (disabled packs return kind: none)",
+    "killswitch:write",
+    { params: Admin.PackParams, ...body(Admin.EnabledRequest) },
+  );
+  route("get", "/v1/admin/templates", "Approved copy and drafts", "templates:read", {
+    query: Admin.TemplateListQuery,
+  });
+  route(
+    "post",
+    "/v1/admin/templates/preview",
+    "Render draft copy against a demo customer (copy checks included)",
+    "templates:read",
+    body(Admin.TemplatePreviewRequest),
+  );
+  route(
+    "get",
+    "/v1/admin/templates/{id}",
+    "A template with its versions and history",
+    "templates:read",
+    {
+      params: Admin.IdParam,
+    },
+  );
+  route(
+    "post",
+    "/v1/admin/templates",
+    "New draft version of a template (copy checks run)",
+    "templates:write",
+    body(Admin.TemplateDraftRequest),
+    201,
+  );
+  route(
+    "post",
+    "/v1/admin/templates/{id}/transitions",
+    "Approval workflow: submit (product), approve (compliance), sharia_approve (sharia, Islamic copy), reject",
+    "templates:read",
+    { params: Admin.IdParam, ...body(Admin.TemplateTransitionRequest) },
+  );
+  route("patch", "/v1/admin/templates/{id}", "Template kill switch", "killswitch:write", {
+    params: Admin.IdParam,
+    ...body(Admin.EnabledRequest),
+  });
+  route("get", "/v1/admin/approvals", "Recent console changes (approval log)", "packs:read");
+  route(
+    "get",
+    "/v1/admin/audit",
+    "Search the audit log (customer refs matched by hash)",
+    "audit:read",
+    {
+      query: Admin.AuditQuery,
+    },
+  );
+  route("get", "/v1/admin/audit/verify", "Verify the bank's whole hash chain", "audit:read");
+  route("get", "/v1/admin/audit/export", "Export events as CSV or JSON", "audit:export", {
+    query: Admin.AuditExportQuery,
+  });
+  route("get", "/v1/admin/audit/{id}", "One event in full, with its chain check", "audit:read", {
+    params: Admin.IdParam,
+  });
+  route(
+    "get",
+    "/v1/admin/complaints",
+    "Complaints lookup: what a customer was shown and how they responded",
+    "complaints:read",
+    { query: Admin.ComplaintsQuery },
+  );
+  route(
+    "get",
+    "/v1/admin/compliance",
+    "Compliance pack: model card, data flow, fields read, redaction proof, retention",
+    "compliance:read",
+  );
 }

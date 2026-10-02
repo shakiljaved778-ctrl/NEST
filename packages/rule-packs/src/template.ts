@@ -79,6 +79,16 @@ export function stripTemplateSyntax(text: string): string {
 }
 
 /**
+ * The longest single reading of a template: its text outside sections plus its longest section.
+ * Headlines often hold alternatives in sections; adding them all up would overstate the length.
+ */
+export function longestVariant(text: string): string {
+  const bodies = [...text.matchAll(SECTION_RE)].map((m) => String(m[3]));
+  const longest = bodies.reduce((a, b) => (b.length > a.length ? b : a), "");
+  return `${text.replace(SECTION_RE, " ")} ${longest}`.replace(/\s{2,}/g, " ").trim();
+}
+
+/**
  * Fact keys whose values actually appear in the rendered text: placeholders outside sections and
  * inside sections that render. Used for fact chips, so a card never cites a figure it doesn't show.
  */

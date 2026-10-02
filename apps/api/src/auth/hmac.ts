@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { HEADERS, signingString } from "@amil/sdk";
+import { HEADERS, NONCE_PATTERN, signingString } from "@amil/sdk";
 import type { ApiKey } from "../config";
 
 /** Replay window (section 7): requests older or newer than 5 minutes are rejected. */
@@ -53,7 +53,8 @@ const header = (h: HmacInput["headers"], name: string): string | undefined => {
 
 /**
  * Verify a bank-to-AMIL request: known key, timestamp within +/-5 minutes, HMAC-SHA256 over
- * timestamp.method.path.body (constant-time compare), and a signature never seen before.
+ * timestamp.method.path.body[.nonce] (constant-time compare), and a signature never seen before.
+ * The optional nonce is signed, so identical requests in the same second can both be accepted.
  */
 export async function verifyHmac(
   input: HmacInput,
@@ -64,7 +65,10 @@ export async function verifyHmac(
   const keyId = header(input.headers, HEADERS.key);
   const timestamp = header(input.headers, HEADERS.timestamp);
   const signature = header(input.headers, HEADERS.signature);
+  const nonce = header(input.headers, HEADERS.nonce);
   if (!keyId || !timestamp || !signature) return { ok: false, reason: "missing_headers" };
+  if (nonce !== undefined && !NONCE_PATTERN.test(nonce))
+    return { ok: false, reason: "bad_signature" };
   const key = keys.find((k) => k.keyId === keyId);
   if (!key) return { ok: false, reason: "unknown_key" };
   const ts = Number(timestamp);
@@ -72,7 +76,7 @@ export async function verifyHmac(
     return { ok: false, reason: "stale_timestamp" };
   }
   const expected = createHmac("sha256", key.secret)
-    .update(signingString(timestamp, input.method, input.url, input.rawBody))
+    .update(signingString(timestamp, input.method, input.url, input.rawBody, nonce))
     .digest();
   const given = /^[0-9a-f]{64}$/i.test(signature) ? Buffer.from(signature, "hex") : Buffer.alloc(0);
   if (given.length !== expected.length || !timingSafeEqual(given, expected)) {

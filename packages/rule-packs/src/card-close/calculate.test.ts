@@ -6,6 +6,7 @@ import { evaluateCardClose } from "./calculate";
 const params: CardCloseParams = {
   pointsExpiryWindowDays: 90,
   pendingCashbackOnClosure: "forfeited",
+  programmePointValueQar: null,
   roundingMode: "half_up",
 };
 const day = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
@@ -70,6 +71,27 @@ describe("card.close: Khalid (flagship, hand-worked)", () => {
     expect(ev.facts._sources.map((s) => s.source).sort()).toEqual(
       ["card", "computed", "instalment_plan", "rewards_ledger", "rule_pack"].sort(),
     );
+  });
+});
+
+describe("card.close: the bank's programme point value (console parameter)", () => {
+  it("replaces the ledger's value when set: 42,000 × 0.0125 = 525.00", () => {
+    const ev = evalCard(khalidCard(), { programmePointValueQar: "0.0125" });
+    expect([
+      ev.facts.pointValueQar.value,
+      ev.facts.pointValueQar.source,
+      ev.facts.pointsValue.value,
+    ]).toEqual(["0.0125", "rule_pack", "525.00"]);
+    // 8,000 expiring × 0.0125 = 100.00
+    expect(ev.facts.pointsExpiringSoonValue.value).toBe("100.00");
+  });
+
+  it("keeps the ledger's value when not set", () => {
+    const ev = evalCard(khalidCard());
+    expect([ev.facts.pointValueQar.value, ev.facts.pointValueQar.source]).toEqual([
+      "0.0100",
+      "rewards_ledger",
+    ]);
   });
 });
 

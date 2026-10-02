@@ -19,6 +19,11 @@ export const RewardsExpiryParamsSchema = z
     shortWindowDays: z.number().int().min(1).max(365),
     midWindowDays: z.number().int().min(1).max(365),
     longWindowDays: z.number().int().min(1).max(365),
+    /** The rewards programme's QAR value of one point (bank-set); null keeps the ledger's value. */
+    programmePointValueQar: z
+      .string()
+      .regex(/^\d{1,3}(\.\d{1,4})?$/)
+      .nullable(),
     roundingMode: RoundingModeSchema,
   })
   .refine(
@@ -79,7 +84,7 @@ export function evaluateRewardsExpiry(
   const asOf = isoDate(input.dataAsOf);
   const today = startOfUtcDay(now);
   const { rewards } = input;
-  const pointValue = D(rewards.pointValueQar);
+  const pointValue = D(params.programmePointValueQar ?? rewards.pointValueQar);
   const value = (points: number) => round(pointValue.times(points), mode);
   const upcoming = rewards.expiryBuckets
     .map((b) => ({ points: b.points, at: new Date(`${b.expiresAt}T00:00:00Z`) }))

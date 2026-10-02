@@ -209,3 +209,22 @@ export const ALL_PACK_DEFINITIONS: PackDefinition<unknown>[] = Object.values(PAC
 export function variantForFinanceType(type: FinanceSettlementInput["finance"]["type"]): Variant {
   return type === "conventional" ? "conventional" : "islamic";
 }
+
+/**
+ * The fact that measures what is at stake for the customer in each pack (console dashboard:
+ * "value surfaced" and "value protected" when the customer reconsidered).
+ */
+export const VALUE_AT_STAKE_FACT: { [K in PackKey]: PackFactKey<K> | null } = {
+  "card.close": "avoidableLoss",
+  "finance.early_settlement": "savingIfSettledOnCheapestDate",
+  "finance.top_up": "extraCostOfExtension",
+  "card.cash_withdrawal": "costIfRepaidShort",
+  "card.minimum_payment": "totalInterestMinimum",
+  "card.epp_conversion": "extraCostVsPayInFull",
+  "card.balance_transfer": "costPromoAndYearAfter",
+  "deposit.break": "differenceIfKeptToMaturity",
+  "salary.transfer_change": "extraCostRemainingTerm",
+  "account.close": "closureFee",
+  "account.dormancy": null,
+  "rewards.expiry": "pointsExpiringLongValue",
+};

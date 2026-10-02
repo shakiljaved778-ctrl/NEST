@@ -146,7 +146,7 @@ describe.skipIf(!url)("AMIL insight API (integration)", () => {
         trigger: "action:card.close",
         customerRefHash: hashCustomerRef(AUDIT_SECRET, "bank_ddb", KHALID),
         rulePackKey: "card.close",
-        rulePackVersion: "1.0.0",
+        rulePackVersion: "1.1.0",
         variant: "conventional",
         applicable: true,
         severity: "critical",

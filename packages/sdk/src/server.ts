@@ -1,9 +1,10 @@
 /**
  * Server-side client for the bank's backend. Signs every request with HMAC-SHA256 over
- * timestamp, method, path and raw body (X-AMIL-Key / X-AMIL-Timestamp / X-AMIL-Signature).
+ * timestamp, method, path, raw body and a fresh nonce (X-AMIL-Key / X-AMIL-Timestamp /
+ * X-AMIL-Nonce / X-AMIL-Signature).
  * Node only: never ship the secret to a browser.
  */
-import { createHmac } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import { parseResponse } from "./http";
 import { readAssistantStream } from "./sse";
 import {
@@ -20,6 +21,8 @@ import {
   type ExplainChargeRequest,
   ConsentList,
   type ConsentRequest,
+  ConsoleSessionResponse,
+  ConsoleUserList,
   Consent,
   HEADERS,
   type InsightResponseRequest,
@@ -35,9 +38,10 @@ export function signRequest(
   method: string,
   path: string,
   body: string,
+  nonce?: string,
 ): string {
   return createHmac("sha256", secret)
-    .update(signingString(timestamp, method, path, body))
+    .update(signingString(timestamp, method, path, body, nonce))
     .digest("hex");
 }
 
@@ -55,13 +59,15 @@ export class AmilServerClient {
   private async call(method: string, path: string, body?: unknown): Promise<Response> {
     const raw = body === undefined ? "" : JSON.stringify(body);
     const timestamp = String(Math.floor((this.options.now ?? Date.now)() / 1000));
+    const nonce = randomUUID();
     const f = this.options.fetch ?? fetch;
     return f(`${this.options.baseUrl.replace(/\/$/, "")}${path}`, {
       method,
       headers: {
         [HEADERS.key]: this.options.keyId,
         [HEADERS.timestamp]: timestamp,
-        [HEADERS.signature]: signRequest(this.options.secret, timestamp, method, path, raw),
+        [HEADERS.nonce]: nonce,
+        [HEADERS.signature]: signRequest(this.options.secret, timestamp, method, path, raw, nonce),
         ...(body === undefined ? {} : { "content-type": "application/json" }),
       },
       ...(body === undefined ? {} : { body: raw }),
@@ -70,6 +76,19 @@ export class AmilServerClient {
 
   async createSession(req: SessionRequest) {
     return parseResponse(await this.call("POST", "/v1/sessions", req), SessionResponse);
+  }
+
+  /** Console staff who can sign in (console backend only). */
+  async listConsoleUsers() {
+    return parseResponse(await this.call("GET", "/v1/admin/users"), ConsoleUserList);
+  }
+
+  /** Mint an 8-hour console token for a staff member (console backend only). */
+  async createConsoleSession(consoleUserId: string) {
+    return parseResponse(
+      await this.call("POST", "/v1/admin/sessions", { consoleUserId }),
+      ConsoleSessionResponse,
+    );
   }
 
   async check(req: CheckRequest) {

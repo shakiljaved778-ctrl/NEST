@@ -5,23 +5,31 @@
   "description": "AMIL bank console (staff-facing): rule packs, templates, approvals, audit.",
   "type": "module",
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev": "dotenv -e ../../.env -- next dev -p 3001",
     "build": "next build",
-    "start": "next start -p 3001",
+    "start": "dotenv -e ../../.env -- next start -p 3001",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.typecheck.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "e2e": "dotenv -e ../../.env -- playwright test"
   },
   "dependencies": {
-    "@amil/i18n": "workspace:*",
+    "@amil/sdk": "workspace:*",
+    "@amil/ui": "workspace:*",
+    "chart.js": "^4.5.1",
+    "lucide-react": "^1.49.0",
     "next": "~15.5.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "~1.56.1",
     "@tailwindcss/postcss": "^4.1.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "dotenv-cli": "^8.0.0",
     "tailwindcss": "^4.1.0"
   }
 }

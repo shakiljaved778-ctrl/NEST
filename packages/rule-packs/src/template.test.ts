@@ -4,6 +4,7 @@ import {
   isTruthyFact,
   renderedFactKeys,
   renderTemplate,
+  longestVariant,
   stripTemplateSyntax,
   templateFactKeys,
 } from "./template";
@@ -72,6 +73,16 @@ describe("isTruthyFact", () => {
     [undefined, false],
   ])("%j -> %s", (f, expected) => {
     expect(isTruthyFact(f)).toBe(expected);
+  });
+});
+
+describe("longestVariant", () => {
+  it("keeps the text outside sections and only the longest section", () => {
+    expect(longestVariant("Hello [[a: short]][[!a: a much longer one {x}]] end")).toBe(
+      "Hello end a much longer one {x}",
+    );
+    expect(longestVariant("[[a: the longer one]][[!a: short]]")).toBe("the longer one");
+    expect(longestVariant("No sections {x}")).toBe("No sections {x}");
   });
 });
 

@@ -1,21 +1,51 @@
 @import "tailwindcss";
 
 :root {
-  --console-bg: #f7f7f8;
+  --console-bg: #f6f6f7;
   --console-ink: #18181b;
-  --console-muted: #71717a;
+  --console-muted: #6b6b75;
   --console-brand: #7a1f3d;
+
+  /* shadcn-style primitives in @amil/ui read these */
+  --ui-primary: var(--console-brand);
+  --ui-primary-contrast: #ffffff;
+  --ui-surface: #ffffff;
+  --ui-surface-muted: #f1edef;
+  --ui-text: var(--console-ink);
+  --ui-text-muted: var(--console-muted);
+  --ui-border: #e6e1e4;
+  --ui-critical: #b42318;
+  --ui-radius: 10px;
 }
+
+@source "../../../../packages/ui/src";
 
 @theme inline {
   --color-canvas: var(--console-bg);
   --color-ink: var(--console-ink);
   --color-ink-muted: var(--console-muted);
   --color-brand: var(--console-brand);
+  --color-line: var(--ui-border);
 }
 
 body {
   background: var(--console-bg);
   color: var(--console-ink);
   font-family: system-ui, "Segoe UI", "Noto Sans Arabic", sans-serif;
+}
+
+table.data {
+  @apply w-full text-left text-sm;
+}
+table.data th {
+  @apply border-b border-line px-3 py-2 text-xs font-medium tracking-wide text-ink-muted uppercase;
+}
+table.data td {
+  @apply border-b border-line px-3 py-2 align-top;
+}
+.field {
+  @apply w-full rounded-md border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-1 focus:ring-brand;
+}
+.label {
+  @apply mb-1 block text-xs font-medium text-ink-muted;
 }

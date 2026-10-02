@@ -23,7 +23,8 @@ pnpm dev        # api http://localhost:4000 (Swagger UI at /docs) · demo bank :
 To run the full stack in containers instead: `docker compose up --build`.
 
 Checks: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Audit chain: `pnpm audit:verify`.
-End-to-end: `pnpm --filter @amil/demo-bank e2e` (Playwright; starts the API and the demo bank).
+End-to-end: `pnpm --filter @amil/demo-bank e2e` and `pnpm --filter @amil/console e2e` (Playwright;
+they start what they need; build the apps first).
 
 Try it: open http://localhost:3000, pick a persona in the switcher, and switch to Arabic at any time
 with the header toggle.
@@ -40,6 +41,18 @@ with the header toggle.
   Khalid (points expiring) or Grace (account about to become dormant).
 
 `pnpm worker` runs the proactive packs on their BullMQ schedules.
+
+**Bank console** (http://localhost:3001): pick a staff member. For a filled dashboard, first run
+`pnpm --filter @amil/api demo:traffic` (30 days of synthetic checks).
+
+- **Product manager**: Rule packs → Card closure (conventional) → set `programmePointValueQar` to
+  `0.0125` → review → save. Khalid's next card closure says QAR 525.00. Flip the pack's kill switch
+  and the demo bank shows its own flow with no insight.
+- **Product → Compliance → Sharia reviewer**: Templates → edit Islamic copy → save draft → submit;
+  sign in as compliance to approve, then as the Sharia reviewer to give the final approval.
+- **Compliance officer**: Complaints lookup → `DDB-C-0001` (Khalid): every insight he saw, its
+  figures and sources, and what he chose. Audit → search, verify the hash chain, export CSV/JSON.
+- **Anyone**: Compliance pack (model card, data flow, fields read, live redaction proof).
 
 Without `ANTHROPIC_API_KEY` the model gateway uses an offline mock that serves the bank-approved
 wording, so everything works with no network.
