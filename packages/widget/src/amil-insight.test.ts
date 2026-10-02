@@ -253,22 +253,28 @@ describe("<amil-insight> runs the check itself", () => {
     });
   });
 
-  it("on failure shows a neutral line and emits amil-unavailable so the bank flow continues", async () => {
-    const unavailable = vi.fn();
-    document.addEventListener("amil-unavailable", unavailable);
-    const el = await mount((e) => {
-      e.fetchImpl = checkFetch(500, { error: "internal_error" });
-      e.apiBase = "http://api.test";
-      e.token = "tok";
-      e.action = "card.close";
-      e.customerRef = "DDB-C-0001";
-      e.cardId = "c1";
-    });
-    await vi.waitFor(() =>
-      expect($(el, ".unavailable")?.textContent).toBe("Information unavailable"),
-    );
-    expect($(el, ".unavailable")?.textContent).not.toContain("internal_error");
-    expect(unavailable).toHaveBeenCalled();
-    document.removeEventListener("amil-unavailable", unavailable);
-  });
+  it.each([
+    [500, "internal_error"],
+    [429, "rate_limited"],
+  ])(
+    "on a %i shows a neutral line and emits amil-unavailable so the bank flow continues",
+    async (status, error) => {
+      const unavailable = vi.fn();
+      document.addEventListener("amil-unavailable", unavailable);
+      const el = await mount((e) => {
+        e.fetchImpl = checkFetch(status, { error });
+        e.apiBase = "http://api.test";
+        e.token = "tok";
+        e.action = "card.close";
+        e.customerRef = "DDB-C-0001";
+        e.cardId = "c1";
+      });
+      await vi.waitFor(() =>
+        expect($(el, ".unavailable")?.textContent).toBe("Information unavailable"),
+      );
+      expect($(el, ".unavailable")?.textContent).not.toContain(error);
+      expect(unavailable).toHaveBeenCalled();
+      document.removeEventListener("amil-unavailable", unavailable);
+    },
+  );
 });

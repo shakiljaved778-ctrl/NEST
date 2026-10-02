@@ -32,6 +32,7 @@ import type { CheckRequest, CheckResponse, FactChip, InsightCard } from "@amil/s
 import type { FastifyBaseLogger } from "fastify";
 import { z } from "zod";
 import { badRequest, notFound } from "../errors";
+import { withSpan } from "../telemetry";
 import { deepLink, isOptionKey } from "./deeplinks";
 
 export interface CheckDeps {
@@ -284,20 +285,22 @@ export async function prepareInsight(
   // ── Wording ──
   let wording: WordingResult;
   try {
-    wording = await deps.gateway.word({
-      action: packKey,
-      variant,
-      locale,
-      evaluation,
-      template: {
-        key: template.key,
-        version: template.version,
-        headline: template.headline,
-        body: template.body,
-      },
-      modelMode: bank.modelMode,
-      display: { locale, digitStyle: bank.digitStyle },
-    });
+    wording = await withSpan("amil.gateway.word", { "amil.model_mode": bank.modelMode }, () =>
+      deps.gateway.word({
+        action: packKey,
+        variant,
+        locale,
+        evaluation,
+        template: {
+          key: template.key,
+          version: template.version,
+          headline: template.headline,
+          body: template.body,
+        },
+        modelMode: bank.modelMode,
+        display: { locale, digitStyle: bank.digitStyle },
+      }),
+    );
   } catch (error) {
     if (error instanceof TemplateRenderError)
       return suppressed("template_render_failed", evaluation, {
@@ -349,9 +352,24 @@ export async function deliverInsight(
    */
   precheck?: (evaluation: AnyEvaluation) => Promise<boolean>,
 ): Promise<Delivered> {
-  const prepared = await prepareInsight(deps, bank, now, locale, subject, precheck);
+  const prepared = await withSpan(
+    "amil.insight.prepare",
+    { "amil.pack": subject.packKey, "amil.variant": subject.variant, "amil.locale": locale },
+    async (span) => {
+      const p = await prepareInsight(deps, bank, now, locale, subject, precheck);
+      if (p) {
+        span.setAttribute("amil.shown", p.shown);
+        span.setAttribute("amil.validator", p.auditFields.validatorResult);
+        if (p.shown) span.setAttribute("amil.severity", p.evaluation.severity ?? "none");
+        else span.setAttribute("amil.suppressed", p.reason);
+      }
+      return p;
+    },
+  );
   if (!prepared) return { response: none(insightId), evaluation: null, auditEventId: null };
-  const row = await audit(prepared.auditFields);
+  const row = await withSpan("amil.audit.append", { "amil.pack": subject.packKey }, () =>
+    audit(prepared.auditFields),
+  );
   if (!prepared.shown) return { response: none(insightId), evaluation: null, auditEventId: null };
   const { evaluation, card } = prepared;
   return {

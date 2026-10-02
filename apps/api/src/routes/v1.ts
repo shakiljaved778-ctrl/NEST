@@ -40,7 +40,12 @@ const InsightIdParam = z.object({ id: z.string().uuid() });
 const AlertIdParam = z.object({ id: z.string().min(1).max(64) });
 const WithdrawQuery = z.object({ purpose: ConsentPurpose });
 
-export function v1Routes(app: FastifyInstance, deps: V1Deps): void {
+export function v1Routes(
+  app: FastifyInstance,
+  deps: V1Deps,
+  /** Per-session limit for Ask AMIL when rate limiting is on (D-064). */
+  assistantPerMinute?: number,
+): void {
   const customerId = async (bankId: string, customerRef: string) => {
     const c = await deps.prisma.customer.findUnique({
       where: { bankId_externalRef: { bankId, externalRef: customerRef } },
@@ -329,43 +334,47 @@ export function v1Routes(app: FastifyInstance, deps: V1Deps): void {
   });
 
   // ── Ask AMIL (server-sent events) ──
-  app.post("/v1/assistant/messages", async (req, reply) => {
-    const auth = await authenticate(req, deps, "assistant:chat");
-    const body = parseOr400(AssistantMessageRequest, req.body);
-    assertCustomer(auth, body.customerRef);
-    await customerId(auth.bankId, body.customerRef); // 404 as JSON, before the stream opens
-    reply.hijack();
-    // Keep headers set by plugins (CORS) on the hijacked response.
-    const inherited = Object.fromEntries(
-      Object.entries(reply.getHeaders()).filter(
-        (e): e is [string, string | number | string[]] => e[1] !== undefined,
-      ),
-    );
-    reply.raw.writeHead(200, {
-      ...inherited,
-      "content-type": "text/event-stream; charset=utf-8",
-      "cache-control": "no-cache, no-transform",
-      connection: "keep-alive",
-      "x-accel-buffering": "no",
-    });
-    const emit = (e: AssistantStreamEvent) =>
-      reply.raw.write(`event: ${e.event}\ndata: ${JSON.stringify(e.data)}\n\n`);
-    try {
-      await runAssistant(
-        checkDeps(req.log),
-        auth.bankId,
-        body,
-        emit,
-        auth.kind === "session" ? auth.locale : undefined,
+  app.post(
+    "/v1/assistant/messages",
+    assistantPerMinute ? { config: { rateLimit: { max: assistantPerMinute } } } : {},
+    async (req, reply) => {
+      const auth = await authenticate(req, deps, "assistant:chat");
+      const body = parseOr400(AssistantMessageRequest, req.body);
+      assertCustomer(auth, body.customerRef);
+      await customerId(auth.bankId, body.customerRef); // 404 as JSON, before the stream opens
+      reply.hijack();
+      // Keep headers set by plugins (CORS) on the hijacked response.
+      const inherited = Object.fromEntries(
+        Object.entries(reply.getHeaders()).filter(
+          (e): e is [string, string | number | string[]] => e[1] !== undefined,
+        ),
       );
-    } catch (error) {
-      // Never leak details to the customer: a generic error event, then the stream ends.
-      req.log.error({ err: error }, "assistant_failed");
-      emit({ event: "error", data: { error: "internal_error" } });
-      emit({ event: "done", data: {} });
-    }
-    reply.raw.end();
-  });
+      reply.raw.writeHead(200, {
+        ...inherited,
+        "content-type": "text/event-stream; charset=utf-8",
+        "cache-control": "no-cache, no-transform",
+        connection: "keep-alive",
+        "x-accel-buffering": "no",
+      });
+      const emit = (e: AssistantStreamEvent) =>
+        reply.raw.write(`event: ${e.event}\ndata: ${JSON.stringify(e.data)}\n\n`);
+      try {
+        await runAssistant(
+          checkDeps(req.log),
+          auth.bankId,
+          body,
+          emit,
+          auth.kind === "session" ? auth.locale : undefined,
+        );
+      } catch (error) {
+        // Never leak details to the customer: a generic error event, then the stream ends.
+        req.log.error({ err: error }, "assistant_failed");
+        emit({ event: "error", data: { error: "internal_error" } });
+        emit({ event: "done", data: {} });
+      }
+      reply.raw.end();
+    },
+  );
 
   // ── Inbound product events (bank backend only, idempotent) ──
   // Recorded for the bank's own audit and for a pilot where AMIL keeps its own store. In the MVP

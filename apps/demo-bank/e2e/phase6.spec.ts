@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Page, test } from "./fixtures";
 
 async function as(page: Page, persona: string, locale: "en" | "ar") {
   await page

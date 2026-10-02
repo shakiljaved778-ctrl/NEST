@@ -4,6 +4,7 @@
  * days, and records plausible customer responses, so the console dashboard has data to show.
  *   pnpm --filter @amil/api demo:traffic            # 30 days, about 12 checks a day
  *   pnpm --filter @amil/api demo:traffic 14 20      # 14 days, about 20 a day
+ *   pnpm --filter @amil/api demo:traffic --if-empty # only if the bank has no audit events yet
  * Every event goes into the same hash-chained audit log as live traffic. Demo data only.
  */
 import { demoContexts, getPrisma, loadCustomerBundle, type PackContext } from "@amil/db";
@@ -15,7 +16,9 @@ import { loadConfig } from "../config";
 import { buildModelGateway } from "../model-gateway";
 import { runCheck } from "../services/checks";
 
-const [daysArg, perDayArg] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const ifEmpty = args.includes("--if-empty");
+const [daysArg, perDayArg] = args.filter((a) => !a.startsWith("--"));
 const days = Number(daysArg ?? 30);
 const perDay = Number(perDayArg ?? 12);
 
@@ -39,6 +42,12 @@ const { gateway } = buildModelGateway(config, redis);
 const log = pino({ level: "warn" });
 
 const bank = await prisma.bank.findFirstOrThrow({ where: { id: "bank_ddb" } });
+if (ifEmpty && (await prisma.insightEvent.count({ where: { bankId: bank.id } })) > 0) {
+  console.log("Audit log already has events: no demo traffic added.");
+  await prisma.$disconnect();
+  redis.disconnect();
+  process.exit(0);
+}
 const customers = await prisma.customer.findMany({
   where: {
     bankId: bank.id,

@@ -1,8 +1,21 @@
 # Local stack for AMIL. Everything here is for DEMO use with synthetic data only.
 #
+#   docker compose up --build                # the whole demo: data, API, worker, demo bank, console
 #   docker compose up -d postgres redis      # just the data stores (for `pnpm dev`)
-#   docker compose up --build                # full stack: migrate + seed, api, demo-bank, console
+#
+# Then open http://localhost:3000 (Doha Demo Bank) and http://localhost:3001 (bank console).
 name: amil
+
+# Demo-only secrets (same values as .env.example). Never use them for anything real.
+x-amil-env: &amil-env
+  DATABASE_URL: postgresql://amil:amil@postgres:5432/amil?schema=public
+  REDIS_URL: redis://redis:6379
+  AMIL_API_KEYS: ddb-demo-key:demo-only-secret-change-me-0123456789abcdef:bank_ddb,ddb-console-key:demo-only-console-secret-change-me-012345678:bank_ddb:console
+  SESSION_SECRET: demo-only-session-secret-change-me-0123456789
+  AUDIT_HASH_SECRET: demo-only-audit-hash-secret-change-me-0123456
+  WIDGET_ORIGINS: http://localhost:3000
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
 
 services:
   postgres:
@@ -28,31 +41,34 @@ services:
       timeout: 3s
       retries: 20
 
-  # One-shot: apply migrations and load the synthetic Doha Demo Bank dataset.
-  migrate:
+  # One-shot: migrations, the synthetic Doha Demo Bank dataset (PII encrypted, D-066), then, on
+  # a fresh database, 30 days of synthetic traffic for the console dashboard and today's alerts.
+  setup:
     build: { context: ., dockerfile: apps/api/Dockerfile, target: build }
     environment:
-      DATABASE_URL: postgresql://amil:amil@postgres:5432/amil?schema=public
-    command: ["sh", "-c", "pnpm db:migrate && pnpm db:seed"]
+      <<: *amil-env
+      # The bank's key for its customer records (demo-only).
+      PII_ENCRYPTION_KEYS: demo1:ZGVtby1vbmx5LXBpaS1rZXktY2hhbmdlLW1lLTAwMDE=
+    command:
+      - sh
+      - -c
+      - >-
+        pnpm db:migrate && pnpm db:seed &&
+        pnpm --filter @amil/api demo:traffic --if-empty &&
+        pnpm --filter @amil/api proactive:run
     depends_on:
       postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
 
   api:
     build: { context: ., dockerfile: apps/api/Dockerfile }
     environment:
+      <<: *amil-env
       NODE_ENV: production
       API_PORT: "4000"
-      DATABASE_URL: postgresql://amil:amil@postgres:5432/amil?schema=public
-      REDIS_URL: redis://redis:6379
-      # Demo-only secrets (same as .env.example). Replace for any real deployment.
-      AMIL_API_KEYS: ddb-demo-key:demo-only-secret-change-me-0123456789abcdef:bank_ddb
-      SESSION_SECRET: demo-only-session-secret-change-me-0123456789
-      AUDIT_HASH_SECRET: demo-only-audit-hash-secret-change-me-0123456
-      WIDGET_ORIGINS: http://localhost:3000
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     ports: ["4000:4000"]
     depends_on:
-      migrate: { condition: service_completed_successfully }
+      setup: { condition: service_completed_successfully }
       redis: { condition: service_healthy }
     healthcheck:
       test:
@@ -71,30 +87,25 @@ services:
     build: { context: ., dockerfile: apps/api/Dockerfile }
     command: ["node", "dist/worker.js"]
     environment:
+      <<: *amil-env
       NODE_ENV: production
-      DATABASE_URL: postgresql://amil:amil@postgres:5432/amil?schema=public
-      REDIS_URL: redis://redis:6379
-      # Demo-only secrets (same as .env.example). Replace for any real deployment.
-      AMIL_API_KEYS: ddb-demo-key:demo-only-secret-change-me-0123456789abcdef:bank_ddb
-      SESSION_SECRET: demo-only-session-secret-change-me-0123456789
-      AUDIT_HASH_SECRET: demo-only-audit-hash-secret-change-me-0123456
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     depends_on:
-      migrate: { condition: service_completed_successfully }
+      setup: { condition: service_completed_successfully }
       redis: { condition: service_healthy }
 
   demo-bank:
     build: { context: ., dockerfile: apps/demo-bank/Dockerfile }
     environment:
       DATABASE_URL: postgresql://amil:amil@postgres:5432/amil?schema=public
+      # The bank's own key for its encrypted customer records (demo-only).
+      PII_ENCRYPTION_KEYS: demo1:ZGVtby1vbmx5LXBpaS1rZXktY2hhbmdlLW1lLTAwMDE=
       # Server-to-server (bank backend -> AMIL) inside the compose network
       AMIL_API_URL: http://api:4000
       AMIL_DEMO_KEY_ID: ddb-demo-key
       AMIL_DEMO_KEY_SECRET: demo-only-secret-change-me-0123456789abcdef
-      # Browser -> AMIL (the widget), via the published port
-      NEXT_PUBLIC_API_URL: http://localhost:4000
     ports: ["3000:3000"]
-    depends_on: [api]
+    depends_on:
+      api: { condition: service_healthy }
 
   console:
     build: { context: ., dockerfile: apps/console/Dockerfile }
@@ -102,10 +113,11 @@ services:
       # The console's backend signs staff in over HMAC and calls /v1/admin/* server-side; the
       # browser only talks to the console (its token stays in an httpOnly cookie).
       AMIL_API_URL: http://api:4000
-      AMIL_DEMO_KEY_ID: ddb-demo-key
-      AMIL_DEMO_KEY_SECRET: demo-only-secret-change-me-0123456789abcdef
+      AMIL_CONSOLE_KEY_ID: ddb-console-key
+      AMIL_CONSOLE_KEY_SECRET: demo-only-console-secret-change-me-012345678
     ports: ["3001:3001"]
-    depends_on: [api]
+    depends_on:
+      api: { condition: service_healthy }
 
 volumes:
   pgdata:

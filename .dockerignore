@@ -5,3 +5,6 @@
 **/coverage
 .env
 .git
+**/test-results
+**/playwright-report
+**/.terraform

@@ -24,12 +24,15 @@ export interface AuthDeps {
 
 /**
  * Authenticate a request as either the bank's server (HMAC headers) or a widget session (Bearer
- * token). `allowSession` names the scope a session needs. Server calls are trusted for the bank.
+ * token). `allowSession` names the scope a session needs. Server calls are trusted for the bank,
+ * and only with a key issued for this purpose: a console key signs staff in and does nothing
+ * else, and a bank app key cannot sign staff in (D-067).
  */
 export async function authenticate(
   req: FastifyRequest,
   deps: AuthDeps,
   allowSession: Scope | null,
+  purpose: "bank" | "console" = "bank",
 ): Promise<AuthContext> {
   const nowSeconds = Math.floor(deps.clock().getTime() / 1000);
   const authz = req.headers.authorization;
@@ -50,6 +53,7 @@ export async function authenticate(
     req.log.warn({ reason: result.reason }, "hmac_rejected");
     throw unauthorized();
   }
+  if ((result.key.purpose ?? "bank") !== purpose) throw forbidden();
   return { kind: "server", bankId: result.key.bankId, keyId: result.key.keyId };
 }
 

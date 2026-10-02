@@ -10,3 +10,11 @@ next-env.d.ts
 .DS_Store
 playwright-report/
 test-results/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl

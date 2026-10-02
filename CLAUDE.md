@@ -59,6 +59,8 @@ pnpm build
 pnpm db:migrate:dev --name <x>    # create a new migration (dev)
 pnpm db:reset                     # DEV ONLY: drop + re-migrate + seed (wipes the audit trail)
 pnpm audit:verify [bankId]        # verify the audit hash chain
+pnpm db:rotate-pii                # re-encrypt PII under the newest PII_ENCRYPTION_KEYS key
+docker compose up --build         # the whole demo from a fresh clone (setup seeds demo data)
 pnpm --filter @amil/demo-bank build && pnpm --filter @amil/demo-bank e2e   # Playwright (starts API + app)
 pnpm --filter @amil/console --filter @amil/demo-bank build && pnpm --filter @amil/console e2e   # console e2e
 pnpm --filter @amil/api demo:traffic [days] [perDay]   # synthetic checks + responses for the dashboard
@@ -77,8 +79,8 @@ disposable database. They are skipped when it is unset.
 - Money: `Money`/`D` helpers from `@amil/rules-engine`. The ESLint config bans `parseFloat`, `Number.prototype.toFixed` and `Math.round` in engine and pack code.
 - Table-driven tests with hand-worked examples in comments for every calculation.
 - Prisma: money `Decimal(18,2)`, rates `Decimal(9,4)` as annual **percent** (for example `36.0000` = 36% p.a.), points `Int`, point value `Decimal(10,4)` QAR.
-- PII lives only on `Customer` (displayName, displayNameAr, phone, email), `Account` (number, iban) and `Card` (pan). Never pass these to the gateway.
-- Audit tables (`insight_event`, `customer_response`) are append-only (Postgres triggers). Never `UPDATE` or `DELETE` them in code.
+- PII lives only on `Customer` (displayName, displayNameAr, phone, email), `Account` (number, iban) and `Card` (pan). Never pass these to the gateway. These columns are encrypted (`@amil/db/pii`, D-066): write them only through `encryptRow` and read them only through `decryptRow` on the bank side (seed, demo bank). AMIL's API and worker must never need them or the key.
+- Audit tables (`insight_event`, `customer_response`) and console logs (`approval_log`, `console_activity`) are append-only (Postgres triggers). Never `UPDATE` or `DELETE` them in code. New console routes that read customer-level data call `recordActivity` with the customer ref hashed (D-068).
 - Seed IDs are deterministic (for example `cus_khalid`, `card_khalid_platinum`) so demo links stay stable across reseeds. Dates in the seed are relative to `SEED_NOW` (default: now).
 - Rule packs (`packages/rule-packs`): each pack is `packs/<key>.<variant>.json` (versioned
   parameters, triggers, required data, declared facts) + a pure calculator + approved copy in
@@ -130,6 +132,12 @@ disposable database. They are skipped when it is unset.
   Console changes never edit history: pack parameters are new versions, copy is new draft versions,
   and each change is in the approval log (D-056, D-058). Integration tests that change packs or
   templates restore the seeded rows afterwards.
+- Security (Phase 8): HMAC keys have a purpose (`bank` | `console`); pass the right one to
+  `authenticate` (D-067). Rate limits key on caller (D-064). The Next apps set a nonce CSP in
+  `middleware.ts` from `@amil/ui/security`: no inline scripts, no new `connect-src` origins without
+  a reason (D-065); the e2e fixture fails on any CSP violation. Spans (`withSpan`, D-070) carry no
+  customer references, figures or text. Keep `pnpm audit --prod` clean; transitive fixes go in
+  `pnpm-workspace.yaml` overrides (D-069).
 - Widget: `<amil-insight>` (Lit, shadow DOM) is themed only through `--amil-*` CSS variables and
   never navigates; hosts listen for `amil-option` / `amil-ready` / `amil-unavailable`.
 - Product rules on DB rows reach the engine only through `@amil/db/adapters`, which Zod-validate

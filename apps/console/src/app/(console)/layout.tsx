@@ -14,6 +14,7 @@ const NAV: (NavItem & { permission: string })[] = [
   { href: "/audit", label: "Audit", permission: "audit:read" },
   { href: "/complaints", label: "Complaints lookup", permission: "complaints:read" },
   { href: "/compliance", label: "Compliance pack", permission: "compliance:read" },
+  { href: "/activity", label: "Console activity", permission: "audit:read" },
 ];
 
 export default async function ConsoleLayout({ children }: { children: ReactNode }) {

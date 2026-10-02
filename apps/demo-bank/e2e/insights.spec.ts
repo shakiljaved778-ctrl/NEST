@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Page, test } from "./fixtures";
 
 /** Log in as a demo persona (demo-only switcher) in a given language. */
 async function as(page: Page, persona: string, locale: "en" | "ar") {

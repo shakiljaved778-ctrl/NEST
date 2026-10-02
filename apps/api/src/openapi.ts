@@ -336,6 +336,12 @@ function registerConsolePaths(registry: Registry, hmacName: string, errors: Erro
     },
   );
   route("get", "/v1/admin/audit/verify", "Verify the bank's whole hash chain", "audit:read");
+  route(
+    "get",
+    "/v1/admin/activity",
+    "Console activity (sign-ins, customer-level reads and exports) and changes, newest first",
+    "audit:read",
+  );
   route("get", "/v1/admin/audit/export", "Export events as CSV or JSON", "audit:export", {
     query: Admin.AuditExportQuery,
   });

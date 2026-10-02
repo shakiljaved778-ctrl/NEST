@@ -17,16 +17,22 @@ import { MemoryReplayStore } from "./auth/hmac";
 const url = process.env.TEST_DATABASE_URL;
 const NOW = new Date(TEST_SEED_NOW);
 const KEY = { keyId: "ddb-test-p7", secret: "r".repeat(40), bankId: "bank_ddb" };
+const CONSOLE_KEY = {
+  keyId: "ddb-console-p7",
+  secret: "c".repeat(40),
+  bankId: "bank_ddb",
+  purpose: "console" as const,
+};
 const AUDIT_SECRET = "a".repeat(40);
 const SESSION_SECRET = "s".repeat(40);
 
 let counter = 0;
-function signedHeaders(method: string, path: string, body: string) {
+function signedHeaders(method: string, path: string, body: string, key: typeof KEY = KEY) {
   const ts = String(Math.floor(NOW.getTime() / 1000) - (counter++ % 250));
   return {
-    "x-amil-key": KEY.keyId,
+    "x-amil-key": key.keyId,
     "x-amil-timestamp": ts,
-    "x-amil-signature": signRequest(KEY.secret, ts, method, path, body),
+    "x-amil-signature": signRequest(key.secret, ts, method, path, body),
     "content-type": "application/json",
   };
 }
@@ -39,12 +45,17 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
   let app: FastifyInstance;
   const tokens: Record<string, string> = {};
 
-  const signed = async (method: "GET" | "POST", path: string, payload?: unknown) => {
+  const signed = async (
+    method: "GET" | "POST",
+    path: string,
+    payload?: unknown,
+    key: typeof KEY = path.startsWith("/v1/admin/") ? CONSOLE_KEY : KEY,
+  ) => {
     const body = payload === undefined ? "" : JSON.stringify(payload);
     return app.inject({
       method,
       url: path,
-      headers: signedHeaders(method, path, body),
+      headers: signedHeaders(method, path, body, key),
       ...(payload === undefined ? {} : { payload: body }),
     });
   };
@@ -77,7 +88,7 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
           redactedProvider: new MockProvider({ latencyMs: 1 }),
           timeoutMs: 1500,
         }),
-        apiKeys: [KEY],
+        apiKeys: [KEY, CONSOLE_KEY],
         sessionSecret: SESSION_SECRET,
         auditHashSecret: AUDIT_SECRET,
         replayStore: new MemoryReplayStore(() => NOW.getTime()),
@@ -198,6 +209,16 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
   });
 
   describe("RBAC and segregation of duties", () => {
+    it("a console key only signs staff in; the bank app's key cannot (D-067)", async () => {
+      expect((await signed("GET", "/v1/admin/users", undefined, KEY)).statusCode).toBe(403);
+      const users = await signed("GET", "/v1/admin/users", undefined, CONSOLE_KEY);
+      expect(users.statusCode).toBe(200);
+      expect(
+        (await signed("POST", "/v1/sessions", { customerRef: KHALID, locale: "en" }, CONSOLE_KEY))
+          .statusCode,
+      ).toBe(403);
+    });
+
     it.each([
       [
         "viewer",
@@ -540,10 +561,39 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
         paths: Record<string, Record<string, { security: Record<string, unknown>[] }>>;
       }>();
       const admin = Object.entries(doc.paths).filter(([p]) => p.startsWith("/v1/admin/"));
-      expect(admin.map(([p]) => p)).toHaveLength(18);
+      expect(admin.map(([p]) => p)).toHaveLength(19);
       const ops = admin.flatMap(([, methods]) => Object.values(methods));
-      expect(ops).toHaveLength(20);
-      expect(ops.filter((o) => "ConsoleSession" in (o.security[0] ?? {}))).toHaveLength(18);
+      expect(ops).toHaveLength(21);
+      expect(ops.filter((o) => "ConsoleSession" in (o.security[0] ?? {}))).toHaveLength(19);
+    });
+
+    it("records sign-ins and customer-level reads with the ref hashed; logs are append-only (D-068)", async () => {
+      await as("compliance", "GET", `/v1/admin/complaints?customerRef=${KHALID}`);
+      await as("compliance", "GET", "/v1/admin/audit/export?format=csv");
+      const { entries } = (await as("admin", "GET", "/v1/admin/activity")).json<{
+        entries: { kind: string; action: string; role: string; detail: unknown }[];
+      }>();
+      const actions = entries.map((e) => e.action);
+      expect(actions).toEqual(
+        expect.arrayContaining([
+          "sign_in",
+          "complaints_lookup",
+          "audit_export",
+          "template.approved",
+          "rule_pack.parameters_changed",
+        ]),
+      );
+      const lookup = entries.find((e) => e.action === "complaints_lookup");
+      expect(lookup).toMatchObject({ kind: "activity", role: "compliance" });
+      expect(JSON.stringify(entries)).not.toContain(KHALID);
+      expect((lookup?.detail as { customerRefHash?: string }).customerRefHash).toMatch(
+        /^[0-9a-f]{64}$/,
+      );
+      expect((await as("product", "GET", "/v1/admin/activity")).statusCode).toBe(403);
+      await expect(prisma.consoleActivity.deleteMany({})).rejects.toThrow(/append-only/);
+      await expect(prisma.approvalLog.updateMany({ data: { comment: "edited" } })).rejects.toThrow(
+        /append-only/,
+      );
     });
 
     it("the audit chain still verifies", async () => {

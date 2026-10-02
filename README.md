@@ -11,7 +11,19 @@ card's options deep-link back into the bank's own flows.
 
 ## Quick start
 
-Requires Node 22, pnpm 10, and PostgreSQL 16 + Redis 7 (via Docker or installed locally).
+The whole demo, from a fresh clone, with Docker:
+
+```bash
+git clone <this repository> amil-ai
+cd amil-ai
+docker compose up --build
+```
+
+Open http://localhost:3000 (Doha Demo Bank) and http://localhost:3001 (bank console). The one-shot
+`setup` service migrates, seeds the synthetic data (PII encrypted at rest), and on a fresh database
+adds 30 days of demo traffic and today's alerts. `docs/DEMO_SCRIPT.md` is a 7-minute walkthrough.
+
+For development (Node 22, pnpm 10, plus PostgreSQL 16 and Redis 7 via Docker or installed locally):
 
 ```bash
 cp .env.example .env
@@ -19,8 +31,6 @@ docker compose up -d postgres redis
 pnpm install && pnpm db:migrate && pnpm db:seed
 pnpm dev        # api http://localhost:4000 (Swagger UI at /docs) · demo bank :3000 · console :3001
 ```
-
-To run the full stack in containers instead: `docker compose up --build`.
 
 Checks: `pnpm lint && pnpm typecheck && pnpm test && pnpm build`. Audit chain: `pnpm audit:verify`.
 End-to-end: `pnpm --filter @amil/demo-bank e2e` and `pnpm --filter @amil/console e2e` (Playwright;
@@ -76,5 +86,9 @@ wording, so everything works with no network.
 - `docs/PLAN.md`: the full checklist and phase status
 - `docs/DECISIONS.md`: decisions taken where the brief was ambiguous
 - `docs/data-model.md`: schema, conventions and seed
+- `docs/DEMO_SCRIPT.md`: the 7-minute bank demo
+- `docs/INTEGRATION_GUIDE.md`: for a bank's app team (sessions, checks, widget, events)
+- `docs/SECURITY.md`: controls, where they live, and how they are tested
+- `infra/terraform`: single-tenant, in-country deployment skeleton
 - `docs/phase-N-report.md`: what each phase delivered
 - `CLAUDE.md`: non-negotiables, commands and conventions for contributors

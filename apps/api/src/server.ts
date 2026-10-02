@@ -4,8 +4,11 @@ import { buildApp } from "./app";
 import { RedisReplayStore } from "./auth/hmac";
 import { loadConfig } from "./config";
 import { buildModelGateway } from "./model-gateway";
+import { startTelemetry } from "./telemetry";
 
 const config = loadConfig();
+// Before anything else, so spans cover start-up too. A no-op without an OTLP endpoint (D-070).
+const telemetry = await startTelemetry(process.env, "amil-api");
 const prisma = getPrisma();
 const redis = new Redis(config.REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 1 });
 
@@ -21,6 +24,14 @@ const app = await buildApp({
       'req.headers["x-amil-key"]',
     ],
     ...(config.NODE_ENV === "development" ? { transport: { target: "pino-pretty" } } : {}),
+  },
+  rateLimit: {
+    redis,
+    serverPerMinute: config.RATE_LIMIT_SERVER_PER_MIN,
+    sessionPerMinute: config.RATE_LIMIT_SESSION_PER_MIN,
+    consolePerMinute: config.RATE_LIMIT_CONSOLE_PER_MIN,
+    anonymousPerMinute: config.RATE_LIMIT_ANONYMOUS_PER_MIN,
+    assistantPerMinute: config.RATE_LIMIT_ASSISTANT_PER_MIN,
   },
   widgetOrigins: config.WIDGET_ORIGINS.split(",")
     .map((s) => s.trim())
@@ -58,6 +69,7 @@ async function shutdown(signal: string): Promise<void> {
   await app.close();
   await prisma.$disconnect();
   redis.disconnect();
+  await telemetry?.shutdown();
   process.exit(0);
 }
 process.on("SIGINT", () => void shutdown("SIGINT"));

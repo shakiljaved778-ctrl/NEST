@@ -1,4 +1,4 @@
-import { type BrowserContext, expect, type Page, test } from "@playwright/test";
+import { type BrowserContext, expect, type Page, test } from "./fixtures";
 
 const BANK = "http://localhost:3000";
 const KHALID_CLOSE = `${BANK}/cards/card_khalid_platinum/close`;
@@ -176,6 +176,12 @@ test.describe.serial("Bank console (Phase 7 acceptance)", () => {
     await page.getByRole("link", { name: "Export CSV" }).click();
     const file = await download;
     expect(file.suggestedFilename()).toBe("amil-audit.csv");
+    // Every look at customer data is itself recorded (D-068).
+    await page.getByRole("link", { name: "Console activity" }).click();
+    const activity = page.getByTestId("activity");
+    await expect(activity).toContainText("audit export");
+    await expect(activity).toContainText("audit search");
+    await expect(activity).not.toContainText("DDB-C-0001");
   });
 
   test("dashboard and compliance pack render from live data", async ({ page }) => {

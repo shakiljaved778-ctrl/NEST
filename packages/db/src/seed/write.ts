@@ -1,12 +1,21 @@
 import type { PrismaClient } from "@prisma/client";
+import { encryptRow, keyProviderFromEnv, type PiiKeyProvider } from "../pii";
 import { BANK_ID } from "./bank";
 import type { SeedData } from "./build";
 
 /**
  * Write the synthetic dataset (D-003): upsert the bank and console users, replace demo product
- * data, never touch the append-only audit tables.
+ * data, never touch the append-only audit tables. PII columns are encrypted before they are
+ * written (D-066).
  */
-export async function writeSeedData(prisma: PrismaClient, data: SeedData): Promise<void> {
+export async function writeSeedData(
+  prisma: PrismaClient,
+  data: SeedData,
+  keys: PiiKeyProvider = keyProviderFromEnv(),
+): Promise<void> {
+  const customers = data.customers.map((r) => encryptRow(keys, "customer", r));
+  const accounts = data.accounts.map((r) => encryptRow(keys, "account", r));
+  const cards = data.cards.map((r) => encryptRow(keys, "card", r));
   await prisma.$transaction(
     async (tx) => {
       const { id: _id, ...bankUpdate } = data.bank;
@@ -24,11 +33,11 @@ export async function writeSeedData(prisma: PrismaClient, data: SeedData): Promi
       }
       await tx.proactiveJob.createMany({ data: data.proactiveJobs });
       await tx.feeSchedule.createMany({ data: data.feeSchedule });
-      await tx.customer.createMany({ data: data.customers });
+      await tx.customer.createMany({ data: customers });
       await tx.consent.createMany({ data: data.consents });
-      await tx.account.createMany({ data: data.accounts });
+      await tx.account.createMany({ data: accounts });
       await tx.standingOrder.createMany({ data: data.standingOrders });
-      await tx.card.createMany({ data: data.cards });
+      await tx.card.createMany({ data: cards });
       await tx.rewardsLedger.createMany({ data: data.rewardsLedgers });
       await tx.instalmentPlan.createMany({ data: data.instalmentPlans });
       await tx.finance.createMany({ data: data.finances });

@@ -8,8 +8,10 @@ import pino from "pino";
 import { loadConfig } from "./config";
 import { buildModelGateway } from "./model-gateway";
 import { proactiveQueue, proactiveWorker, syncSchedules } from "./scheduler";
+import { startTelemetry } from "./telemetry";
 
 const config = loadConfig();
+await startTelemetry(process.env, "amil-worker");
 const log = pino({ level: config.LOG_LEVEL, name: "amil-worker" });
 const prisma = getPrisma();
 // BullMQ needs blocking commands: no per-request retry limit on its connection.

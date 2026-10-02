@@ -43,12 +43,12 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] `packages/sdk`: Zod contract + typed server (HMAC) and widget (session) clients
 - [x] `packages/gateway`: providers (anthropic, in_country, mock), redactor, number validator, wording cache
 - [x] `packages/db`: Prisma schema, migrations, seed
-- [~] `packages/i18n`: en/ar number, date and currency formatting, Arabic-Indic digits, glossary (catalogs grow per phase)
+- [x] `packages/i18n`: en/ar number, date and currency formatting, Arabic-Indic digits, glossary
 - [x] `packages/ui`: shared shadcn-style components (D-026)
 - [x] PostgreSQL 16, Redis 7 (docker-compose) · [x] BullMQ (Phase 5: proactive worker, schedules mirrored from ProactiveJob, D-039)
 - [x] LangGraph.js assistant (Phase 6)
-- [~] pino structured logs (Phase 1) · [ ] OpenTelemetry (Phase 8)
-- [x] `docker-compose.yml`, `Dockerfile` per app · [ ] `infra/terraform` skeleton (Phase 8)
+- [x] pino structured logs (Phase 1) · [x] OpenTelemetry tracing, OTLP when configured (Phase 8, D-070)
+- [x] `docker-compose.yml`, `Dockerfile` per app (slim API image) · [x] `infra/terraform` skeleton, GCP in-country (Phase 8, D-071)
 - [x] `.env.example`; `ANTHROPIC_API_KEY` optional (mock provider fallback, Phase 3)
 
 ## Section 4: Domain model (Prisma)
@@ -117,7 +117,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 10: Demo bank app (Phase 4+)
 
-- [~] Phone-framed app, persona switcher, home, card/finance/deposit/account detail, one AMIL-checked flow for every action, deep-link targets, settings (Phases 4–5) · [x] deposit break, salary change, account close, statements with tappable charges, alerts inbox (Phase 5) · [x] Ask AMIL tab, compare views (Phase 6)
+- [x] Phone-framed app, persona switcher, home, card/finance/deposit/account detail, one AMIL-checked flow for every action, deep-link targets, settings (Phases 4–5) · [x] deposit break, salary change, account close, statements with tappable charges, alerts inbox (Phase 5) · [x] Ask AMIL tab, compare views (Phase 6)
 - [x] Critical severity requires "I understand" before "Continue" enables
 
 ## Section 11: Bank console (Phase 7)
@@ -140,11 +140,11 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 13: Security and quality
 
-- [~] Zod validation on every request (strict schemas), CORS allow-list for widget origins · [ ] rate limiting, helmet, CSP (Phase 8)
-- [ ] AES-256-GCM application-level PII encryption with KMS interface (Phase 8)
-- [x] RBAC on console with segregation of duties (D-055); console changes recorded in the approval log · [x] signed request nonce (D-063)
+- [x] Zod validation on every request (strict schemas), CORS allow-list for widget origins · [x] rate limiting (D-064), helmet headers, nonce CSP for the apps and widget host (D-065)
+- [x] AES-256-GCM application-level PII encryption with KMS interface and key rotation (Phase 8, D-066)
+- [x] RBAC on console with segregation of duties (D-055); console changes in the approval log, sign-ins and customer-level reads in the activity log, both append-only (D-068) · [x] signed request nonce (D-063) · [x] HMAC keys with a purpose (D-067)
 - [x] Integration tests against real PostgreSQL via TEST_DATABASE_URL (D-023) · [x] e2e (Playwright): demo bank (16) and console (7) suites
-- [x] CI: GitHub Actions lint, typecheck, test, build, Playwright e2e (`.github/workflows/ci.yml`) · [ ] dependency audit (Phase 8)
+- [x] CI: GitHub Actions lint, typecheck, test, build, Playwright e2e (`.github/workflows/ci.yml`) · [x] dependency audit, Terraform validate, Docker demo smoke test (Phase 8, D-069, D-072)
 
 ## Section 14: Phases
 
@@ -155,11 +155,11 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] **Phase 5: Remaining packs + proactive + explain.** Every pack fires for ≥ 2 personas; alerts after scheduler; all fee lines explainable
 - [x] **Phase 6: Ask AMIL + compare.** Khalid card-close answer with fact chips; refuses investment advice; compare matches engine
 - [x] **Phase 7: Bank console.** Point-value change flows to next insight; kill switch immediate; complaints lookup shows Khalid
-- [ ] **Phase 8: Hardening + demo.** Headers, encryption, rate limits, CI, Terraform, DEMO_SCRIPT, INTEGRATION_GUIDE, SECURITY; fresh clone to running demo in ≤ 3 commands
+- [x] **Phase 8: Hardening + demo.** Headers, encryption, rate limits, CI, Terraform, DEMO_SCRIPT, INTEGRATION_GUIDE, SECURITY; fresh clone to running demo in ≤ 3 commands
 
 ## Section 15: Voice and copy rules (all templates)
 
 - [x] Calm, factual, second person; no alarmism, emojis or exclamation marks (enforced by template lint test)
 - [x] Lead with consequence and value; avoid-the-loss option first, then Continue, then Talk to someone (option order lint-enforced)
 - [x] Arabic written natively against the glossary; glossary injected into Arabic model requests
-- [ ] Footer: "Figures from Doha Demo Bank records as of {asOf}. Wording assisted by AI." (+ Arabic)
+- [x] Footer: "Figures from Doha Demo Bank records as of {asOf}. Wording assisted by AI." (+ Arabic); the AI line only when a model wrote the wording (D-018)

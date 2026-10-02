@@ -8,3 +8,11 @@ onlyBuiltDependencies:
   - "esbuild"
   - "prisma"
   - "sharp"
+
+# Security overrides for transitive dependencies flagged by `pnpm audit --prod` (D-069). Remove
+# each once the parent package ships the patched version.
+overrides:
+  # next pins postcss 8.4.x (build-time CSS processing).
+  "next>postcss": "^8.5.23"
+  # Prisma CLI config loader.
+  "@prisma/config>deepmerge-ts": "^8.0.0"

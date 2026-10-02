@@ -1,9 +1,14 @@
 import "server-only";
 import { getPrisma } from "@amil/db/client";
+import { decryptRow, keyProviderFromEnv, type PiiKeyProvider } from "@amil/db/pii";
 import { notFound } from "next/navigation";
 import { BANK_ID } from "./constants";
 import { DEMO_AMOUNTS } from "./demo";
 import { currentPersonaKey } from "./persona";
+
+let keys: PiiKeyProvider | undefined;
+/** The bank's PII key provider (D-066): its records hold names, numbers and contacts encrypted. */
+const piiKeys = () => (keys ??= keyProviderFromEnv());
 
 /**
  * The demo bank's own backend: it reads its own (synthetic) core-banking records. AMIL is a
@@ -25,15 +30,21 @@ export async function currentCustomer() {
     },
   });
   if (!customer) notFound();
-  return customer;
+  const k = piiKeys();
+  return {
+    ...decryptRow(k, "customer", customer),
+    accounts: customer.accounts.map((a) => decryptRow(k, "account", a)),
+    cards: customer.cards.map((c) => decryptRow(k, "card", c)),
+  };
 }
 
 export type CurrentCustomer = Awaited<ReturnType<typeof currentCustomer>>;
 
 export async function listPersonas() {
-  return getPrisma().customer.findMany({
+  const rows = await getPrisma().customer.findMany({
     where: { bankId: BANK_ID },
     select: {
+      id: true,
       personaKey: true,
       displayName: true,
       displayNameAr: true,
@@ -42,6 +53,7 @@ export async function listPersonas() {
     },
     orderBy: { externalRef: "asc" },
   });
+  return rows.map((r) => decryptRow(piiKeys(), "customer", r));
 }
 
 export async function bankBrand() {

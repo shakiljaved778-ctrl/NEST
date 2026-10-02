@@ -41,6 +41,8 @@ verification then starts from the oldest retained event and uses its `prevHash` 
 
 ## D-006: PII is stored in plaintext columns until Phase 8 (Phase 1)
 
+_Superseded by D-066 (Phase 8): the PII columns are now encrypted._
+
 The PII columns (`Customer.displayName/displayNameAr/phone/email`, `Account.number/iban`,
 `Card.pan`) are `String` columns sized to later hold AES-256-GCM ciphertext. Application-level
 encryption is Phase 8 scope, so the column types will not change. All card PANs, IBANs and phone
@@ -593,3 +595,155 @@ rejected the second one (found when the console's sign-in page was reloaded quic
 may now carry `X-AMIL-Nonce` (16–64 letters, digits or hyphens); it is appended to the signing
 string (`….${body}.${nonce}`), so it cannot be added, changed or stripped without breaking the
 signature. The SDK sends a fresh UUID on every call. Requests without a nonce verify as before.
+
+## D-064: Rate limits per caller, shared in Redis (Phase 8)
+
+`@fastify/rate-limit` keys each request by who is calling, before authentication:
+
+- the bank key id for signed calls;
+- a hash of the bearer token, separately for customer sessions and console users;
+- otherwise the client IP.
+
+A forged token only buys its own bucket of requests that all fail with 401.
+
+Per-minute defaults:
+
+| Caller                | Default |
+| --------------------- | ------- |
+| Bank key              | 6,000   |
+| Customer session      | 120     |
+| Console user          | 600     |
+| Anonymous IP          | 300     |
+| Ask AMIL, per session | 20      |
+
+All of them are environment settings. The response is a generic `429 rate_limited` with
+`Retry-After`, which the widget treats as unavailable. Counters live in Redis so several API
+instances share them. If Redis is down, requests pass rather than fail, so a throttle can never
+take the service down. Health checks are exempt.
+
+## D-065: Security headers and a nonce-based CSP (Phase 8)
+
+- **API.**
+  - `@fastify/helmet`: HSTS, `nosniff`, frame options, referrer policy, COOP, and CORP
+    `same-site` so the widget's CORS calls still work.
+  - A deny-all CSP (`default-src 'none'; frame-ancestors 'none'`). Swagger UI at `/docs` keeps
+    its own policy, without `upgrade-insecure-requests`, so it works over local http.
+  - `Cache-Control: no-store` on everything under `/v1`.
+- **Demo bank and console.**
+  - Middleware sets a per-request nonce CSP: `script-src 'self' 'nonce-…' 'strict-dynamic'`,
+    `connect-src` limited to the app and (for the demo bank) the AMIL API, `object-src 'none'`,
+    `base-uri 'self'`, `form-action 'self'` and `frame-ancestors 'none'`.
+  - `style-src` allows inline styles: brand tokens and charts use style attributes, and no
+    script can run through them.
+  - Static headers: `X-Frame-Options: DENY`, a referrer policy, a permissions policy, COOP, and
+    HSTS in production.
+  - The policy lives in `@amil/ui/security` (edge-safe) and is shared by both apps.
+- **Tests.** Every Playwright test fails if the browser reports a CSP violation.
+
+## D-066: PII encrypted at the application level (Phase 8)
+
+The seven PII columns (`Customer.displayName/displayNameAr/phone/email`, `Account.number/iban`,
+`Card.pan`) hold `enc:v1:<keyId>:<iv>:<ciphertext>:<tag>`.
+
+- **Cipher.** AES-256-GCM with a random 96-bit IV. The authenticated data is
+  `<table>.<column>:<rowId>`, so a value moved to another row or column fails to decrypt.
+- **Keys** come from a `PiiKeyProvider`. For the demo that is `PII_ENCRYPTION_KEYS` (newest
+  first). In production it is `kmsKeyProvider`: data keys wrapped by the bank's KMS and
+  unwrapped once at start.
+- **Rotation.** New writes use the newest key. Older keys still decrypt. `pnpm db:rotate-pii`
+  re-encrypts every value under the newest key, after which the old key can be removed.
+- **Who encrypts and decrypts.** The bank side does both: the seed (the only writer) and the demo
+  bank's backend. AMIL's API and worker never read these columns, so they do not hold the key.
+  This is the property a pilot keeps when AMIL has its own store.
+- **No lookups.** Nothing looks a record up by these columns, so no blind index is needed.
+
+## D-067: Each HMAC key has a purpose (Phase 8)
+
+`AMIL_API_KEYS` entries are `keyId:secret:bankId[:purpose]`, where the purpose is `bank` (the
+default) or `console`.
+
+- A console key can only list staff and mint console tokens.
+- A bank app key can call everything else but cannot sign staff into the console.
+- A wrong-purpose call gets `403`.
+
+The console app now has its own key (`AMIL_CONSOLE_KEY_ID/SECRET`), so a leaked app key cannot
+mint staff sessions.
+
+## D-068: Console reads are recorded; console logs are append-only (Phase 8)
+
+A new `console_activity` table records:
+
+- sign-ins;
+- every look at customer-level data: audit search, event view, export, chain verification and
+  complaints lookup.
+
+Filters are kept, but a customer reference only as its keyed hash. Changes stay in
+`approval_log`. Database triggers make both tables append-only, like the audit tables. Admin and
+compliance see one combined list under **Console activity** (`GET /v1/admin/activity`).
+
+## D-069: Dependency audit in CI, with pnpm overrides for transitive fixes (Phase 8)
+
+`pnpm audit --prod --audit-level=high` runs in CI. The audit found:
+
+- `postcss` < 8.5.23, pinned by Next (build-time CSS processing);
+- `deepmerge-ts` < 8, from the Prisma CLI's config loader.
+
+Both are lifted with overrides in `pnpm-workspace.yaml` and checked to work (Prisma generate and
+migrate, both app builds). Each override should be removed once its parent package ships the
+fix.
+
+## D-070: OpenTelemetry tracing, off unless configured (Phase 8)
+
+When `OTEL_EXPORTER_OTLP_ENDPOINT` is set, the API and worker start the OpenTelemetry Node SDK
+with an OTLP/HTTP exporter. Otherwise every span is a no-op.
+
+- **Spans:**
+  - one per request, named by method and route pattern;
+  - `amil.insight.prepare`, with pack, variant, locale, severity or suppression reason, and
+    validator result;
+  - `amil.gateway.word`;
+  - `amil.audit.append`.
+- **No customer data in attributes.** No customer references, figures or text, because traces
+  leave the audit boundary.
+- **Failures** are recorded without their messages.
+- **Logs** stay pino; the audit log stays separate from both.
+- **Instrumentation** is manual, not automatic, because auto-instrumentation needs ESM loader
+  hooks in the bundled build.
+
+## D-071: Terraform skeleton for one bank per GCP project, in-country (Phase 8)
+
+`infra/terraform` targets GCP `me-central1` (Doha). It is a starting point a bank's platform team
+reviews, not a turnkey stack.
+
+- **Network:** a private VPC.
+- **Database:** Cloud SQL PostgreSQL 16 with private IP, TLS only, CMEK and PITR backups kept in
+  the region.
+- **Cache:** Memorystore Redis with AUTH and TLS.
+- **Keys:** Cloud KMS keys (the PII envelope key and the database CMEK), rotated yearly.
+- **Secrets:** Secret Manager with in-region replication. Values are added out of band, never
+  in state.
+- **Services:** Cloud Run `api` and `console` (internal ingress, behind the bank's load balancer
+  and identity-aware proxy), `worker` (always-on CPU), and a `migrate` job.
+- **Identity:** one service account per service, reading only the secrets it needs.
+
+The cloud is the bank's choice. Any provider with an in-country region works the same way. CI
+runs `terraform fmt -check` and `terraform validate`.
+
+## D-072: The demo from a fresh clone in three commands (Phase 8)
+
+The three commands are `git clone …`, `cd amil-ai`, `docker compose up --build`. The one-shot
+`setup` service then:
+
+- migrates;
+- seeds, with PII encrypted;
+- on a fresh database only (`demo:traffic --if-empty`), adds 30 days of synthetic traffic;
+- runs the proactive packs, so alerts exist.
+
+After that the API, worker, demo bank and console start.
+
+- **API image.** It is now slim: production dependencies only, through `pnpm deploy`, plus the
+  generated Prisma client. That is 423 MB instead of the full ~1 GB workspace.
+- **Demo bank image.** It installs OpenSSL for Prisma's engine.
+- **CI.** A CI job runs exactly this compose stack and smoke-tests it. Container builds could not
+  run in the development sandbox (package mirrors are blocked there), so CI is where the images
+  are proven.

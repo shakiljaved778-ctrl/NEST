@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
+import { listActivity, recordActivity, withRefHash } from "../admin/activity";
 import { auditEvent, complaints, exportAudit, searchAudit, verifyChain } from "../admin/audit";
 import { dashboard } from "../admin/analytics";
 import { compliancePack } from "../admin/compliance";
@@ -43,7 +44,7 @@ export function adminRoutes(app: FastifyInstance, deps: V1Deps): void {
 
   // ── Sign-in (console backend only) ──
   app.get("/v1/admin/users", async (req) => {
-    const bank = await authenticate(req, deps, null);
+    const bank = await authenticate(req, deps, null, "console");
     if (bank.kind !== "server") throw forbidden();
     const users = await deps.prisma.consoleUser.findMany({
       where: { bankId: bank.bankId, active: true },
@@ -54,13 +55,14 @@ export function adminRoutes(app: FastifyInstance, deps: V1Deps): void {
   });
 
   app.post("/v1/admin/sessions", async (req, reply) => {
-    const bank = await authenticate(req, deps, null);
+    const bank = await authenticate(req, deps, null, "console");
     if (bank.kind !== "server") throw forbidden();
     const { consoleUserId } = parseOr400(ConsoleSessionRequest, req.body);
     const user = await deps.prisma.consoleUser.findFirst({
       where: { id: consoleUserId, bankId: bank.bankId, active: true },
     });
     if (!user) throw notFound();
+    await recordActivity(deps.prisma, user, "sign_in", {}, deps.clock());
     const role = user.role;
     const { token, expiresAt } = await mintConsoleToken(
       deps.sessionSecret,
@@ -192,25 +194,43 @@ export function adminRoutes(app: FastifyInstance, deps: V1Deps): void {
   });
 
   // ── Audit ──
+  const log = (
+    user: { id: string; bankId: string },
+    action: Parameters<typeof recordActivity>[2],
+    detail: Record<string, unknown>,
+  ) => recordActivity(deps.prisma, user, action, detail, deps.clock());
+
   app.get("/v1/admin/audit", async (req) => {
     const user = await auth(req, "audit:read");
-    return searchAudit(
-      deps.prisma,
-      user.bankId,
-      deps.auditHashSecret,
-      parseOr400(AuditQuery, req.query),
-    );
+    const q = parseOr400(AuditQuery, req.query);
+    const result = await searchAudit(deps.prisma, user.bankId, deps.auditHashSecret, q);
+    await log(user, "audit_search", {
+      ...withRefHash(deps.auditHashSecret, user.bankId, q),
+      results: result.events.length,
+    });
+    return result;
   });
 
   app.get("/v1/admin/audit/verify", async (req) => {
     const user = await auth(req, "audit:read");
-    return verifyChain(deps.prisma, user.bankId);
+    const result = await verifyChain(deps.prisma, user.bankId);
+    await log(user, "audit_verify", { ok: result.ok, checked: result.checked });
+    return result;
+  });
+
+  app.get("/v1/admin/activity", async (req) => {
+    const user = await auth(req, "audit:read");
+    return { entries: await listActivity(deps.prisma, user.bankId) };
   });
 
   app.get("/v1/admin/audit/export", async (req, reply) => {
     const user = await auth(req, "audit:export");
     const { format, ...q } = parseOr400(AuditExportQuery, req.query);
     const body = await exportAudit(deps.prisma, user.bankId, deps.auditHashSecret, q, format);
+    await log(user, "audit_export", {
+      format,
+      ...withRefHash(deps.auditHashSecret, user.bankId, q),
+    });
     return reply
       .header("content-type", format === "csv" ? "text/csv; charset=utf-8" : "application/json")
       .header("content-disposition", `attachment; filename="amil-audit.${format}"`)
@@ -220,13 +240,20 @@ export function adminRoutes(app: FastifyInstance, deps: V1Deps): void {
   app.get("/v1/admin/audit/:id", async (req) => {
     const user = await auth(req, "audit:read");
     const { id } = parseOr400(IdParam, req.params);
-    return auditEvent(deps.prisma, user.bankId, id);
+    const result = await auditEvent(deps.prisma, user.bankId, id);
+    await log(user, "audit_event_view", { eventId: id, seq: result.event.seq });
+    return result;
   });
 
   app.get("/v1/admin/complaints", async (req) => {
     const user = await auth(req, "complaints:read");
     const q = parseOr400(ComplaintsQuery, req.query);
-    return complaints(deps.prisma, user.bankId, deps.auditHashSecret, q);
+    const result = await complaints(deps.prisma, user.bankId, deps.auditHashSecret, q);
+    await log(user, "complaints_lookup", {
+      ...withRefHash(deps.auditHashSecret, user.bankId, q),
+      insights: result.insights.length,
+    });
+    return result;
   });
 
   // ── Compliance pack ──

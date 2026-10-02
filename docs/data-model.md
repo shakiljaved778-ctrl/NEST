@@ -7,17 +7,17 @@ The source of truth is `packages/db/prisma/schema.prisma`, with migrations in
 
 ## Conventions
 
-| Concern           | Rule                                                                                                                                                                                                                                                           |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tenancy           | Multi-bank capable: root rows carry `bankId`, and child rows inherit it through their parent. Deployed single-tenant.                                                                                                                                          |
-| Money             | `Decimal(18,2)` in QAR. Application code uses `decimal.js` through `@amil/rules-engine` (`D()`, `round()`, `toMoneyString()`). No JS floats.                                                                                                                   |
-| Rates             | `Decimal(9,4)` holding an **annual percent**: `36.0000` means 36% p.a., `4.7500` means 4.75% p.a.                                                                                                                                                              |
-| Points            | `Int`. Point value is `Decimal(10,4)` QAR per point (for example `0.0100`).                                                                                                                                                                                    |
-| JSON rules        | Every money value and rate inside a `Json` column is a decimal **string** (`"1.50"`), never a JSON number (D-004). A seed test enforces this.                                                                                                                  |
-| Dates             | `timestamptz`. Calendar maths is done in UTC days (`@amil/rules-engine` `daysBetween`, `addMonths`).                                                                                                                                                           |
-| PII               | Only `Customer.displayName`, `displayNameAr`, `phone`, `email`, `Account.number`, `iban` and `Card.pan`. Never sent to the model gateway (non-negotiable 6). Application-level AES-256-GCM encryption arrives in Phase 8, with no column type changes (D-006). |
-| Audit             | `insight_event` and `customer_response` are append-only, enforced by Postgres triggers (see below).                                                                                                                                                            |
-| Deterministic IDs | Seed IDs are readable and stable (`cus_khalid`, `card_khalid_platinum`, `fin_fatima_murabaha`) so demo links survive reseeding.                                                                                                                                |
+| Concern           | Rule                                                                                                                                                                                                                                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tenancy           | Multi-bank capable: root rows carry `bankId`, and child rows inherit it through their parent. Deployed single-tenant.                                                                                                                                                                                   |
+| Money             | `Decimal(18,2)` in QAR. Application code uses `decimal.js` through `@amil/rules-engine` (`D()`, `round()`, `toMoneyString()`). No JS floats.                                                                                                                                                            |
+| Rates             | `Decimal(9,4)` holding an **annual percent**: `36.0000` means 36% p.a., `4.7500` means 4.75% p.a.                                                                                                                                                                                                       |
+| Points            | `Int`. Point value is `Decimal(10,4)` QAR per point (for example `0.0100`).                                                                                                                                                                                                                             |
+| JSON rules        | Every money value and rate inside a `Json` column is a decimal **string** (`"1.50"`), never a JSON number (D-004). A seed test enforces this.                                                                                                                                                           |
+| Dates             | `timestamptz`. Calendar maths is done in UTC days (`@amil/rules-engine` `daysBetween`, `addMonths`).                                                                                                                                                                                                    |
+| PII               | Only `Customer.displayName`, `displayNameAr`, `phone`, `email`, `Account.number`, `iban` and `Card.pan`. Never sent to the model gateway (non-negotiable 6). Stored encrypted (AES-256-GCM, `enc:v1:<keyId>:<iv>:<ct>:<tag>`, bound to table, column and row; D-066). Only the bank side holds the key. |
+| Audit             | `insight_event`, `customer_response`, `approval_log` and `console_activity` are append-only, enforced by Postgres triggers (see below).                                                                                                                                                                 |
+| Deterministic IDs | Seed IDs are readable and stable (`cus_khalid`, `card_khalid_platinum`, `fin_fatima_murabaha`) so demo links survive reseeding.                                                                                                                                                                         |
 
 ## Entity overview
 
@@ -38,7 +38,7 @@ Bank ─┬─ Customer ─┬─ Consent
       │        └──────────────────────────┘
       ├─ ProactiveJob
       ├─ InboundEvent (idempotency for POST /v1/events)
-      └─ ConsoleUser ── ApprovalLog
+      └─ ConsoleUser ── ApprovalLog, ConsoleActivity
 ```
 
 ## Entities
@@ -174,11 +174,13 @@ alert worded in every bank locale (D-038). `ProactiveJob` holds the cron schedul
 (D-039). `InboundEvent` stores bank webhook events (`POST /v1/events`) with a unique
 `(bankId, idempotencyKey)`.
 
-### ConsoleUser and ApprovalLog
+### ConsoleUser, ApprovalLog and ConsoleActivity
 
 Console users have a role: `admin | product | compliance | sharia | viewer`. `ApprovalLog` records
-every console action on templates and rule packs (status transitions, kill switches, parameter
-diffs).
+every console change to templates and rule packs (status transitions, kill switches, parameter
+diffs). `ConsoleActivity` records sign-ins and every look at customer-level data (audit search,
+event view, export, chain verification, complaints lookup), with customer references only as
+their keyed hash (D-068). Both are append-only.
 
 ## Seed
 

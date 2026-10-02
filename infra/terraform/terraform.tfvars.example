@@ -1,0 +1,5 @@
+project_id     = "ddb-amil-uat"
+bank_id        = "bank_ddb"
+environment    = "uat"
+image_tag      = "2026.10.02-abc1234"
+widget_origins = ["https://app.uat.doha-demo-bank.example"]

@@ -183,15 +183,16 @@ model Bank {
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
 
-  customers     Customer[]
-  feeSchedules  FeeSchedule[]
-  rulePacks     RulePack[]
-  templates     Template[]
-  insightEvents InsightEvent[]
-  proactiveJobs ProactiveJob[]
-  consoleUsers  ConsoleUser[]
-  approvalLogs  ApprovalLog[]
-  inboundEvents InboundEvent[]
+  customers         Customer[]
+  feeSchedules      FeeSchedule[]
+  rulePacks         RulePack[]
+  templates         Template[]
+  insightEvents     InsightEvent[]
+  proactiveJobs     ProactiveJob[]
+  consoleUsers      ConsoleUser[]
+  approvalLogs      ApprovalLog[]
+  consoleActivities ConsoleActivity[]
+  inboundEvents     InboundEvent[]
 
   @@map("bank")
 }
@@ -656,8 +657,9 @@ model ConsoleUser {
   active    Boolean     @default(true)
   createdAt DateTime    @default(now())
 
-  bank         Bank          @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  bank         Bank              @relation(fields: [bankId], references: [id], onDelete: Cascade)
   approvalLogs ApprovalLog[]
+  activities   ConsoleActivity[]
 
   @@unique([bankId, email])
   @@map("console_user")
@@ -684,4 +686,23 @@ model ApprovalLog {
 
   @@index([bankId, entityType, entityId])
   @@map("approval_log")
+}
+
+/// What staff did in the console that is not a change (changes are in ApprovalLog): sign-ins and
+/// every customer-level read or export. Append-only, like ApprovalLog (D-068).
+model ConsoleActivity {
+  id      String   @id @default(cuid())
+  bankId  String
+  actorId String
+  /// sign_in | audit_search | audit_event_view | audit_export | audit_verify | complaints_lookup
+  action  String
+  /// Filters and counts. Customer references appear only as their keyed hash.
+  detail  Json?
+  at      DateTime @default(now())
+
+  bank  Bank        @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  actor ConsoleUser @relation(fields: [actorId], references: [id])
+
+  @@index([bankId, at])
+  @@map("console_activity")
 }
