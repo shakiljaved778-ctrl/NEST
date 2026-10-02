@@ -105,15 +105,25 @@
   staff sessions. They now have separate keys with purposes.
 - **The approval log could be edited.** It is now append-only, like the audit tables.
 
-## Not verifiable here
+- **Found by CI on the first push of this phase**, and fixed:
+  - Turbo's strict environment mode did not pass the new variables (the PII key, the console
+    key) to test tasks.
+  - The slim API image's Prisma client copy assumed a folder that a clean build does not have.
+  - The demo bank image generated Prisma's engine for OpenSSL 1.1 but ran on OpenSSL 3. The
+    schema now pins the OpenSSL 3 engine.
+
+## Containers: proven in CI
 
 Container images cannot be built in this development sandbox, because package mirrors are
-blocked from inside containers. The compose job in CI is what proves the images and the
-three-command demo. Everything the images run was checked natively:
+blocked from inside containers. The CI job **Docker demo (compose up)** builds every image, runs
+`docker compose up --build`, and smoke-tests the stack:
 
-- the slim API bundle served `/readyz`;
-- the demo bank's standalone build served pages from the encrypted database;
-- the setup sequence ran on an empty database.
+- the API is ready;
+- the demo bank renders the persona list, decrypted from its encrypted records;
+- the console sign-in page loads;
+- setup loaded the demo traffic and today's alerts.
+
+It is green on CI run 36, together with verify, end-to-end and Terraform.
 
 ## Screenshots
 
