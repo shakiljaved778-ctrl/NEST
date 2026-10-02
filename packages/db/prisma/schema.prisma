@@ -12,7 +12,9 @@
 //   - All product values are SYNTHETIC demo data. Doha Demo Bank is fictional.
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // The app images run Debian bookworm with OpenSSL 3; "native" covers development machines.
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {

@@ -1,6 +1,8 @@
 # @amil/demo-bank (Next.js standalone). Build context: the amil/ folder (see docker-compose.yml).
 FROM node:22-bookworm-slim AS base
-RUN corepack enable
+# OpenSSL lets Prisma pick the right query engine at build time as well as at run time.
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/* && corepack enable
 WORKDIR /repo
 
 FROM base AS build
