@@ -60,7 +60,8 @@ const HINTS: Record<string, string> = {
 
 /**
  * Parameter editor (section 11): edit, review the diff, choose when it takes effect. AMIL
- * validates the result against the pack's own schema before a new version is written.
+ * validates the result against the pack's own schema; the new version is a proposal that
+ * compliance approves before it applies (D-074).
  */
 export function ParamEditor({
   path,
@@ -226,7 +227,7 @@ export function ParamEditor({
               </div>
               <div className="mt-4 flex gap-2">
                 <Button size="sm" disabled={busy} onClick={() => void save()}>
-                  Save as new version
+                  Propose for approval
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => setReviewing(false)}>
                   Back to editing

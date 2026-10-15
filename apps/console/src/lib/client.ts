@@ -28,5 +28,7 @@ export const ERROR_TEXT: Record<string, string> = {
   invalid_transition: "This step is not available in the template's current state.",
   not_found: "Not found.",
   unauthorized: "Your session has ended. Sign in again.",
+  reason_required: "Give a reason.",
+  pending_exists: "A proposal for this pack is already waiting for compliance approval.",
 };
 export const errorText = (code: string) => ERROR_TEXT[code] ?? `Request failed (${code}).`;

@@ -25,6 +25,9 @@ export const PackVersionRequest = z
   })
   .strict();
 export const EnabledRequest = z.object({ enabled: z.boolean(), comment: Comment }).strict();
+export const PackReviewRequest = z
+  .object({ action: z.enum(["approve", "reject"]), comment: Comment })
+  .strict();
 
 export const TemplateListQuery = z
   .object({

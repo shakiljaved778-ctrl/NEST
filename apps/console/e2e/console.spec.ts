@@ -21,20 +21,32 @@ async function khalidClosing(context: BrowserContext) {
   return page;
 }
 
+/** Product proposes the point value; compliance approves it (four eyes, D-074). */
 async function setPointValue(page: Page, value: string) {
+  await signIn(page, "Product manager");
   await page.goto("/packs/card.close/conventional");
   await page.getByLabel("programmePointValueQar").fill(value);
   await page.getByRole("button", { name: /Review 1 change/ }).click();
   await expect(page.getByTestId("param-diff")).toContainText("programmePointValueQar");
   await page.getByLabel("Reason for the change").fill("Programme repricing (demo)");
-  await page.getByRole("button", { name: "Save as new version" }).click();
+  await page.getByRole("button", { name: "Propose for approval" }).click();
   await page.waitForURL((u) => u.searchParams.has("saved"));
-  await expect(page.getByRole("status")).toContainText(/Saved as version \d+\.\d+\.\d+/);
+  await expect(page.getByRole("status")).toContainText(/Proposed as version \d+\.\d+\.\d+/);
+  // Product cannot approve its own proposal.
+  await expect(page.getByTestId("pending-version")).toContainText("Waiting for compliance");
+
+  await signIn(page, "Compliance officer");
+  await page.goto("/packs/card.close/conventional");
+  const pending = page.getByTestId("pending-version");
+  await expect(pending).toContainText("programmePointValueQar");
+  await pending.getByLabel("Review comment").fill("Matches the programme terms");
+  await pending.getByRole("button", { name: "Approve" }).click();
+  await expect(page.getByTestId("pending-version")).toHaveCount(0);
   await expect(page.getByLabel("programmePointValueQar")).toHaveValue(value);
 }
 
 test.describe.serial("Bank console (Phase 7 acceptance)", () => {
-  test("changing Khalid's point value in the console changes his next insight", async ({
+  test("changing Khalid's point value in the console changes his next insight, once approved", async ({
     page,
     context,
   }) => {
@@ -62,26 +74,34 @@ test.describe.serial("Bank console (Phase 7 acceptance)", () => {
     );
   });
 
-  test("disabling card.close removes the insight immediately; enabling brings it back", async ({
+  test("disabling card.close removes the insight immediately; compliance turns it back on", async ({
     page,
     context,
   }) => {
+    const toggleIn = (p: Page) =>
+      p
+        .getByTestId("pack-card.close-conventional")
+        .getByRole("switch", { name: /Card closure \(conventional\)/ });
     await signIn(page, "Product manager");
     await page.goto("/packs");
-    const toggle = page
-      .getByTestId("pack-card.close-conventional")
-      .getByRole("switch", { name: /Card closure \(conventional\)/ });
+    const toggle = toggleIn(page);
     await expect(toggle).toHaveAttribute("aria-checked", "true");
-    page.once("dialog", (d) => void d.accept());
+    // Turning off needs a reason (D-075).
+    page.once("dialog", (d) => void d.accept("Incident drill"));
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-checked", "false");
+    // Product cannot turn it back on.
+    await expect(toggle).toBeDisabled();
 
     const bank = await khalidClosing(context);
     await expect(bank.getByTestId("bank-continue")).toBeVisible();
     await expect(bank.locator("amil-insight .card")).toHaveCount(0);
 
-    await toggle.click();
-    await expect(toggle).toHaveAttribute("aria-checked", "true");
+    await signIn(page, "Compliance officer");
+    await page.goto("/packs");
+    page.once("dialog", (d) => void d.accept("Drill over"));
+    await toggleIn(page).click();
+    await expect(toggleIn(page)).toHaveAttribute("aria-checked", "true");
     await bank.goto(KHALID_CLOSE);
     await expect(bank.locator("amil-insight .card h2")).toContainText("42,000 points");
   });

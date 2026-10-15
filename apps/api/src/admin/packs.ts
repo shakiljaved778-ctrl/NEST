@@ -35,6 +35,8 @@ const view = (r: Row) => ({
   effectiveFrom: r.effectiveFrom.toISOString(),
   createdAt: r.createdAt.toISOString(),
   createdBy: r.createdBy,
+  approvedBy: r.approvedBy,
+  approvedAt: r.approvedAt?.toISOString() ?? null,
   parameters: r.parameters,
 });
 
@@ -62,6 +64,18 @@ export async function listPacks(prisma: PrismaClient, bankId: string, now: Date)
         defaults: def.parameters,
         current: current ? view(current) : null,
         scheduled: list.filter((r) => r.status === "active" && r.effectiveFrom > now).map(view),
+        pending: list
+          .filter((r) => r.status === "pending_approval")
+          .map((r) => ({
+            ...view(r),
+            diff: parameterDiff(
+              {
+                ...(def.parameters as object),
+                ...((current?.parameters ?? {}) as object),
+              } as Record<string, unknown>,
+              r.parameters as Record<string, unknown>,
+            ),
+          })),
         versions: list.map(view).reverse(),
       },
     ];
@@ -88,12 +102,12 @@ export function parameterDiff(before: Record<string, unknown>, after: Record<str
 }
 
 /**
- * A new parameter version (section 11: validation, diff, version history, effective date). The
- * stored parameters are validated against the pack's own schema before anything is written, so
- * an invalid value can never reach the engine. The previous version stays until the new one's
- * effective date.
+ * Propose a new parameter version (section 11: validation, diff, version history, effective date;
+ * four eyes, D-074). The merged parameters are validated against the pack's own schema before
+ * anything is written, so an invalid value can never reach the engine. The proposal is stored as
+ * `pending_approval` and is never served: compliance approves or rejects it.
  */
-export async function createPackVersion(
+export async function proposePackVersion(
   prisma: PrismaClient,
   user: ConsoleUser,
   key: string,
@@ -109,6 +123,11 @@ export async function createPackVersion(
   const rows = await prisma.rulePack.findMany({ where: { bankId: user.bankId, key, variant } });
   const current = currentOf(rows, now);
   if (!current) throw notFound();
+  const waiting = rows.find((r) => r.status === "pending_approval");
+  if (waiting)
+    throw new ConsoleValidationError("pending_exists", [
+      { path: "version", message: `version ${waiting.version} is waiting for compliance approval` },
+    ]);
   const pack = getPack(key, variant);
   const before = {
     ...(pack.defaultParameters as object),
@@ -137,9 +156,10 @@ export async function createPackVersion(
         variant,
         version,
         productFamily: current.productFamily,
-        status: "active",
+        status: "pending_approval",
         enabled: current.enabled,
         parameters: parsed.data as Prisma.InputJsonValue,
+        // The requested date; approval moves it to the approval time if that is later.
         effectiveFrom,
         createdBy: user.id,
       },
@@ -149,7 +169,7 @@ export async function createPackVersion(
         bankId: user.bankId,
         entityType: "rule_pack",
         entityId: row.id,
-        action: "parameters_changed",
+        action: "parameters_proposed",
         fromStatus: current.version,
         toStatus: version,
         actorId: user.id,
@@ -159,6 +179,59 @@ export async function createPackVersion(
       },
     });
     return { ...view(row), key, variant, diff };
+  });
+}
+
+/**
+ * Compliance approves or rejects a proposed version (D-074). Approval makes it live from the
+ * later of its requested date and now; the proposer can never approve their own change.
+ */
+export async function reviewPackVersion(
+  prisma: PrismaClient,
+  user: ConsoleUser,
+  id: string,
+  action: "approve" | "reject",
+  comment: string | undefined,
+  now: Date,
+) {
+  const row = await prisma.rulePack.findFirst({ where: { id, bankId: user.bankId } });
+  if (!row) throw notFound();
+  if (row.status !== "pending_approval")
+    throw new ConsoleValidationError("invalid_transition", [
+      { path: "status", message: `version ${row.version} is ${row.status}` },
+    ]);
+  if (row.createdBy === user.id) throw new HttpError(403, "forbidden");
+  const approve = action === "approve";
+  if (!approve && !comment?.trim())
+    throw new ConsoleValidationError("reason_required", [
+      { path: "comment", message: "say why the change is rejected" },
+    ]);
+  return prisma.$transaction(async (tx) => {
+    const updated = await tx.rulePack.update({
+      where: { id },
+      data: approve
+        ? {
+            status: "active",
+            effectiveFrom: row.effectiveFrom > now ? row.effectiveFrom : now,
+            approvedBy: user.id,
+            approvedAt: now,
+          }
+        : { status: "rejected" },
+    });
+    await tx.approvalLog.create({
+      data: {
+        bankId: user.bankId,
+        entityType: "rule_pack",
+        entityId: id,
+        action: approve ? "parameters_approved" : "parameters_rejected",
+        fromStatus: "pending_approval",
+        toStatus: approve ? "active" : "rejected",
+        actorId: user.id,
+        comment: comment ?? null,
+        at: now,
+      },
+    });
+    return { ...view(updated), key: row.key, variant: row.variant };
   });
 }
 

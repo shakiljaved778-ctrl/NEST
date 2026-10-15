@@ -113,7 +113,11 @@ enum TxnType {
 
 enum RulePackStatus {
   draft
+  /// Proposed by product; never served until compliance approves it (D-074)
+  pending_approval
   active
+  /// Turned down by compliance; kept for the record
+  rejected
   retired
 }
 
@@ -501,6 +505,9 @@ model RulePack {
   effectiveFrom DateTime
   createdAt     DateTime       @default(now())
   createdBy     String?
+  /// Compliance approval of a proposed version (four eyes, D-074)
+  approvedBy    String?
+  approvedAt    DateTime?
 
   bank Bank @relation(fields: [bankId], references: [id], onDelete: Cascade)
 

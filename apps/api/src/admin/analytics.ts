@@ -2,6 +2,16 @@ import type { PrismaClient } from "@amil/db";
 import { isPackKey, VALUE_AT_STAKE_FACT } from "@amil/rule-packs";
 import { D, type Dec, toMoneyString } from "@amil/rules-engine";
 
+/**
+ * An option that avoids the loss: not one that continues the action (`continue_*`, `settle_now`)
+ * and not "talk to someone" (help, not a choice).
+ */
+export const isLossAvoiding = (optionKey: string | null): boolean =>
+  !!optionKey &&
+  !optionKey.startsWith("continue_") &&
+  optionKey !== "settle_now" &&
+  optionKey !== "talk_to_someone";
+
 const pct = (n: number, d: number) => (d === 0 ? null : Math.round((n / d) * 1000) / 10);
 function percentile(sorted: number[], p: number): number | null {
   if (!sorted.length) return null;
@@ -14,7 +24,9 @@ function percentile(sorted: number[], p: number): number | null {
  * - customer responses (continued / chose an option / talk to someone / dismissed);
  * - reconsidered actions: an action insight answered without "continued" (the customer chose
  *   another path, asked for help or dismissed, rather than going ahead);
- * - value surfaced (sum of each pack's value-at-stake fact) and protected (on reconsidered ones);
+ * - value surfaced (sum of each pack's value-at-stake fact) and protected: only where the
+ *   customer chose an option that avoids the loss (not "continue", not "talk to someone", not a
+ *   dismissal), the defensible reading for a bank's board (D-076);
  * - validator rejection rate and check latency (p50 / p95).
  */
 export async function dashboard(prisma: PrismaClient, bankId: string, from: Date, to: Date) {
@@ -31,7 +43,7 @@ export async function dashboard(prisma: PrismaClient, bankId: string, from: Date
       validatorResult: true,
       latencyMs: true,
       facts: true,
-      responses: { select: { action: true } },
+      responses: { select: { action: true, optionKey: true } },
     },
   });
   const shown = events.filter((e) => e.applicable && e.templateKey && isPackKey(e.rulePackKey));
@@ -40,6 +52,7 @@ export async function dashboard(prisma: PrismaClient, bankId: string, from: Date
   const responses = { continued: 0, chose_option: 0, talk_to_someone: 0, dismissed: 0 };
   let answered = 0;
   let reconsidered = 0;
+  let lossAvoided = 0;
   let surfaced: Dec = D(0);
   let protectedValue: Dec = D(0);
   for (const e of shown) {
@@ -58,8 +71,9 @@ export async function dashboard(prisma: PrismaClient, bankId: string, from: Date
     if (e.trigger.startsWith("action:") && e.responses.length) {
       answered++;
       const kinds = new Set(e.responses.map((r) => r.action));
-      if (!kinds.has("continued")) {
-        reconsidered++;
+      if (!kinds.has("continued")) reconsidered++;
+      if (e.responses.some((r) => r.action === "chose_option" && isLossAvoiding(r.optionKey))) {
+        lossAvoided++;
         protectedValue = protectedValue.plus(value);
       }
     }
@@ -81,6 +95,7 @@ export async function dashboard(prisma: PrismaClient, bankId: string, from: Date
       answered,
       reconsidered,
       reconsideredRatePct: pct(reconsidered, answered),
+      lossAvoidingChoices: lossAvoided,
       valueSurfacedQar: toMoneyString(surfaced),
       valueProtectedQar: toMoneyString(protectedValue),
       validatorRejectionRatePct: pct(rejected, validated.length),

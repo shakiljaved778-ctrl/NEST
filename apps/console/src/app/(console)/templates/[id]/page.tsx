@@ -47,7 +47,8 @@ export default async function TemplatePage({ params }: { params: Promise<{ id: s
             <KillSwitch
               path={`/templates/${t.id}`}
               enabled={t.enabled}
-              canWrite={can(me, "killswitch:write")}
+              canDisable={can(me, "killswitch:disable")}
+              canEnable={can(me, "killswitch:enable")}
               name={`template ${t.key} (${t.locale})`}
             />
           ) : null

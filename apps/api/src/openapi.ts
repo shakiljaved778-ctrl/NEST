@@ -275,7 +275,7 @@ function registerConsolePaths(registry: Registry, hmacName: string, errors: Erro
   route(
     "post",
     "/v1/admin/rule-packs/{key}/{variant}/versions",
-    "New parameter version (validated against the pack schema; diff recorded)",
+    "Propose a parameter version (validated against the pack schema; diff recorded; served only once compliance approves it)",
     "packs:write",
     { params: Admin.PackParams, ...body(Admin.PackVersionRequest) },
     201,
@@ -283,9 +283,16 @@ function registerConsolePaths(registry: Registry, hmacName: string, errors: Erro
   route(
     "patch",
     "/v1/admin/rule-packs/{key}/{variant}",
-    "Pack kill switch (disabled packs return kind: none)",
-    "killswitch:write",
+    "Pack kill switch (disabled packs return kind: none). Turning off needs a reason (killswitch:disable); turning on needs killswitch:enable",
+    "killswitch:disable",
     { params: Admin.PackParams, ...body(Admin.EnabledRequest) },
+  );
+  route(
+    "post",
+    "/v1/admin/rule-packs/versions/{id}/review",
+    "Approve or reject a proposed parameter version (four eyes; never your own proposal)",
+    "packs:approve",
+    { params: Admin.IdParam, ...body(Admin.PackReviewRequest) },
   );
   route("get", "/v1/admin/templates", "Approved copy and drafts", "templates:read", {
     query: Admin.TemplateListQuery,
@@ -321,10 +328,16 @@ function registerConsolePaths(registry: Registry, hmacName: string, errors: Erro
     "templates:read",
     { params: Admin.IdParam, ...body(Admin.TemplateTransitionRequest) },
   );
-  route("patch", "/v1/admin/templates/{id}", "Template kill switch", "killswitch:write", {
-    params: Admin.IdParam,
-    ...body(Admin.EnabledRequest),
-  });
+  route(
+    "patch",
+    "/v1/admin/templates/{id}",
+    "Template kill switch (same rule as packs)",
+    "killswitch:disable",
+    {
+      params: Admin.IdParam,
+      ...body(Admin.EnabledRequest),
+    },
+  );
   route("get", "/v1/admin/approvals", "Recent console changes (approval log)", "packs:read");
   route(
     "get",

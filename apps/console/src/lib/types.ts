@@ -15,6 +15,8 @@ export interface PackVersion {
   effectiveFrom: string;
   createdAt: string;
   createdBy: string;
+  approvedBy: string | null;
+  approvedAt: string | null;
   parameters: Record<string, unknown>;
 }
 export interface PackFact {
@@ -33,6 +35,10 @@ export interface Pack {
   defaults: Record<string, unknown>;
   current: PackVersion | null;
   scheduled: PackVersion[];
+  /** Proposed versions waiting for compliance (D-074), with the change against the live one. */
+  pending: (PackVersion & {
+    diff: { before: Record<string, unknown>; after: Record<string, unknown> };
+  })[];
   versions: PackVersion[];
 }
 
@@ -104,6 +110,7 @@ export interface Dashboard {
     answered: number;
     reconsidered: number;
     reconsideredRatePct: number | null;
+    lossAvoidingChoices: number;
     valueSurfacedQar: string;
     valueProtectedQar: string;
     validatorRejectionRatePct: number | null;

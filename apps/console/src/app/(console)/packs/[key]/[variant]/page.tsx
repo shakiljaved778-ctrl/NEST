@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { KillSwitch } from "@/components/kill-switch";
 import { PageHeader, Panel, Section } from "@/components/page-header";
+import { PackReview } from "@/components/pack-review";
 import { ParamEditor } from "@/components/param-editor";
 import { adminGet } from "@/lib/api";
 import { fmtDateTime, packLabel } from "@/lib/labels";
@@ -60,7 +61,8 @@ export default async function PackPage({
           <KillSwitch
             path={path}
             enabled={pack.current.enabled}
-            canWrite={can(me, "killswitch:write")}
+            canDisable={can(me, "killswitch:disable")}
+            canEnable={can(me, "killswitch:enable")}
             name={`${packLabel(key)} (${variant})`}
           />
         }
@@ -73,8 +75,8 @@ export default async function PackPage({
                 role="status"
                 className="mb-3 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"
               >
-                Saved as version {saved}. It applies from its effective date; the next check uses
-                it.
+                Proposed as version {saved}. It applies once compliance approves it, from its
+                requested date or the approval time, whichever is later.
               </p>
             ) : null}
             <Panel>
@@ -90,6 +92,42 @@ export default async function PackPage({
               />
             </Panel>
           </Section>
+          {pack.pending.map((p) => (
+            <Section key={p.id} title={`Proposed version ${p.version}`}>
+              <Panel className="space-y-3" data-testid="pending-version">
+                <p className="text-xs text-ink-muted">
+                  Proposed by {p.createdBy} on {fmtDateTime(p.createdAt)}; requested from{" "}
+                  {fmtDateTime(p.effectiveFrom)}.
+                </p>
+                <table className="data">
+                  <thead>
+                    <tr>
+                      <th>Parameter</th>
+                      <th>Live</th>
+                      <th>Proposed</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.keys(p.diff.after).map((k) => (
+                      <tr key={k}>
+                        <td className="font-mono text-xs">{k}</td>
+                        <td className="font-mono text-xs text-red-800">
+                          {JSON.stringify(p.diff.before[k] ?? null)}
+                        </td>
+                        <td className="font-mono text-xs text-emerald-800">
+                          {JSON.stringify(p.diff.after[k] ?? null)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <PackReview
+                  versionId={p.id}
+                  canApprove={can(me, "packs:approve") && p.createdBy !== me.user.id}
+                />
+              </Panel>
+            </Section>
+          ))}
           {pack.scheduled.length ? (
             <Section title="Scheduled">
               <Panel>
@@ -110,7 +148,7 @@ export default async function PackPage({
                   <tr>
                     <th>Version</th>
                     <th>Effective from</th>
-                    <th>By</th>
+                    <th>Proposed / approved by</th>
                     <th>Changed</th>
                   </tr>
                 </thead>
@@ -120,9 +158,17 @@ export default async function PackPage({
                       <td className="tabular-nums">
                         {v.version}{" "}
                         {v.id === pack.current?.id ? <Badge tone="brand">live</Badge> : null}
+                        {v.status === "pending_approval" ? (
+                          <Badge tone="warning">awaiting approval</Badge>
+                        ) : v.status === "rejected" ? (
+                          <Badge>rejected</Badge>
+                        ) : null}
                       </td>
                       <td className="text-xs">{fmtDateTime(v.effectiveFrom)}</td>
-                      <td className="text-xs">{v.createdBy}</td>
+                      <td className="text-xs">
+                        {v.createdBy}
+                        {v.approvedBy ? ` / ${v.approvedBy}` : ""}
+                      </td>
                       <td className="font-mono text-xs">
                         {changedKeys(v.parameters, pack.versions[i + 1]?.parameters)
                           .map(

@@ -71,7 +71,7 @@ export default async function DashboardPage({
         <Kpi
           label="Estimated value protected"
           value={qar(t.valueProtectedQar)}
-          hint={`${qar(t.valueSurfacedQar)} surfaced in total`}
+          hint={`${t.lossAvoidingChoices} loss-avoiding choices · ${qar(t.valueSurfacedQar)} surfaced`}
         />
         <Kpi
           label="Validator rejections"
@@ -118,8 +118,10 @@ export default async function DashboardPage({
               </p>
               <p>
                 <strong className="text-ink">Value protected:</strong> the sum of each pack&apos;s
-                computed value at stake (for example the avoidable loss on a card closure) on
-                reconsidered insights. An estimate: AMIL never knows what the customer did next.
+                computed value at stake (for example the avoidable loss on a card closure) where the
+                customer chose the option that avoids the loss. Continuing, asking to talk to
+                someone or dismissing does not count. An estimate: AMIL never knows what the
+                customer did next.
               </p>
               <p>
                 <strong className="text-ink">Validator rejections:</strong> model wordings rejected

@@ -10,12 +10,13 @@ import type { Pack } from "@/lib/types";
 export default async function PacksPage() {
   const me = await requirePermission("packs:read");
   const { packs } = await adminGet<{ packs: Pack[] }>("/rule-packs");
-  const canKill = can(me, "killswitch:write");
+  const canDisable = can(me, "killswitch:disable");
+  const canEnable = can(me, "killswitch:enable");
   return (
     <>
       <PageHeader
         title="Rule packs"
-        description="Each pack computes one decision's facts with the bank's own parameters. Turn a pack off to stop it at once (customers see no insight, never an error); open a pack to change its parameters."
+        description="Each pack computes one decision's facts with the bank's own parameters. Turn a pack off to stop it at once (customers see no insight, never an error; a reason is required, and only compliance turns it back on). Open a pack to propose new parameters: compliance approves them before they apply."
       />
       <Panel className="p-0">
         <table className="data">
@@ -48,7 +49,12 @@ export default async function PacksPage() {
                       {p.variant}
                     </Badge>
                   </td>
-                  <td className="tabular-nums">{p.current?.version ?? "–"}</td>
+                  <td className="tabular-nums">
+                    {p.current?.version ?? "–"}{" "}
+                    {p.pending.length ? (
+                      <Badge tone="warning">{p.pending[0]?.version} awaiting approval</Badge>
+                    ) : null}
+                  </td>
                   <td className="text-xs">
                     {p.current ? fmtDateTime(p.current.effectiveFrom) : "–"}
                   </td>
@@ -63,7 +69,8 @@ export default async function PacksPage() {
                     <KillSwitch
                       path={`/rule-packs/${p.key}/${p.variant}`}
                       enabled={p.current?.enabled ?? false}
-                      canWrite={canKill}
+                      canDisable={canDisable}
+                      canEnable={canEnable}
                       name={name}
                     />
                   </td>

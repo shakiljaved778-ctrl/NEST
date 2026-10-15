@@ -4,7 +4,13 @@ import { auditEvent, complaints, exportAudit, searchAudit, verifyChain } from ".
 import { dashboard } from "../admin/analytics";
 import { compliancePack } from "../admin/compliance";
 import { authenticateConsole } from "../admin/guard";
-import { createPackVersion, listPacks, setPackEnabled } from "../admin/packs";
+import {
+  ConsoleValidationError,
+  listPacks,
+  proposePackVersion,
+  reviewPackVersion,
+  setPackEnabled,
+} from "../admin/packs";
 import { permissionsOf } from "../admin/rbac";
 import { mintConsoleToken } from "../admin/session";
 import {
@@ -24,6 +30,7 @@ import {
   EnabledRequest,
   IdParam,
   PackParams,
+  PackReviewRequest,
   PackVersionRequest,
   TemplateDraftRequest,
   TemplateListQuery,
@@ -103,13 +110,30 @@ export function adminRoutes(app: FastifyInstance, deps: V1Deps): void {
     const body = parseOr400(PackVersionRequest, req.body);
     return reply
       .code(201)
-      .send(await createPackVersion(deps.prisma, user, key, variant, body, deps.clock()));
+      .send(await proposePackVersion(deps.prisma, user, key, variant, body, deps.clock()));
   });
 
-  app.patch("/v1/admin/rule-packs/:key/:variant", async (req) => {
-    const user = await auth(req, "killswitch:write");
-    const { key, variant } = parseOr400(PackParams, req.params);
+  app.post("/v1/admin/rule-packs/versions/:id/review", async (req) => {
+    const user = await auth(req, "packs:approve");
+    const { id } = parseOr400(IdParam, req.params);
+    const body = parseOr400(PackReviewRequest, req.body);
+    return reviewPackVersion(deps.prisma, user, id, body.action, body.comment, deps.clock());
+  });
+
+  /** Kill switch rule (D-075): off needs a reason; on needs compliance. */
+  const killSwitch = async (req: FastifyRequest) => {
     const body = parseOr400(EnabledRequest, req.body);
+    const user = await auth(req, body.enabled ? "killswitch:enable" : "killswitch:disable");
+    if (!body.enabled && !body.comment?.trim())
+      throw new ConsoleValidationError("reason_required", [
+        { path: "comment", message: "say why it is being turned off" },
+      ]);
+    return { user, body };
+  };
+
+  app.patch("/v1/admin/rule-packs/:key/:variant", async (req) => {
+    const { key, variant } = parseOr400(PackParams, req.params);
+    const { user, body } = await killSwitch(req);
     return setPackEnabled(
       deps.prisma,
       user,
@@ -162,9 +186,8 @@ export function adminRoutes(app: FastifyInstance, deps: V1Deps): void {
   });
 
   app.patch("/v1/admin/templates/:id", async (req) => {
-    const user = await auth(req, "killswitch:write");
     const { id } = parseOr400(IdParam, req.params);
-    const body = parseOr400(EnabledRequest, req.body);
+    const { user, body } = await killSwitch(req);
     return setTemplateEnabled(deps.prisma, user, id, body.enabled, body.comment, deps.clock());
   });
 

@@ -129,7 +129,7 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
   });
 
   describe("acceptance", () => {
-    it("changing the point value in the console changes Khalid's next insight", async () => {
+    it("changing the point value in the console changes Khalid's next insight (once compliance approves)", async () => {
       expect((await check()).card?.headline).toBe(
         "Closing this card forfeits 42,000 points (about QAR 420.00)",
       );
@@ -143,37 +143,51 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
         },
       );
       expect(res.statusCode).toBe(201);
+      const proposed = res.json<{ id: string; version: string; status: string }>();
       expect(res.json()).toMatchObject({
         version: "1.1.1",
+        status: "pending_approval",
         diff: {
           before: { programmePointValueQar: null },
           after: { programmePointValueQar: "0.0125" },
         },
       });
+      // Four eyes (D-074): a proposal is never served, and product cannot approve it.
+      expect((await check()).card?.headline).toContain("QAR 420.00");
+      const review = `/v1/admin/rule-packs/versions/${proposed.id}/review`;
+      expect((await as("product", "POST", review, { action: "approve" })).statusCode).toBe(403);
+      const approved = await as("compliance", "POST", review, {
+        action: "approve",
+        comment: "Matches the programme terms",
+      });
+      expect(approved.json()).toMatchObject({ status: "active", approvedBy: "cu_compliance" });
       const next = await check();
       expect(next.card?.headline).toBe(
         "Closing this card forfeits 42,000 points (about QAR 525.00)",
       );
       const event = await prisma.insightEvent.findUnique({ where: { id: next.insightId } });
       expect(event?.rulePackVersion).toBe("1.1.1");
-      // The change is logged with its diff and its author.
-      const log = await prisma.approvalLog.findFirst({
-        where: { action: "parameters_changed" },
-        orderBy: { at: "desc" },
+      // Both steps are logged with their author.
+      const log = await prisma.approvalLog.findMany({
+        where: { entityId: proposed.id },
+        orderBy: [{ at: "asc" }, { id: "asc" }],
       });
-      expect([log?.actorId, log?.comment]).toEqual(["cu_product", "Programme rate review"]);
+      expect(log.map((l) => [l.action, l.actorId])).toEqual([
+        ["parameters_proposed", "cu_product"],
+        ["parameters_approved", "cu_compliance"],
+      ]);
     });
 
-    it("disabling card.close removes the insight immediately, and enabling brings it back", async () => {
-      const off = await as("compliance", "PATCH", "/v1/admin/rule-packs/card.close/conventional", {
-        enabled: false,
-        comment: "Incident",
-      });
+    it("disabling card.close removes the insight immediately; only compliance turns it back on (D-075)", async () => {
+      const path = "/v1/admin/rule-packs/card.close/conventional";
+      const noReason = await as("product", "PATCH", path, { enabled: false });
+      expect(noReason.statusCode).toBe(400);
+      expect(noReason.json()).toMatchObject({ error: "reason_required" });
+      const off = await as("product", "PATCH", path, { enabled: false, comment: "Incident" });
       expect(off.json()).toEqual({ key: "card.close", variant: "conventional", enabled: false });
       expect((await check()).kind).toBe("none");
-      await as("compliance", "PATCH", "/v1/admin/rule-packs/card.close/conventional", {
-        enabled: true,
-      });
+      expect((await as("product", "PATCH", path, { enabled: true })).statusCode).toBe(403);
+      await as("compliance", "PATCH", path, { enabled: true, comment: "Resolved" });
       expect((await check()).kind).toBe("insight");
     });
 
@@ -261,6 +275,45 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
       });
       expect(checkWithConsole.statusCode).toBe(401);
       expect((await app.inject({ method: "GET", url: "/v1/admin/me" })).statusCode).toBe(401);
+    });
+
+    it("one proposal at a time; a rejection needs a reason; nobody approves their own change", async () => {
+      const propose = () =>
+        as("product", "POST", "/v1/admin/rule-packs/deposit.break/conventional/versions", {
+          parameters: { dayCountBasis: 360 },
+        });
+      const first = (await propose()).json<{ id: string; status: string }>();
+      expect(first.status).toBe("pending_approval");
+      const again = await propose();
+      expect(again.json()).toMatchObject({ error: "pending_exists" });
+      const review = `/v1/admin/rule-packs/versions/${first.id}/review`;
+      const noReason = await as("compliance", "POST", review, { action: "reject" });
+      expect(noReason.json()).toMatchObject({ error: "reason_required" });
+      const rejected = await as("compliance", "POST", review, {
+        action: "reject",
+        comment: "Not our product terms",
+      });
+      expect(rejected.json()).toMatchObject({ status: "rejected" });
+      expect((await as("compliance", "POST", review, { action: "approve" })).json()).toMatchObject({
+        error: "invalid_transition",
+      });
+      // Self-approval is refused even if a role ever allowed both steps.
+      const own = (await propose()).json<{ id: string }>();
+      await prisma.rulePack.update({ where: { id: own.id }, data: { createdBy: "cu_compliance" } });
+      expect(
+        (
+          await as("compliance", "POST", `/v1/admin/rule-packs/versions/${own.id}/review`, {
+            action: "approve",
+          })
+        ).statusCode,
+      ).toBe(403);
+      const pending = (await as("viewer", "GET", "/v1/admin/rule-packs")).json<{
+        packs: { key: string; variant: string; pending: { id: string }[] }[];
+      }>();
+      expect(
+        pending.packs.find((p) => p.key === "deposit.break" && p.variant === "conventional")
+          ?.pending,
+      ).toEqual([expect.objectContaining({ id: own.id })]);
     });
 
     it("parameter validation rejects bad values before anything is stored", async () => {
@@ -410,9 +463,12 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
       const live = await prisma.template.findFirst({
         where: { key: "card.close.conventional.critical", locale: "en", status: "approved" },
       });
-      await as("product", "PATCH", `/v1/admin/templates/${live?.id}`, { enabled: false });
+      await as("product", "PATCH", `/v1/admin/templates/${live?.id}`, {
+        enabled: false,
+        comment: "Wording under review",
+      });
       expect((await check()).kind).toBe("none");
-      await as("product", "PATCH", `/v1/admin/templates/${live?.id}`, { enabled: true });
+      await as("compliance", "PATCH", `/v1/admin/templates/${live?.id}`, { enabled: true });
       expect((await check()).kind).toBe("insight");
     });
 
@@ -525,6 +581,7 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
         totals: {
           shown: number;
           reconsidered: number;
+          lossAvoidingChoices: number;
           valueProtectedQar: string;
           latencyP95Ms: number;
         };
@@ -533,6 +590,9 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
       }>();
       expect(d.totals.shown).toBeGreaterThan(0);
       expect(d.totals.reconsidered).toBeGreaterThan(0);
+      // Only loss-avoiding choices count as value protected (D-076): Khalid chose Redeem points.
+      expect(d.totals.lossAvoidingChoices).toBeGreaterThan(0);
+      expect(d.totals.lossAvoidingChoices).toBeLessThanOrEqual(d.totals.reconsidered);
       expect(Number(d.totals.valueProtectedQar)).toBeGreaterThan(0);
       expect(d.byPack.find((p) => p.key === "card.close")?.critical).toBeGreaterThan(0);
       expect(d.responses.chose_option).toBeGreaterThan(0);
@@ -561,10 +621,10 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
         paths: Record<string, Record<string, { security: Record<string, unknown>[] }>>;
       }>();
       const admin = Object.entries(doc.paths).filter(([p]) => p.startsWith("/v1/admin/"));
-      expect(admin.map(([p]) => p)).toHaveLength(19);
+      expect(admin.map(([p]) => p)).toHaveLength(20);
       const ops = admin.flatMap(([, methods]) => Object.values(methods));
-      expect(ops).toHaveLength(21);
-      expect(ops.filter((o) => "ConsoleSession" in (o.security[0] ?? {}))).toHaveLength(19);
+      expect(ops).toHaveLength(22);
+      expect(ops.filter((o) => "ConsoleSession" in (o.security[0] ?? {}))).toHaveLength(20);
     });
 
     it("records sign-ins and customer-level reads with the ref hashed; logs are append-only (D-068)", async () => {
@@ -580,7 +640,8 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
           "complaints_lookup",
           "audit_export",
           "template.approved",
-          "rule_pack.parameters_changed",
+          "rule_pack.parameters_proposed",
+          "rule_pack.parameters_approved",
         ]),
       );
       const lookup = entries.find((e) => e.action === "complaints_lookup");
