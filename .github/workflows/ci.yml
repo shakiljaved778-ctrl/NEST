@@ -139,7 +139,7 @@ jobs:
           retention-days: 7
 
   terraform:
-    name: Terraform (fmt, validate)
+    name: Terraform (fmt, validate, test)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -156,6 +156,10 @@ jobs:
 
       - name: Validate
         run: terraform init -backend=false -input=false && terraform validate
+
+      # Plan-level checks with mocked providers: residency, two-stage apply, secret access.
+      - name: Test
+        run: terraform test
 
   # The demo from a fresh clone: one command (D-072). Builds every image and smoke-tests the stack.
   compose:
@@ -178,6 +182,19 @@ jobs:
           # Setup loaded the dashboard's demo traffic and today's alerts.
           docker compose logs setup | grep -E "insights shown|already has events"
           docker compose logs setup | grep "rewards.expiry: ran"
+
+      # The production operations image (D-079): migrations, then the bank bootstrap (D-080).
+      - name: Ops image (migrate, bootstrap)
+        run: |
+          docker build -f apps/api/Dockerfile --target ops -t amil-ops .
+          db="DATABASE_URL=postgresql://amil:amil@postgres:5432/amil?schema=public"
+          docker run --rm --network amil_default -e "$db" amil-ops | tee ops.log
+          grep -q "No pending migrations" ops.log
+          docker run --rm --network amil_default -e "$db" \
+            -v "$PWD/infra/bank-config.example.json:/config/bank.json:ro" \
+            amil-ops node_modules/.bin/tsx src/scripts/bootstrap-bank.ts /config/bank.json \
+            | tee bootstrap.log
+          grep -q "Bootstrapped bank_example" bootstrap.log
 
       - name: Logs
         if: failure()

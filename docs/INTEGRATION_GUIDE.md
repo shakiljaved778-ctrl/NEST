@@ -47,6 +47,11 @@ You get one or more HMAC keys per environment:
 
 Keep keys in your secret store. Never ship them to a browser or mobile app.
 
+**mTLS** is optional for pilots (D-078). Calls are protected by TLS at your edge, the HMAC
+signature, the timestamp window and single-use nonces. If your security standards require client
+certificates as well, enforce them on the API listener of your Application Gateway. No AMIL change
+is needed.
+
 ### Signing a request
 
 Every server call carries four headers:
@@ -272,11 +277,13 @@ core systems directly.
 
 ## 10. Going live checklist
 
-- [ ] HMAC keys stored in your secret manager; separate keys for UAT and production
+- [ ] HMAC keys stored in your secret manager; separate keys for UAT and production (received
+      through your secret store, never by email; see DEPLOYMENT.md §3)
 - [ ] App origins added to `WIDGET_ORIGINS`; the API is behind your load balancer and TLS
 - [ ] Consent screen wired to `POST /v1/consents`, including withdrawal
 - [ ] Every AMIL placement has your own "Continue" for `kind: none` and `amil-unavailable`
 - [ ] Deep links for every option key resolve in your app
 - [ ] Copy reviewed and approved in the console (compliance; Sharia for Islamic products)
-- [ ] Pack parameters set to your product terms in the console
+- [ ] Pack parameters set to your product terms: proposed by product, approved by compliance
+- [ ] Each pack switched on by compliance (the bootstrap leaves every pack off)
 - [ ] Product events or a read-only replica feeding AMIL's store

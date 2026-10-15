@@ -80,14 +80,24 @@ is all provable afterwards."_
    - Back on **Audit**, select **Verify hash chain** to check the whole log.
    - Mention **Export CSV/JSON**, and that every one of these lookups is itself recorded under
      **Console activity**.
-4. **The bank stays in control** (switch user to the **Product manager**):
-   - **Rule packs, then Card closure:** parameters are versioned, with a diff and an effective
-     date. Change `programmePointValueQar` to `0.0125`, review, save, and close Khalid's card
-     again in tab 1. It now says **QAR 525.00**. (Clear the value afterwards to return to 420.)
-   - **Kill switch:** turn Card closure off. Khalid's next attempt shows only the bank's own
-     Continue: no insight, no error.
-   - **Templates:** copy changes go draft, then compliance, then Sharia for Islamic copy. Type
+4. **The bank stays in control. Four eyes on every number.**
+   - **Propose (as the Product manager).** Switch user to the **Product manager**, open **Rule
+     packs, then Card closure**, and change `programmePointValueQar` to `0.0125`. Review the diff,
+     give a reason and select **Propose for approval**. _"Product can propose, but nothing changes
+     for customers yet."_
+   - **Approve (as the Compliance officer).** Switch back to **Compliance officer** and approve
+     the proposal in the pending panel. Then close Khalid's card again in tab 1: it now says
+     **QAR 525.00**. _"No one can approve their own change, and every step is logged."_ (Set the
+     value back afterwards, the same way, to return to 420.)
+   - **Kill switch.** As the Product manager, turn Card closure off and give a reason. Khalid's
+     next attempt shows only the bank's own Continue: no insight, no error. _"Anyone accountable
+     can stop it at once. Only compliance can turn it back on."_ The switch is now locked for
+     product, so switch to Compliance and turn it back on.
+   - **Templates.** Copy changes go draft, then compliance, then Sharia for Islamic copy. Type
      "upgrade" into a headline: the banned-term checker flags it live.
+   - **Staff (optional, as the Platform admin).** Okta proves who someone is; AMIL decides what
+     they may do. Admins add people and change roles, but never their own. The bank always keeps
+     a compliance officer.
 
 ## 6:00–7:00: Compliance pack (tab 2)
 
@@ -106,9 +116,9 @@ word, and every insight is provable."_
 
 ## If something goes wrong
 
-| Problem                         | Fix                                                                                              |
-| ------------------------------- | ------------------------------------------------------------------------------------------------ |
-| The insight does not appear     | The bank's own Continue shows instead, by design. Check that the Card closure kill switch is on. |
-| The console asks you to sign in | Pick the staff member again; tokens last 8 hours.                                                |
-| The dashboard is empty          | Run `docker compose run --rm setup` (or `pnpm --filter @amil/api demo:traffic`).                 |
-| Khalid shows QAR 525.00         | Clear `programmePointValueQar` on Card closure (conventional).                                   |
+| Problem                         | Fix                                                                                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| The insight does not appear     | The bank's own Continue shows instead, by design. Check that the Card closure kill switch is on (compliance turns it back on). |
+| The console asks you to sign in | Pick the staff member again; tokens last 8 hours.                                                                              |
+| The dashboard is empty          | Run `docker compose run --rm setup` (or `pnpm --filter @amil/api demo:traffic`).                                               |
+| Khalid shows QAR 525.00         | As product, propose clearing `programmePointValueQar` on Card closure (conventional); approve it as compliance.                |

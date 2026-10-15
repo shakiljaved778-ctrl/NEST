@@ -25,6 +25,22 @@ RUN pnpm --filter @amil/api deploy --prod --legacy /out \
      done \
   && [ "$found" = 1 ] || { echo "no @prisma/client in the deploy" >&2; exit 1; }
 
+# Operations image (D-079): Prisma migrations (the default command) and the bank bootstrap
+# (D-080). The runtime image has no Prisma CLI, so releases run this as a one-off job first.
+FROM build AS ops-build
+RUN pnpm --filter @amil/db deploy --legacy /ops \
+  && cd /ops && node_modules/.bin/prisma generate
+
+FROM node:22-bookworm-slim AS ops
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=ops-build --chown=node:node /ops ./
+USER node
+# Bootstrap: node_modules/.bin/tsx src/scripts/bootstrap-bank.ts /config/bank.json
+CMD ["node_modules/.bin/prisma", "migrate", "deploy"]
+
 # Slim runtime: the bundled API, its production dependencies and nothing else.
 FROM node:22-bookworm-slim AS runtime
 RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \

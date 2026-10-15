@@ -1,0 +1,158 @@
+# Deploy AMIL to a bank's Azure subscription in Qatar Central (D-073). See docs/DEPLOYMENT.md.
+#
+# Manual only. The job runs in the GitHub environment `amil-<env>`, so its required reviewers
+# approve every run before it starts. Azure sign-in is OIDC (no stored Azure secret). The
+# environment holds only identifiers, never secrets: secret values live in the bank's Key Vault.
+#
+# Environment variables (Settings → Environments → amil-<env> → Variables):
+#   AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
+#   TFSTATE_RESOURCE_GROUP, TFSTATE_STORAGE_ACCOUNT, TFSTATE_CONTAINER
+#   TFVARS (the contents of terraform.tfvars for this environment)
+# Repository variable AMIL_DEPLOY_RUNNER: the label of a self-hosted runner inside the bank's
+# network (Key Vault and the registry are private); defaults to ubuntu-latest for a first try
+# with operator_ip_ranges.
+name: Deploy (Azure Qatar Central)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [uat, prod]
+        default: uat
+      plan_only:
+        description: Stop after the plan (review it, then run again to apply)
+        type: boolean
+        default: false
+      bootstrap:
+        description: Run the bank bootstrap after migrations (first release only; safe to repeat)
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ${{ vars.AMIL_DEPLOY_RUNNER || 'ubuntu-latest' }}
+    environment: amil-${{ inputs.environment }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: infra/terraform
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+          terraform_wrapper: false
+
+      - name: Terraform init (state in the bank's storage, Qatar Central)
+        env:
+          TFVARS: ${{ vars.TFVARS }}
+        run: |
+          test -n "$TFVARS" || { echo "Set the TFVARS variable on environment amil-${{ inputs.environment }}" >&2; exit 1; }
+          printf '%s\n' "$TFVARS" > deploy.auto.tfvars
+          terraform init \
+            -backend-config="resource_group_name=${{ vars.TFSTATE_RESOURCE_GROUP }}" \
+            -backend-config="storage_account_name=${{ vars.TFSTATE_STORAGE_ACCOUNT }}" \
+            -backend-config="container_name=${{ vars.TFSTATE_CONTAINER }}" \
+            -backend-config="key=amil-${{ inputs.environment }}.tfstate"
+          echo "TAG=${GITHUB_SHA::12}" >> "$GITHUB_ENV"
+
+      # The registry exists after the first (stage 1) apply; until then there is nothing to push.
+      - name: Build and push images
+        run: |
+          registry="$(terraform output -raw registry 2>/dev/null || true)"
+          if [ -z "$registry" ]; then
+            echo "No registry yet (first apply): skipping images."
+            exit 0
+          fi
+          az acr login --name "${registry%%.*}"
+          cd "$GITHUB_WORKSPACE"
+          docker build -f apps/api/Dockerfile -t "$registry/api:$TAG" .
+          docker build -f apps/api/Dockerfile --target ops -t "$registry/ops:$TAG" .
+          docker build -f apps/console/Dockerfile -t "$registry/console:$TAG" .
+          for image in api ops console; do docker push "$registry/$image:$TAG"; done
+
+      - name: Plan
+        run: |
+          terraform plan -var "image_tag=$TAG" -no-color | tee plan.txt
+          {
+            echo "### Plan for amil-${{ inputs.environment }} at \`$TAG\`"
+            echo '```'
+            grep -E '^(Plan:|No changes|  # )' plan.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Stop here (plan only)
+        if: inputs.plan_only
+        run: echo "Plan only. Run again without plan_only to apply."
+
+      # Migrations run before the new app revisions: update the jobs to the new image first.
+      # Migrations are additive (expand, then contract in a later release), so the running
+      # revision keeps working while they run.
+      - name: Update jobs, then migrate
+        if: ${{ !inputs.plan_only }}
+        run: |
+          terraform apply -auto-approve -var "image_tag=$TAG" -target=azurerm_container_app_job.ops
+          jobs="$(terraform output -json jobs 2>/dev/null || echo '{}')"
+          if [ "$jobs" = "{}" ] || [ "$jobs" = "null" ]; then
+            echo "Stage 1 (deploy_apps = false): no jobs yet."
+            exit 0
+          fi
+          rg="$(terraform output -raw resource_group)"
+          run_job() {
+            local job exec status
+            job="$(echo "$jobs" | jq -r --arg k "$1" '.[$k]')"
+            exec="$(az containerapp job start -g "$rg" -n "$job" --query name -o tsv)"
+            echo "$1: started $exec"
+            for _ in $(seq 1 180); do
+              status="$(az containerapp job execution show -g "$rg" -n "$job" --job-execution-name "$exec" --query properties.status -o tsv)"
+              case "$status" in
+                Succeeded) echo "$1: succeeded"; return 0 ;;
+                Failed | Degraded | Stopped) echo "$1: $status (logs in Log Analytics: ContainerAppConsoleLogs_CL)" >&2; return 1 ;;
+              esac
+              sleep 10
+            done
+            echo "$1: timed out" >&2
+            return 1
+          }
+          run_job migrate
+          if [ "${{ inputs.bootstrap }}" = "true" ]; then run_job bootstrap; fi
+
+      - name: Apply
+        if: ${{ !inputs.plan_only }}
+        run: |
+          terraform apply -auto-approve -var "image_tag=$TAG"
+          {
+            echo "### Deployed \`$TAG\` to amil-${{ inputs.environment }}"
+            echo '```'
+            terraform output
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Clean up
+        if: always()
+        run: rm -f deploy.auto.tfvars plan.txt

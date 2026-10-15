@@ -60,6 +60,7 @@ pnpm db:migrate:dev --name <x>    # create a new migration (dev)
 pnpm db:reset                     # DEV ONLY: drop + re-migrate + seed (wipes the audit trail)
 pnpm audit:verify [bankId]        # verify the audit hash chain
 pnpm db:rotate-pii                # re-encrypt PII under the newest PII_ENCRYPTION_KEYS key
+pnpm db:bootstrap <config.json>   # a real bank's tenant: bank, staff, packs off, copy in review (D-080)
 docker compose up --build         # the whole demo from a fresh clone (setup seeds demo data)
 pnpm --filter @amil/demo-bank build && pnpm --filter @amil/demo-bank e2e   # Playwright (starts API + app)
 pnpm --filter @amil/console --filter @amil/demo-bank build && pnpm --filter @amil/console e2e   # console e2e
@@ -138,6 +139,18 @@ disposable database. They are skipped when it is unset.
   a reason (D-065); the e2e fixture fails on any CSP violation. Spans (`withSpan`, D-070) carry no
   customer references, figures or text. Keep `pnpm audit --prod` clean; transitive fixes go in
   `pnpm-workspace.yaml` overrides (D-069).
+- Pilot rules: pack parameter versions are proposed (`pending_approval`) and only compliance
+  approves them, never their own (D-074). Kill switches: off by product, compliance or admin with
+  a reason; on by compliance only (D-075). Value protected counts only loss-avoiding options
+  (`isLossAvoiding`, D-076). Okta is the console's sign-in when `OKTA_*` is set: roles stay in
+  AMIL and the email must match an active console user (D-077, `apps/console/src/lib/oidc.ts`).
+  Staff changes are admin-only, never on one's own entry, and keep one active compliance officer
+  (D-081).
+- Deployment (`infra/terraform`, Azure Qatar Central, D-073): every resource stays in
+  `qatarcentral`; Terraform writes only secrets it derives, everything else is set out of band;
+  run `terraform fmt`, `validate` and `test` after changes (tests use mocked providers). The API
+  and worker connect as `amil_app` (no DDL); migrations and the bootstrap run from the `ops`
+  Docker target (D-079). Migrations must be additive (expand, then contract in a later release).
 - Widget: `<amil-insight>` (Lit, shadow DOM) is themed only through `--amil-*` CSS variables and
   never navigates; hosts listen for `amil-option` / `amil-ready` / `amil-unavailable`.
 - Product rules on DB rows reach the engine only through `@amil/db/adapters`, which Zod-validate

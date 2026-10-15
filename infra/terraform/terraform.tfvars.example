@@ -1,0 +1,13 @@
+subscription_id    = "00000000-0000-0000-0000-000000000000"
+bank_id            = "bank_example"
+environment        = "uat"
+name_suffix        = "exb"
+widget_origins     = ["https://app.uat.bank.example"]
+console_public_url = "https://amil-console.uat.bank.example"
+okta_issuer        = "https://bank.okta.com/oauth2/default"
+okta_client_id     = "0oa-example-client-id"
+console_key_id     = "exb-console-key"
+
+# Stage 1: false. Stage 2, after images are pushed and secrets are set: true, with the tag.
+deploy_apps = false
+image_tag   = "unset"

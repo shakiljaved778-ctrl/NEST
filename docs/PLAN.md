@@ -48,7 +48,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] PostgreSQL 16, Redis 7 (docker-compose) · [x] BullMQ (Phase 5: proactive worker, schedules mirrored from ProactiveJob, D-039)
 - [x] LangGraph.js assistant (Phase 6)
 - [x] pino structured logs (Phase 1) · [x] OpenTelemetry tracing, OTLP when configured (Phase 8, D-070)
-- [x] `docker-compose.yml`, `Dockerfile` per app (slim API image) · [x] `infra/terraform` skeleton, GCP in-country (Phase 8, D-071)
+- [x] `docker-compose.yml`, `Dockerfile` per app (slim API image, ops image for migrations and the bootstrap, D-079) · [x] `infra/terraform` for Azure Qatar Central with plan tests, and a gated deploy workflow (D-073; replaces the GCP skeleton of D-071)
 - [x] `.env.example`; `ANTHROPIC_API_KEY` optional (mock provider fallback, Phase 3)
 
 ## Section 4: Domain model (Prisma)
@@ -84,7 +84,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 7: API (Phase 3+)
 
-- [x] HMAC-signed server calls (`X-AMIL-Key`, `X-AMIL-Timestamp`, `X-AMIL-Signature`, 5-minute window, single-use signatures), mTLS-ready (D-015)
+- [x] HMAC-signed server calls (`X-AMIL-Key`, `X-AMIL-Timestamp`, `X-AMIL-Signature`, 5-minute window, single-use signatures); mTLS optional for pilots, at the bank's gateway (D-015, D-078)
 - [x] `POST /v1/sessions` (15-minute widget token)
 - [x] `POST/GET/DELETE /v1/consents`
 - [x] `POST /v1/checks` (p95 51 ms measured with mock; model deadline 1.5 s → template, async cache warm)
@@ -94,7 +94,7 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] `POST /v1/compare` (Phase 6, D-049)
 - [x] `POST /v1/assistant/messages` SSE (Phase 6, D-045..D-047)
 - [x] `POST /v1/events` with idempotency key (Phase 5, recorded only in the MVP, D-043)
-- [x] `/v1/admin/*` with RBAC: sign-in, dashboard, rule packs, templates + workflow, approvals, audit, complaints, compliance (Phase 7, D-054..D-062)
+- [x] `/v1/admin/*` with RBAC: sign-in, dashboard, rule packs, templates + workflow, approvals, audit, complaints, compliance (Phase 7, D-054..D-062), staff (D-081)
 - [x] `GET /healthz`, `GET /readyz`, `GET /docs`
 - [x] Errors never leak to the customer UI (generic error codes; no-insight is never an error)
 
@@ -122,12 +122,14 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 
 ## Section 11: Bank console (Phase 7)
 
-- [x] Dashboard (Chart.js): insights by pack and severity, per day, responses, reconsidered actions, estimated value protected, validator rejection rate, latency (D-060)
-- [x] Rule packs: list, kill switch, parameter editor with validation, diff review, effective date, version history, change log (D-056, D-057)
+- [x] Dashboard (Chart.js): insights by pack and severity, per day, responses, reconsidered actions, estimated value protected (loss-avoiding choices only, D-076), validator rejection rate, latency (D-060)
+- [x] Rule packs: list, kill switch, parameter editor with validation, diff review, effective date, version history, change log (D-056, D-057); parameter changes need compliance approval (D-074); kill switch off by product/compliance/admin with a reason, on by compliance only (D-075)
 - [x] Templates: editor, live preview at each severity beside the other language, copy checker as you type, approval workflow product → compliance → Sharia, kill switch, versions and history (D-058, D-059)
 - [x] Audit: search by customer ref (keyed hash), pack and dates; event view with hash and link check; whole-chain verify; CSV and JSON export (D-061)
 - [x] Complaints lookup: what a customer was shown and how they responded, chain verified (D-061)
 - [x] Compliance pack: model card, data flow, fields each pack reads, live redaction proof, retention, consent purposes (D-062)
+- [x] Okta sign-in (OIDC code flow with PKCE); roles stay in AMIL; demo picker off when configured (D-077)
+- [x] Staff: admins add people, change roles, deactivate (never their own access; one compliance officer always kept), audited (D-081)
 
 ## Section 12: Seed data
 
@@ -143,8 +145,8 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] Zod validation on every request (strict schemas), CORS allow-list for widget origins · [x] rate limiting (D-064), helmet headers, nonce CSP for the apps and widget host (D-065)
 - [x] AES-256-GCM application-level PII encryption with KMS interface and key rotation (Phase 8, D-066)
 - [x] RBAC on console with segregation of duties (D-055); console changes in the approval log, sign-ins and customer-level reads in the activity log, both append-only (D-068) · [x] signed request nonce (D-063) · [x] HMAC keys with a purpose (D-067)
-- [x] Integration tests against real PostgreSQL via TEST_DATABASE_URL (D-023) · [x] e2e (Playwright): demo bank (16) and console (7) suites
-- [x] CI: GitHub Actions lint, typecheck, test, build, Playwright e2e (`.github/workflows/ci.yml`) · [x] dependency audit, Terraform validate, Docker demo smoke test (Phase 8, D-069, D-072)
+- [x] Integration tests against real PostgreSQL via TEST_DATABASE_URL (D-023) · [x] e2e (Playwright): demo bank (16) and console (12, including Okta against a mock provider) suites
+- [x] CI: GitHub Actions lint, typecheck, test, build, Playwright e2e (`.github/workflows/ci.yml`) · [x] dependency audit, Terraform validate and test, Docker demo smoke test, ops image (Phase 8, D-069, D-072, D-079)
 
 ## Section 14: Phases
 
@@ -156,6 +158,8 @@ This file restates the master prompt as a checklist. It is kept in sync with the
 - [x] **Phase 6: Ask AMIL + compare.** Khalid card-close answer with fact chips; refuses investment advice; compare matches engine
 - [x] **Phase 7: Bank console.** Point-value change flows to next insight; kill switch immediate; complaints lookup shows Khalid
 - [x] **Phase 8: Hardening + demo.** Headers, encryption, rate limits, CI, Terraform, DEMO_SCRIPT, INTEGRATION_GUIDE, SECURITY; fresh clone to running demo in ≤ 3 commands
+- [x] **Pilot preparation** (after Phase 8; `docs/pilot-preparation-report.md`): the answers to the Phase 8 questions (D-073..D-078), the ops image and bank bootstrap (D-079, D-080), staff management (D-081), `docs/DEPLOYMENT.md`
+- [ ] **Per pilot bank:** Azure subscription, Okta app, Application Gateway, data feed into AMIL's store (DEPLOYMENT.md §1 and §6)
 
 ## Section 15: Voice and copy rules (all templates)
 

@@ -25,7 +25,7 @@ within 2 business days.
 | Data stays in-country               | The model sees only a de-identified fact template (`redacted` mode, fail-closed redactor with property tests), or a model inside the bank (`in_country`), or none (`off`). Ask AMIL never sends the customer's free text to a model (D-045).                             |
 | Everything audited                  | Append-only, hash-chained audit log of every evaluation, shown or suppressed (non-negotiable 7).                                                                                                                                                                         |
 | The bank approves all copy          | Only approved copy is served; Islamic copy only after Sharia approval.                                                                                                                                                                                                   |
-| Kill switches                       | Per pack and per template, effective immediately. The customer sees no insight, never an error.                                                                                                                                                                          |
+| Kill switches                       | Per pack and per template, effective immediately. The customer sees no insight, never an error. Product, compliance or an admin can turn one off, with a reason; only compliance turns it back on (D-075).                                                               |
 
 ## Controls
 
@@ -39,11 +39,26 @@ within 2 business days.
   key can do nothing else.
 - **Customer sessions** are 15-minute JWTs (HS256) bound to one customer and to scopes. A
   session can never act for another customer.
-- **Console staff** get 8-hour tokens with their own audience and key (D-054):
-  - the user and role are re-read on every request;
-  - RBAC with segregation of duties: no role both drafts and approves copy (D-055);
+- **Console staff sign in with Okta** (D-077):
+  - OIDC authorization code flow with PKCE and a confidential client;
+  - the ID token's signature, issuer, audience, nonce, expiry and `email_verified` are checked;
+  - the email must belong to an active AMIL console user, and the role comes from AMIL, never
+    from Okta;
+  - the demo staff picker is off whenever Okta is configured.
+- **Console sessions** are 8-hour tokens with their own audience and key (D-054):
+  - the user and role are re-read on every request, so deactivation and role changes apply at
+    once;
   - in the browser, the token stays in an httpOnly, `SameSite=Strict`, `Secure` cookie. A
     same-origin proxy adds it, and rejects writes from other origins.
+- **Segregation of duties** (D-055, D-074, D-081):
+  - no role both drafts and approves copy;
+  - pack parameters are proposed by product and approved by compliance, never by the person who
+    proposed them;
+  - only admins change staff access, never their own, and the bank always keeps an active
+    compliance officer.
+- **mTLS** between the bank and AMIL is optional for pilots (D-078). HMAC, timestamps, single-use
+  nonces and private networking protect the calls; a bank that wants client certificates
+  enforces them at its Application Gateway.
 
 ### Data protection
 
@@ -59,9 +74,15 @@ within 2 business days.
   - **Who holds the key:** AMIL's own services never read these columns and do not hold the key.
 - **The audit log never stores the customer reference**, only a keyed HMAC of it (D-009).
   Console searches match by the same hash.
-- **In transit:** TLS terminates at the bank's load balancer. The Terraform skeleton enforces
-  TLS to PostgreSQL and Redis, and keeps both on private IPs only (D-071).
-- **Database encryption:** Cloud SQL uses a customer-managed key in-country (CMEK).
+- **In transit:** TLS terminates at the bank's Application Gateway. The Terraform (Azure Qatar
+  Central, D-073) enforces TLS 1.2+ to PostgreSQL and Redis and keeps every data store, Key Vault
+  and the registry on private endpoints.
+- **Database encryption:** PostgreSQL uses a customer-managed HSM key in the bank's Key Vault in
+  Qatar Central (CMEK). Backups stay in Qatar: there is no geo-redundant copy.
+- **Database privileges:** the API and worker connect as `amil_app`, which has row access and no
+  DDL. Only the migrate job uses the schema owner (D-079).
+- **Secrets:** they are in Key Vault, and each workload's identity can read only its own.
+  Secrets the bank issues never enter Terraform state.
 - **Logs** redact `authorization`, cookies and the HMAC headers.
 - **Traces** carry route patterns, pack keys and outcomes, never customer references, figures or
   text (D-070).
@@ -109,8 +130,11 @@ within 2 business days.
   pinned with pnpm overrides until the parents ship them (D-069).
 - **Lockfile.** It is frozen in CI and image builds. Images run as a non-root user. The API image
   contains production dependencies only.
-- **CI checks:** format, lint, typecheck, tests, build, both Playwright suites, the Docker demo,
-  and Terraform validation.
+- **CI checks:** format, lint, typecheck, tests, build, both Playwright suites, the Docker demo
+  and the ops image, and Terraform `validate` and `test` (plan checks for residency, private data
+  stores and secret access).
+- **Deployments** are manual, approved per run through a GitHub environment, and sign in to Azure
+  with OIDC. No Azure secret is stored in GitHub (`.github/workflows/deploy-azure.yml`).
 
 ## Tests that guard these controls
 
@@ -120,6 +144,11 @@ within 2 business days.
 | Number validator          | `packages/gateway` adversarial suite (Arabic-Indic, full-width, zero-width, spelled numbers) |
 | HMAC, replay, nonce       | `apps/api/src/auth/auth.test.ts`                                                             |
 | Key purposes, RBAC        | `apps/api/src/phase7.int.test.ts`                                                            |
+| Four eyes, kill switches  | `apps/api/src/phase7.int.test.ts`, `apps/console/e2e/console.spec.ts`                        |
+| Okta sign-in              | `apps/console/src/lib/oidc.test.ts`, `apps/console/e2e/okta.spec.ts` (mock OIDC provider)    |
+| Staff access              | `apps/api/src/staff.int.test.ts`, `apps/console/e2e/console.spec.ts`                         |
+| Bank bootstrap            | `packages/db/src/bootstrap.test.ts`                                                          |
+| Infrastructure            | `infra/terraform/tests/plan.tftest.hcl`                                                      |
 | Headers, CSP, rate limits | `apps/api/src/app.test.ts`, `packages/ui/src/security.test.ts`, e2e CSP fixture              |
 | PII encryption, rotation  | `packages/db/src/pii.test.ts`, `apps/api/src/phase8.int.test.ts`                             |
 | Append-only logs          | `packages/db/src/audit-triggers.int.test.ts`, `apps/api/src/phase7.int.test.ts`              |
@@ -128,10 +157,9 @@ within 2 business days.
 
 ## Known limits of this demo
 
-- **Console sign-in** is a staff picker. A bank puts its SSO (OIDC/SAML via an identity-aware
-  proxy) in front of the console backend.
+- **Console sign-in in the demo** is a staff picker. Deployments use Okta (D-077), and the
+  picker is then off.
 - **Demo-only keys.** The demo uses fixed keys from `.env.example`. A deployment draws every
-  secret from its secret manager and its KMS (see `infra/terraform`).
-- **mTLS** between the bank and AMIL is not implemented. It is an open question for pilots.
+  secret from Key Vault (see `docs/DEPLOYMENT.md`).
 - **Shared database.** AMIL and the demo bank read one database (D-024). In a pilot, AMIL keeps
   its own in-country store, fed by events or a read-only replica.

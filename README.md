@@ -55,13 +55,15 @@ with the header toggle.
 **Bank console** (http://localhost:3001): pick a staff member. For a filled dashboard, first run
 `pnpm --filter @amil/api demo:traffic` (30 days of synthetic checks).
 
-- **Product manager**: Rule packs → Card closure (conventional) → set `programmePointValueQar` to
-  `0.0125` → review → save. Khalid's next card closure says QAR 525.00. Flip the pack's kill switch
-  and the demo bank shows its own flow with no insight.
+- **Product manager → Compliance officer**: Rule packs → Card closure (conventional) → set
+  `programmePointValueQar` to `0.0125` → review → propose; sign in as compliance and approve it.
+  Khalid's next card closure says QAR 525.00. Turn the pack's kill switch off (with a reason) and
+  the demo bank shows its own flow with no insight; only compliance can turn it back on.
 - **Product → Compliance → Sharia reviewer**: Templates → edit Islamic copy → save draft → submit;
   sign in as compliance to approve, then as the Sharia reviewer to give the final approval.
 - **Compliance officer**: Complaints lookup → `DDB-C-0001` (Khalid): every insight he saw, its
   figures and sources, and what he chose. Audit → search, verify the hash chain, export CSV/JSON.
+- **Platform admin**: Staff: add people, change roles, deactivate (never your own access).
 - **Anyone**: Compliance pack (model card, data flow, fields read, live redaction proof).
 
 Without `ANTHROPIC_API_KEY` the model gateway uses an offline mock that serves the bank-approved
@@ -89,6 +91,7 @@ wording, so everything works with no network.
 - `docs/DEMO_SCRIPT.md`: the 7-minute bank demo
 - `docs/INTEGRATION_GUIDE.md`: for a bank's app team (sessions, checks, widget, events)
 - `docs/SECURITY.md`: controls, where they live, and how they are tested
-- `infra/terraform`: single-tenant, in-country deployment skeleton
+- `docs/DEPLOYMENT.md`: deploying a pilot bank on Azure Qatar Central (Terraform in
+  `infra/terraform`, deploy workflow, Okta, bootstrap)
 - `docs/phase-N-report.md`: what each phase delivered
 - `CLAUDE.md`: non-negotiables, commands and conventions for contributors

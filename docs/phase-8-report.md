@@ -135,14 +135,15 @@ Pushed to the temporary branch **`amil-ai-export`** on NEST (Phases 1–8; no sh
 NEST). Import it into `amil-ai` with
 `git fetch https://github.com/shakiljaved778-ctrl/NEST amil-ai-export && git push origin FETCH_HEAD:refs/heads/main`.
 
-## Open questions for you
+## Open questions (answered)
 
-1. **Cloud.** The Terraform skeleton uses GCP Doha. Would your first pilot bank prefer Azure
-   Qatar Central or on-premises? The modules map one to one.
-2. **mTLS** between the bank and AMIL, in addition to HMAC. Required for pilots, or optional?
-3. **Console SSO.** Which identity provider should the console expect first (Entra ID, Okta,
-   other)?
-4. **Still open from Phase 7:**
-   - who may use kill switches;
-   - whether pack parameter changes need compliance approval;
-   - how "value protected" is defined.
+All six were answered after this phase, and the answers are now built in. See
+`docs/pilot-preparation-report.md` and decisions D-073 to D-078.
+
+1. **Cloud:** Azure Qatar Central.
+2. **mTLS:** optional for pilots.
+3. **Console SSO:** Okta.
+4. **Who may use kill switches:** product, compliance or an admin can turn one off, with a
+   reason; only compliance turns it back on.
+5. **Pack parameter changes:** they need compliance approval.
+6. **"Value protected":** it counts only choices that avoid the loss.

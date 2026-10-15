@@ -729,6 +729,8 @@ reviews, not a turnkey stack.
 The cloud is the bank's choice. Any provider with an in-country region works the same way. CI
 runs `terraform fmt -check` and `terraform validate`.
 
+_Superseded by D-073 (pilot preparation): the first pilot runs on Azure Qatar Central._
+
 ## D-072: The demo from a fresh clone in three commands (Phase 8)
 
 The three commands are `git clone …`, `cd amil-ai`, `docker compose up --build`. The one-shot
@@ -747,3 +749,158 @@ After that the API, worker, demo bank and console start.
 - **CI.** A CI job runs exactly this compose stack and smoke-tests it. Container builds could not
   run in the development sandbox (package mirrors are blocked there), so CI is where the images
   are proven.
+
+## D-073: Pilots run on Azure Qatar Central, one bank per subscription (pilot preparation)
+
+The answer to the Phase 8 cloud question. `infra/terraform` now targets Azure `qatarcentral` and
+replaces the GCP skeleton. The design maps one to one:
+
+- **Region.** `location` is validated to be `qatarcentral`. PostgreSQL has no geo-redundant
+  backup, because Qatar Central has no in-country pair and backups must stay in Qatar.
+- **Network.** A VNet with subnets for Container Apps, PostgreSQL (delegated) and private
+  endpoints, plus private DNS. Nothing has a public IP; the bank's Application Gateway and WAF are
+  in front.
+- **Keys.** Key Vault Premium with RBAC, purge protection and HSM keys: the PII envelope key and
+  the PostgreSQL CMEK.
+- **Data.** PostgreSQL 16 Flexible Server (TLS 1.2+, zone-redundant HA in prod) and Azure Cache
+  for Redis (TLS only, `noeviction` for BullMQ).
+- **Services.** Container Apps in an internal environment: api, a single worker, console, and the
+  migrate and bootstrap jobs. Each workload has its own identity, scoped to the secrets it reads.
+- **Secrets.** Terraform writes only values it derives (connection strings, the break-glass admin
+  password). Everything the bank issues starts as a placeholder and is set out of band, so it
+  never enters state.
+- **Two-stage first apply** (`deploy_apps`), so no app starts before its secrets exist.
+
+The deploy workflow (`deploy-azure.yml`) is manual and gated by a GitHub environment, and signs
+in to Azure with OIDC. It builds the images, plans, migrates, then rolls out.
+
+`terraform test` checks the plan with mocked providers: residency, the two stages, private-only
+data stores and secret access. CI runs it after `fmt` and `validate`.
+
+## D-074: Pack parameter changes need compliance approval (pilot preparation)
+
+Four eyes on the numbers that drive every figure a customer sees:
+
+- **Proposing.** Product (or an admin) proposes a new version, which is `pending_approval`.
+- **Reviewing.** Compliance approves or rejects it. A rejection needs a reason.
+- **No self-approval.** Nobody approves their own proposal.
+- **One at a time.** Only one proposal per pack and variant can be pending.
+- **Effective date.** Approval makes the version active from its requested date, or from now if
+  that date has passed.
+
+Every step is in the approval log, and the console shows the diff against the active version.
+
+## D-075: Kill switches: anyone accountable can stop, only compliance restarts (pilot preparation)
+
+Stopping a harmful insight must be fast, and restarting one must be deliberate.
+
+- **Off.** Product, compliance or an admin can switch off a pack or a template. A reason is
+  required and recorded.
+- **On.** Only compliance can switch it back on.
+
+Viewers and Sharia reviewers can do neither.
+
+## D-076: "Value protected" counts only loss-avoiding choices (pilot preparation)
+
+The dashboard's estimated value protected now counts an insight's amount at stake only when the
+customer chose an option that avoids the loss. That means an option other than:
+
+- continuing (`continue_*`);
+- settling now (`settle_now`);
+- talking to someone (`talk_to_someone`).
+
+Continuing, dismissing or asking for a call are still shown, as responses and as "reconsidered".
+They are not counted as money protected. This is the conservative reading a bank's board can
+defend.
+
+## D-077: Console sign-in with Okta, roles stay in AMIL (pilot preparation)
+
+The answer to the Phase 8 SSO question.
+
+**The flow.** The console signs staff in with OpenID Connect, using the authorization code flow
+with PKCE and a confidential client (`client_secret_basic`). The ID token is verified with
+`jose`, checking:
+
+- the RS256 signature against the issuer's JWKS;
+- the issuer and audience;
+- the nonce;
+- expiry;
+- `email_verified`.
+
+**Who gets in.** Okta proves identity only. The email must belong to an active AMIL console user
+of the bank, and the role comes from AMIL, so segregation of duties stays in one audited place.
+
+**Other details.**
+
+- The sign-in method is recorded in the console activity log.
+- When Okta is configured, the demo staff picker is off.
+- A mock OIDC provider drives the end-to-end tests.
+
+## D-078: mTLS is optional for pilots (pilot preparation)
+
+The answer to the Phase 8 mTLS question: not required for pilots.
+
+**What protects calls without it:**
+
+- TLS at the bank's edge;
+- HMAC-SHA256 signatures with a timestamp window and single-use nonces (D-015, D-063);
+- key purposes (D-067);
+- private networking between the bank's gateway and AMIL.
+
+**When a bank asks for it,** its Application Gateway can require client certificates on the
+API's server-to-server listener, with no change to AMIL.
+
+## D-079: A dedicated ops image for migrations and the bootstrap (pilot preparation)
+
+The slim runtime image has no Prisma CLI, by design (D-072).
+
+The `ops` target of `apps/api/Dockerfile` is a `pnpm deploy` of `@amil/db`, with the Prisma CLI,
+its engines and `tsx`. Its default command is `prisma migrate deploy`.
+
+- **Who runs it.** It runs as the Container Apps `migrate` and `bootstrap` jobs, as the schema
+  owner. The API and worker connect as `amil_app`, which has row access and no DDL
+  (`infra/sql/amil_app_role.sql`).
+- **How it is tested.** The API's integration suites pass when connected as that role. CI builds
+  the image and runs both commands against the compose stack.
+
+## D-080: A bank tenant starts from a bootstrap, never from the seed (pilot preparation)
+
+`pnpm db:bootstrap <config.json>` (`packages/db/src/bootstrap.ts`) reads a validated bank config
+(`infra/bank-config.example.json`). It adds:
+
+- the bank, with its names, locales, brand, deep-link scheme, thresholds and model mode;
+- its console users, with at least one compliance officer;
+- the chosen packs and variants;
+- the shipped copy;
+- proactive schedules;
+- optionally, the fee schedule.
+
+It adds no customer data.
+
+**Safe by default:**
+
+- Packs are created **switched off**.
+- Copy is imported **in review**.
+
+So nothing reaches a customer until the bank has proposed and approved its own terms, approved
+the copy (with Sharia approval for Islamic copy) and compliance has switched each pack on.
+
+**Re-running is safe.** It adds only what is missing, and never changes a pack, a template, a fee
+or a role the bank has already worked on.
+
+## D-081: Admins manage console staff in the console (pilot preparation)
+
+With Okta (D-077), the AMIL staff list decides who may sign in and with which role. A pilot bank
+must be able to change it without database access, so the console has a **Staff** page.
+
+- **Who.** Admins add people (by their Okta email), change roles, and deactivate or reactivate
+  them. Compliance can see the list; other roles cannot.
+- **No self-change.** Nobody changes their own access, so an admin cannot give themselves an
+  approving role.
+- **A compliance officer always remains.** The bank always keeps at least one active compliance
+  officer, because only compliance approves parameters and copy and turns kill switches back on.
+- **Reasons and the log.** Role changes and deactivations need a reason. Every change is in the
+  approval log (`console_user.*`), so it appears in the console activity page.
+- **Immediate effect.** Deactivation and role changes apply to the user's next request, because
+  the console re-reads the user on every request.
+- **Kept, not deleted.** People are never deleted, so the logs keep their names.
