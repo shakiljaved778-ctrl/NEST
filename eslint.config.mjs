@@ -40,6 +40,7 @@ export default tseslint.config(
       "**/next-env.d.ts",
       "**/*.config.{js,mjs,cjs}",
       "**/scripts/**/*.mjs",
+      "**/e2e/**/*.mjs",
       "**/prompts.generated.ts",
       "**/knowledge.generated.ts",
     ],

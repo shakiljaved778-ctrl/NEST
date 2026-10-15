@@ -13,7 +13,11 @@ export const PackParams = z.object({
 export const IdParam = z.object({ id: z.string().min(1).max(64) });
 
 export const ConsoleSessionRequest = z
-  .object({ consoleUserId: z.string().min(1).max(64) })
+  .object({
+    consoleUserId: z.string().min(1).max(64),
+    /** How the console backend authenticated the staff member (recorded, D-077). */
+    method: z.enum(["demo", "okta"]).optional(),
+  })
   .strict();
 export const DateRangeQuery = z.object({ from: DateQ, to: DateQ }).strict();
 

@@ -17,6 +17,7 @@
     "@amil/sdk": "workspace:*",
     "@amil/ui": "workspace:*",
     "chart.js": "^4.5.1",
+    "jose": "^6.2.12",
     "lucide-react": "^1.49.0",
     "next": "~15.5.0",
     "react": "^19.1.0",

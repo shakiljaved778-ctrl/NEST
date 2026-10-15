@@ -45,5 +45,24 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },
+    // Okta sign-in (D-077): a test-only OpenID provider, and a second console configured for it.
+    {
+      command: "node e2e/mock-oidc.mjs",
+      url: "http://localhost:4100/health",
+      reuseExistingServer: !process.env.CI,
+      timeout: 30_000,
+    },
+    {
+      command: "dotenv -e ../../.env -- next start -p 3002",
+      url: "http://localhost:3002/login",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+      env: {
+        OKTA_ISSUER: "http://localhost:4100",
+        OKTA_CLIENT_ID: "amil-console-test",
+        OKTA_CLIENT_SECRET: "amil-console-test-secret",
+        CONSOLE_PUBLIC_URL: "http://localhost:3002",
+      },
+    },
   ],
 });

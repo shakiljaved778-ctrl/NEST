@@ -64,12 +64,12 @@ export function adminRoutes(app: FastifyInstance, deps: V1Deps): void {
   app.post("/v1/admin/sessions", async (req, reply) => {
     const bank = await authenticate(req, deps, null, "console");
     if (bank.kind !== "server") throw forbidden();
-    const { consoleUserId } = parseOr400(ConsoleSessionRequest, req.body);
+    const { consoleUserId, method } = parseOr400(ConsoleSessionRequest, req.body);
     const user = await deps.prisma.consoleUser.findFirst({
       where: { id: consoleUserId, bankId: bank.bankId, active: true },
     });
     if (!user) throw notFound();
-    await recordActivity(deps.prisma, user, "sign_in", {}, deps.clock());
+    await recordActivity(deps.prisma, user, "sign_in", { method: method ?? "demo" }, deps.clock());
     const role = user.role;
     const { token, expiresAt } = await mintConsoleToken(
       deps.sessionSecret,

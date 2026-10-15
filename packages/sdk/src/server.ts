@@ -84,9 +84,12 @@ export class AmilServerClient {
   }
 
   /** Mint an 8-hour console token for a staff member (console backend only). */
-  async createConsoleSession(consoleUserId: string) {
+  async createConsoleSession(consoleUserId: string, method?: "demo" | "okta") {
     return parseResponse(
-      await this.call("POST", "/v1/admin/sessions", { consoleUserId }),
+      await this.call("POST", "/v1/admin/sessions", {
+        consoleUserId,
+        ...(method ? { method } : {}),
+      }),
       ConsoleSessionResponse,
     );
   }
