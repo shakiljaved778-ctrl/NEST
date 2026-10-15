@@ -61,26 +61,31 @@ export async function listActivity(prisma: PrismaClient, bankId: string, limit =
       include: { actor: { select: { name: true, role: true } } },
     }),
   ]);
-  return [
-    ...activity.map((a) => ({
-      id: a.id,
-      kind: "activity" as const,
-      action: a.action,
-      actor: a.actor.name,
-      role: a.actor.role,
-      at: a.at.toISOString(),
-      detail: a.detail,
-    })),
-    ...changes.map((c) => ({
-      id: c.id,
-      kind: "change" as const,
-      action: `${c.entityType}.${c.action}`,
-      actor: c.actor.name,
-      role: c.actor.role,
-      at: c.at.toISOString(),
-      detail: { entityId: c.entityId, fromStatus: c.fromStatus, toStatus: c.toStatus },
-    })),
-  ]
-    .sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0))
-    .slice(0, limit);
+  return (
+    [
+      ...activity.map((a) => ({
+        id: a.id,
+        kind: "activity" as const,
+        action: a.action,
+        actor: a.actor.name,
+        role: a.actor.role,
+        at: a.at.toISOString(),
+        detail: a.detail,
+      })),
+      ...changes.map((c) => ({
+        id: c.id,
+        kind: "change" as const,
+        action: `${c.entityType}.${c.action}`,
+        actor: c.actor.name,
+        role: c.actor.role,
+        at: c.at.toISOString(),
+        detail: { entityId: c.entityId, fromStatus: c.fromStatus, toStatus: c.toStatus },
+      })),
+    ]
+      // Newest first; same-instant entries by id (cuids grow with creation time), as the queries do.
+      .sort((a, b) =>
+        a.at !== b.at ? (a.at < b.at ? 1 : -1) : a.id < b.id ? 1 : a.id > b.id ? -1 : 0,
+      )
+      .slice(0, limit)
+  );
 }

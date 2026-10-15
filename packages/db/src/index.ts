@@ -9,3 +9,4 @@ export * from "./pack-inputs";
 export * from "./bundle";
 export * from "./pii";
 export * from "./pii-rotate";
+export { consoleUserId } from "./bootstrap";

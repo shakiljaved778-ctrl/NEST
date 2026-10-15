@@ -30,5 +30,8 @@ export const ERROR_TEXT: Record<string, string> = {
   unauthorized: "Your session has ended. Sign in again.",
   reason_required: "Give a reason.",
   pending_exists: "A proposal for this pack is already waiting for compliance approval.",
+  email_exists: "This email is already on the staff list.",
+  self_change: "Ask another admin to change your own access.",
+  last_compliance: "The bank must keep at least one active compliance officer.",
 };
 export const errorText = (code: string) => ERROR_TEXT[code] ?? `Request failed (${code}).`;

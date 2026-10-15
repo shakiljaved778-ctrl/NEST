@@ -12,7 +12,8 @@
     "./adapters": "./src/adapters.ts",
     "./client": "./src/client.ts",
     "./pack-inputs": "./src/pack-inputs.ts",
-    "./pii": "./src/pii.ts"
+    "./pii": "./src/pii.ts",
+    "./bootstrap": "./src/bootstrap.ts"
   },
   "scripts": {
     "lint": "eslint .",
@@ -25,7 +26,8 @@
     "db:seed": "dotenv -e ../../.env -- tsx src/seed.ts",
     "db:reset": "dotenv -e ../../.env -- prisma migrate reset --force",
     "audit:verify": "dotenv -e ../../.env -- tsx src/scripts/verify-audit.ts",
-    "db:rotate-pii": "dotenv -e ../../.env -- tsx src/scripts/rotate-pii.ts"
+    "db:rotate-pii": "dotenv -e ../../.env -- tsx src/scripts/rotate-pii.ts",
+    "db:bootstrap": "dotenv -e ../../.env -- tsx src/scripts/bootstrap-bank.ts"
   },
   "prisma": {
     "seed": "tsx src/seed.ts"

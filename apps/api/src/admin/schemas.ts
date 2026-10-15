@@ -83,3 +83,23 @@ export const AuditExportQuery = AuditQuery.extend({ format: z.enum(["csv", "json
 export const ComplaintsQuery = z
   .object({ customerRef: z.string().min(1).max(64), from: DateQ, to: DateQ })
   .strict();
+
+const StaffRole = z.enum(["admin", "product", "compliance", "sharia", "viewer"]);
+export const StaffCreateRequest = z
+  .object({
+    email: z.email().max(254),
+    name: z.string().trim().min(1).max(120),
+    role: StaffRole,
+  })
+  .strict();
+export const StaffUpdateRequest = z
+  .object({
+    role: StaffRole.optional(),
+    active: z.boolean().optional(),
+    /** Why access changed (kept in the approval log, D-081). */
+    comment: z.string().trim().min(3).max(500),
+  })
+  .strict()
+  .refine((b) => b.role !== undefined || b.active !== undefined, {
+    message: "change the role or the active flag",
+  });

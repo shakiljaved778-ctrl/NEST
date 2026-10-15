@@ -3,10 +3,10 @@ import { type BrowserContext, expect, type Page, test } from "./fixtures";
 const BANK = "http://localhost:3000";
 const KHALID_CLOSE = `${BANK}/cards/card_khalid_platinum/close`;
 
-/** Demo sign-in: pick a staff member by role. */
+/** Demo sign-in: pick a seeded demo staff member by role. */
 async function signIn(page: Page, role: string) {
   await page.goto("/login");
-  await page.getByRole("button", { name: new RegExp(role) }).click();
+  await page.getByRole("button", { name: new RegExp(`^Demo .*${role}`) }).click();
   await page.waitForURL("http://localhost:3001/");
 }
 
@@ -181,6 +181,48 @@ test.describe.serial("Bank console (Phase 7 acceptance)", () => {
     await expect(
       page.getByTestId("pack-card.close-conventional").getByRole("switch"),
     ).toBeDisabled();
+  });
+
+  test("staff: an admin adds a person, changes their role and deactivates them (D-081)", async ({
+    page,
+  }) => {
+    const email = `e2e-${Date.now()}@ddb.example.test`;
+    const name = `E2E Temp ${Date.now()}`;
+    await signIn(page, "Platform admin");
+    await page.getByRole("link", { name: "Staff" }).click();
+    const form = page.getByTestId("add-staff");
+    await form.getByLabel("Email").fill(email);
+    await form.getByLabel("Name").fill(name);
+    await form.getByLabel("Role").selectOption("product");
+    await form.getByRole("button", { name: "Add" }).click();
+    const row = page.locator(`tr[data-email="${email}"]`);
+    await expect(row).toContainText("Product manager");
+    // Admins never change their own access.
+    await expect(page.locator('tr[data-email="admin@ddb.example.test"]')).toContainText(
+      "Your own access",
+    );
+
+    await row.getByLabel(`Role for ${name}`).selectOption("viewer");
+    page.once("dialog", (d) => void d.accept("Moved to read-only (e2e)"));
+    await row.getByRole("button", { name: "Change role" }).click();
+    await expect(row).toContainText("Viewer");
+
+    page.once("dialog", (d) => void d.accept("Left the bank (e2e)"));
+    await row.getByRole("button", { name: "Deactivate" }).click();
+    await expect(row).toContainText("deactivated");
+
+    // A deactivated person cannot sign in; the change is in the activity log.
+    await page.goto("/login");
+    await expect(page.getByRole("button", { name: new RegExp(name) })).toHaveCount(0);
+    await signIn(page, "Compliance officer");
+    await page.goto("/activity");
+    await expect(page.getByTestId("activity")).toContainText("console user.deactivated");
+    // Compliance sees who has access, but cannot change it; product does not see the page.
+    await page.goto("/staff");
+    await expect(page.getByTestId("staff")).toContainText(email);
+    await expect(page.getByTestId("add-staff")).toHaveCount(0);
+    await signIn(page, "Product manager");
+    await expect(page.getByRole("link", { name: "Staff" })).toHaveCount(0);
   });
 
   test("audit: search by customer, verify the chain, export CSV", async ({ page }) => {

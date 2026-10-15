@@ -6,6 +6,8 @@
  * - the Sharia reviewer gives the final approval for Islamic copy, and only that;
  * - admin runs the platform (proposes parameters, turns kill switches off) but approves nothing;
  * - viewer reads dashboards, rules, copy and the compliance pack.
+ * Staff access (D-081): admins add people and change roles, never their own; compliance can see
+ * who has access.
  * Kill switches stop harm, so product, compliance and admin can all turn one off (with a reason);
  * only compliance turns one back on.
  */
@@ -29,6 +31,8 @@ export const PERMISSIONS = {
   "audit:export": ["compliance"],
   "complaints:read": ["compliance"],
   "compliance:read": ["admin", "product", "compliance", "sharia", "viewer"],
+  "staff:read": ["admin", "compliance"],
+  "staff:write": ["admin"],
 } as const satisfies Record<string, readonly ConsoleRole[]>;
 export type Permission = keyof typeof PERMISSIONS;
 

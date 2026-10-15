@@ -72,7 +72,7 @@ export async function listPacks(prisma: PrismaClient, bankId: string, now: Date)
               {
                 ...(def.parameters as object),
                 ...((current?.parameters ?? {}) as object),
-              } as Record<string, unknown>,
+              },
               r.parameters as Record<string, unknown>,
             ),
           })),

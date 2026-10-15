@@ -13,6 +13,7 @@ import {
 } from "../admin/packs";
 import { permissionsOf } from "../admin/rbac";
 import { mintConsoleToken } from "../admin/session";
+import { addStaff, listStaff, updateStaff } from "../admin/staff";
 import {
   createDraft,
   getTemplate,
@@ -32,6 +33,8 @@ import {
   PackParams,
   PackReviewRequest,
   PackVersionRequest,
+  StaffCreateRequest,
+  StaffUpdateRequest,
   TemplateDraftRequest,
   TemplateListQuery,
   TemplatePreviewRequest,
@@ -87,6 +90,25 @@ export function adminRoutes(app: FastifyInstance, deps: V1Deps): void {
   app.get("/v1/admin/me", async (req) => {
     const user = await auth(req, "dashboard:read");
     return { user, permissions: permissionsOf(user.role) };
+  });
+
+  // ── Staff (D-081) ──
+  app.get("/v1/admin/staff", async (req) => {
+    const user = await auth(req, "staff:read");
+    return { staff: await listStaff(deps.prisma, user.bankId) };
+  });
+
+  app.post("/v1/admin/staff", async (req, reply) => {
+    const user = await auth(req, "staff:write");
+    const body = parseOr400(StaffCreateRequest, req.body);
+    return reply.code(201).send(await addStaff(deps.prisma, user, body, deps.clock()));
+  });
+
+  app.patch("/v1/admin/staff/:id", async (req) => {
+    const user = await auth(req, "staff:write");
+    const { id } = parseOr400(IdParam, req.params);
+    const body = parseOr400(StaffUpdateRequest, req.body);
+    return updateStaff(deps.prisma, user, id, body, deps.clock());
   });
 
   // ── Dashboard ──

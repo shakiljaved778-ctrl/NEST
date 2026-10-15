@@ -261,6 +261,27 @@ function registerConsolePaths(registry: Registry, hmacName: string, errors: Erro
   );
   route(
     "get",
+    "/v1/admin/staff",
+    "Console staff: who may sign in, with which role (active and deactivated)",
+    "staff:read",
+  );
+  route(
+    "post",
+    "/v1/admin/staff",
+    "Add a staff member (their Okta email); recorded in the approval log",
+    "staff:write",
+    body(Admin.StaffCreateRequest),
+    201,
+  );
+  route(
+    "patch",
+    "/v1/admin/staff/{id}",
+    "Change a staff member's role or deactivate them, with a reason. Never your own entry; the bank keeps at least one active compliance officer",
+    "staff:write",
+    { params: Admin.IdParam, ...body(Admin.StaffUpdateRequest) },
+  );
+  route(
+    "get",
     "/v1/admin/dashboard",
     "Insights shown, responses, reconsidered actions, value protected, validator rejections, latency",
     "dashboard:read",

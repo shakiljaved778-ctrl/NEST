@@ -621,10 +621,10 @@ describe.skipIf(!url)("Phase 7: bank console API (integration)", () => {
         paths: Record<string, Record<string, { security: Record<string, unknown>[] }>>;
       }>();
       const admin = Object.entries(doc.paths).filter(([p]) => p.startsWith("/v1/admin/"));
-      expect(admin.map(([p]) => p)).toHaveLength(20);
+      expect(admin.map(([p]) => p)).toHaveLength(22);
       const ops = admin.flatMap(([, methods]) => Object.values(methods));
-      expect(ops).toHaveLength(22);
-      expect(ops.filter((o) => "ConsoleSession" in (o.security[0] ?? {}))).toHaveLength(20);
+      expect(ops).toHaveLength(25);
+      expect(ops.filter((o) => "ConsoleSession" in (o.security[0] ?? {}))).toHaveLength(23);
     });
 
     it("records sign-ins and customer-level reads with the ref hashed; logs are append-only (D-068)", async () => {

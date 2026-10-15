@@ -217,3 +217,13 @@ export interface CompliancePack {
   retention: { auditRetentionYears: number; rule: string };
   consentPurposes: { purpose: string; use: string }[];
 }
+
+/** A console staff member (D-081). */
+export interface StaffMember {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  active: boolean;
+  createdAt: string;
+}

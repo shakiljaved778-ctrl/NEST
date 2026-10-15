@@ -1,0 +1,42 @@
+{
+  "bank": {
+    "id": "bank_example",
+    "name": "Example Bank (replace me)",
+    "nameAr": "البنك المثال",
+    "defaultLocale": "ar",
+    "supportedLocales": ["ar", "en"],
+    "brandTokens": {
+      "primary": "#0b4f6c",
+      "primaryContrast": "#ffffff",
+      "surface": "#ffffff",
+      "surfaceMuted": "#f2f6f8",
+      "text": "#14212b",
+      "textMuted": "#5b6b78",
+      "critical": "#b42318",
+      "caution": "#b54708",
+      "info": "#175cd3",
+      "radius": "12px",
+      "fontFamily": "system-ui, sans-serif"
+    },
+    "deepLinkScheme": "examplebank://",
+    "digitStyle": "latn",
+    "severityThresholds": {
+      "default": { "cautionAtQar": "50.00", "criticalAtQar": "250.00" },
+      "finance.early_settlement": { "cautionAtQar": "100.00", "criticalAtQar": "1000.00" },
+      "deposit.break": { "cautionAtQar": "100.00", "criticalAtQar": "1000.00" }
+    },
+    "modelMode": "off",
+    "currency": "QAR",
+    "auditRetentionYears": 10
+  },
+  "consoleUsers": [
+    { "email": "amil.admin@bank.example", "name": "AMIL administrator", "role": "admin" },
+    { "email": "cards.product@bank.example", "name": "Cards product owner", "role": "product" },
+    { "email": "compliance@bank.example", "name": "Compliance officer", "role": "compliance" },
+    { "email": "sharia@bank.example", "name": "Sharia reviewer", "role": "sharia" }
+  ],
+  "packs": ["card.close", "finance.early_settlement", "deposit.break", "rewards.expiry"],
+  "variants": ["conventional", "islamic"],
+  "proactiveSchedules": { "rewards.expiry": "15 6 * * *" },
+  "feeSchedule": []
+}

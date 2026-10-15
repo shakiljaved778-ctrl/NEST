@@ -29,11 +29,11 @@ export const STATUS_LABELS: Record<string, string> = {
 export const ROLE_LABELS: Record<string, { title: string; can: string }> = {
   product: {
     title: "Product manager",
-    can: "Edits pack parameters and drafts copy; uses kill switches. Cannot approve copy.",
+    can: "Proposes pack parameters and drafts copy; turns kill switches off. Approves nothing.",
   },
   compliance: {
     title: "Compliance officer",
-    can: "Approves copy, searches and exports the audit log, runs complaints lookups.",
+    can: "Approves parameters and copy, turns kill switches back on, searches and exports the audit log, runs complaints lookups.",
   },
   sharia: {
     title: "Sharia reviewer",
@@ -41,7 +41,7 @@ export const ROLE_LABELS: Record<string, { title: string; can: string }> = {
   },
   admin: {
     title: "Platform admin",
-    can: "Pack parameters, kill switches and the audit log. Approves nothing.",
+    can: "Manages staff access, proposes pack parameters, turns kill switches off, reads the audit log. Approves nothing.",
   },
   viewer: { title: "Viewer", can: "Reads dashboards, packs, copy and the compliance pack." },
 };
